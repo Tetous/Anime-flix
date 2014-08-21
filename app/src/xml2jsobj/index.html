@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>XML to JavaScript object</title>
+<style>
+body { font-family: sans-serif; font-size: 90%; color: #333; background-color: #fff; }
+#output { font-family: monospace; padding: 2px 8px; background-color: #eee; border: 1px solid #666; }
+</style>
+</head>
+<body>
+
+<h1>XML to JavaScript Object</h1>
+
+<div id="output"></div>
+
+<p>For more information, please please refer to:<br />
+<a href="http://www.sitepoint.com/xml-to-javascript-object/">How to Convert XML to a JavaScript Object</a></p>
+
+<p><a href="xml2jsobj.zip"><strong>Download xml2jsobj.zip</strong></a></p>
+
+<p>This example code was developed by <a href="http://twitter.com/craigbuckler">Craig Buckler</a> of <a href="http://optimalworks.net/">OptimalWorks.net</a> for <a href="http://sitepoint.com/">SitePoint.com</a>.</p>
+
+<p>It can be used without any restrictions but please don't expect 24/7 support! A link back to <a href="http://www.sitepoint.com/">SitePoint.com</a> is appreciated.</p>
+
+<script src="xml2jsobj.js"></script>
+<script>
+// XML file
+var url = "example.xml";
+
+// AJAX request
+var xhr = (window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject("Microsoft.XMLHTTP"));
+xhr.onreadystatechange = XHRhandler;
+xhr.open("GET", url, true);
+xhr.send(null);
+
+// handle response
+function XHRhandler() {
+
+	if (xhr.readyState == 4) {
+	
+		var obj = XML2jsobj(xhr.responseXML.documentElement);
+		
+		Display(obj);
+		xhr = null;
+	
+	}
+
+}
+
+// display tweets
+function Display(data) {
+	
+	var output = document.getElementById("output");
+	Show("Data from URL: "+url);
+	
+	if (data && data.status) {
+		if (data.status.length) {
+			// multiple statuses
+			for (var i=0, sl=data.status.length; i < sl; i++) {
+				Show(data.status[i]);
+			}
+		}
+		else {
+			// single status
+			Show(data.status);
+		}
+	}
+	
+	// display item
+	function Show(status) {
+		if (typeof status != "string") {
+			status = status.id + ": " + status.text + " [" + status.created_at + "]";
+		}
+		var p = document.createElement("p");
+		p.appendChild(document.createTextNode(status));
+		output.appendChild(p);
+	}
+	
+}
+
+</script>
+
+</body>
+</html>
