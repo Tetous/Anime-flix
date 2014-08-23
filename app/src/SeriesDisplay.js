@@ -80,6 +80,7 @@ define(function (require, exports, module) {
             series = ser;
             image.setContent(ser.listData.series_image);
             title.setContent(ser.listData.series_title);
+            description.setContent(ser.searchData.synopsis);
             while (episodeDropdown.options.length > 0) {
                 episodeDropdown.options.remove(0);
             }

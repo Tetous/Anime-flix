@@ -17,7 +17,8 @@ define(function(require, exports, module) {
 	var Lightbox=require('famous/views/Lightbox');
 	var IconView=require('NillaIconView');
 	var Icon=require('NillaIcon');
-	var SeriesDisplay=require('SeriesDisplay');
+	var SeriesDisplay = require('SeriesDisplay');
+	var SearchView = require('SearchView');
 
 	require('xml2jsobj/xml2jsobj');
 
@@ -126,6 +127,7 @@ define(function(require, exports, module) {
 		var buttonView=new View();
 		buttonView.add(searchButton);
 		buttons.push(buttonView);
+		searchButton.on('click',function(){lightbox.show(searchView);});
 
 	    //Series Display
 		var seriesDisplayTransform = new StateModifier({
@@ -159,8 +161,67 @@ define(function(require, exports, module) {
 			outTransition: { duration: 500, curve: Easing.easeOut }
 		});
 
+		function searchShowWithID(title,id)
+		{
+		    var request = new XMLHttpRequest();
+		    request.open("GET", 'http://www.learnfamo.us/chard/requester.php?m=search&u=' + window.MALCreds.username + '&p=' + window.MALCreds.password + '&s=' + title,false);
+		    request.send();
+		    parser = new DOMParser();
+		    var domObj = parser.parseFromString(request.response, "text/xml");
+		    var obj = XML2jsobj(domObj).anime;
+		    if (obj.entry.length==undefined)
+		    {
+		        return obj.entry;
+		    }
+		    else
+		    {
+		        for (var i = 0; i < obj.entry.length; i++)
+		        {
+		            if (obj.entry[i].id == id)
+		            {
+		                return obj.entry[i];
+		            }
+		        }
+		    }
+		}
+
+		function createBlankListData()
+		{
+		    var date=new Date();
+		    return {
+		        series_animedb_id: 0,
+		        series_title: "",
+		        series_type: 1,
+		        series_episodes: 0,
+		        series_status: 0,
+		        series_start: '0000-00-00',
+		        series_end:'0000-00-00',
+		        my_id: 0,
+		        my_watched_episodes: 0,
+		        my_start_date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
+		        my_finish_date: '000-00-00',
+		        my_score: 0,
+		        my_status: 1,
+		        my_rewatching: 0,
+		        my_rewatching_ep: 0,
+		        my_last_updated: 0
+		    };
+		}
+		function createListDataFromSearchData(data)
+		{
+		    var baseData = createBlankListData();
+		    baseData.series_animedb_id = data.id;
+		    baseData.series_title = data.title;
+		    baseData.series_image = data.image;
+		    baseData.series_start = data.start_date;
+		    baseData.series_end = data.end_date;
+		    baseData.series_episodes = data.episodes;
+		    baseData.series_synonyms = data.synonyms + '; ' + data.english;
+		    return baseData;
+		}
+
 		function showSelectedPassThrough(data) {
-		    var series = { listData: data };
+		    var series = { listData: data, searchData: searchShowWithID(data.series_title, data.series_animedb_id) };
 		    seriesDisplay.setSeries(series);
 		    seriesDisplay.show();
 			//view._eventOutput.emit('showSelected',data);
@@ -176,6 +237,27 @@ define(function(require, exports, module) {
 		droppedIconView.on('iconClick', showSelectedPassThrough);
 		var planToWatchIconView=IconView();
 		planToWatchIconView.on('iconClick', showSelectedPassThrough);
+		var searchView = SearchView();
+		searchView.on('searchSeriesSelected', function (data)
+		{
+		    var listData;
+		    var bail = false;
+		    for (var i = 0; i < malList.anime.length&&!bail; i++)
+		    {
+		        if (data.id == malList.anime[i].series_animedb_id)
+		        {
+		            listData = malList.anime[i];
+		            bail = true;
+		        }
+		    }
+		    if (listData==undefined)
+		    {
+		        listData=createListDataFromSearchData(data);
+		    }
+		    var series = { listData: listData, searchData: data };
+		    seriesDisplay.setSeries(series);
+		    seriesDisplay.show();
+		});
 
 		layout.content.add(lightboxTransform).add(lightbox);
 

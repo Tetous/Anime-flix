@@ -208,7 +208,7 @@ define(function(require, exports, module) {
 			var done=false;
 
 			var titles;
-			if(show.series_synonyms instanceof String)
+			if(show.series_synonyms != undefined)
 			{
 				titles=show.series_synonyms.split('; ');
 			}

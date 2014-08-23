@@ -36,7 +36,8 @@ switch ($_GET["m"])
     case 'search':
         $out=getSearch($_GET['s'],$_GET['u'],$_GET['p']);
         header('Content-Length: '.strlen($out));
-        echo $out;
+        header('Content-type: text/xml');
+        echo str_replace('utf-8','UTF-8',$out);
         break;
 	
 	default:
@@ -44,21 +45,37 @@ switch ($_GET["m"])
 		break;
 }
 
-function search($searchItem,$username,$password)
+function getSearch($searchItem,$username,$password)
 {
     global $ch;
     
     $replacedItem=str_replace(' ','+',$searchItem);
         $ch=curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
         curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
         curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/anime/search.xml?q='.$replacedItem);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
         $output=curl_exec($ch);
-        return $output;
+        // close curl resource to free up system resources 
+        curl_close($ch);
+    return $output;
 }
 
+function processTitle($title)
+{
+    switch($title)
+    {
+        case 'High School DxD New':
+            return 'Highschool DxD New';
+            break;
+        default:
+            return $title;
+            break;
+    }
+}
 function getStreamUrl($paramShowUrl,$title,$episode)
 {
-
+$title=processTitle($title);
   $baseShowUrl=$paramShowUrl.'?page=';
     global $ch;
       $ch=curl_init();

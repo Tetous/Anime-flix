@@ -28,10 +28,14 @@ function XML2jsobj(node) {
 		}
 	};
 	
-	// element attributes
+    // element attributes
 	var c, cn;
-	for (c = 0; cn = node.attributes[c]; c++) {
-		Add(cn.name, cn.value);
+	if (node.attributes != undefined)
+	{
+	    for (c = 0; cn = node.attributes[c]; c++)
+	    {
+	        Add(cn.name, cn.value);
+	    }
 	}
 	
 	// child elements
