@@ -66,7 +66,15 @@ define(function (require, exports, module)
 		    var iconHeight = iconWidth * 1.555;
 		    var imagesPerRow = Math.floor((windowSize[0] - minIconBufferX) / (iconWidth + minIconBufferX));
 
-		    var iconBufferX = (windowSize[0]-(minIconBufferX + (minIconBufferX + iconWidth) * imagesPerRow))/(imagesPerRow+1)+minIconBufferX;
+		    var iconBufferX=0;
+		    if (imagesPerRow <= iconStateMods.length)
+		    {
+		        iconBufferX = (windowSize[0] - (minIconBufferX + (minIconBufferX + iconWidth) * imagesPerRow)) / (imagesPerRow + 1) + minIconBufferX;
+		    }
+		    else
+		    {
+		        iconBufferX = minIconBufferX + (iconWidth + minIconBufferX) / (iconStateMods.length+1);
+		    }
 
 		    iconView.setOptions({ size: [undefined, 100 + Math.floor(iconStateMods.length / imagesPerRow + 0.95) * (iconHeight + 100)] });
 

@@ -62,14 +62,14 @@ define(function(require, exports, module) {
 		});
 		var transitionScreen=new Surface({
 			properties:{
-				backgroundColor:'#00fff8',
+			    backgroundColor: '#4494FD',//'#00fff8',
 				textAlign:'center',
 				lineHeight:window.mainContext.getSize()[1]+'px',
 				verticalAlign:'middle'
 			}
 		});
 		playerSurface.on('playerLoaded',function(){
-			playerSurface.player.poster('/content/images/AnimeflixLogin2.png');
+			playerSurface.player.poster('/content/images/AnimeflixLogo.png');
 			playerSurface.player.on('ended',function(){
 				transitionScreen.setContent('10');
 				show(transitionScreenTransform);

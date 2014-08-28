@@ -8,41 +8,67 @@ $ch;
 switch ($_GET["m"])
 {
 	case 'login':
-    $out=checkLogin($_GET["u"],$_GET["p"]);
-    header('Content-Length: '.strlen($out));
+        $out=checkLogin($_GET["u"],$_GET["p"]);
+        header('Content-Length: '.strlen($out));
 		echo $out;
 		break;
 	case 'list':
-    $out=getMALList($_GET['u']);
-    header('Content-Length: '.strlen($out));
-    header('Content-type: text/xml');
-    echo $out;
+        $out=getMALList($_GET['u']);
+        header('Content-Length: '.strlen($out));
+        header('Content-type: text/xml');
+        echo $out;
 		break;
 	case 'ledger':
-     $out=getAnimePlusList();
-     header('Content-Length: '.strlen($out));
-     echo $out;
+        $out=getAnimePlusList();
+        header('Content-Length: '.strlen($out));
+        echo $out;
 		break;
     case 'alts':
-     $out=getAlternateTitles(file_get_contents('php://input'));
-     header('Content-Length: '.strlen($out));
-     echo $out;
+        $out=getAlternateTitles(file_get_contents('php://input'));
+        header('Content-Length: '.strlen($out));
+        echo $out;
         break;
     case 'stream':
-     $out=getStreamUrl(file_get_contents('php://input'),$_GET['t'],$_GET['e']);
-     header('Content-Length: '.strlen($out));
-     echo $out;
-     break;
+        $out=getStreamUrl(file_get_contents('php://input'),$_GET['t'],$_GET['e']);
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
     case 'search':
         $out=getSearch($_GET['s'],$_GET['u'],$_GET['p']);
         header('Content-Length: '.strlen($out));
         header('Content-type: text/xml');
         echo str_replace('utf-8','UTF-8',$out);
         break;
-	
+	case 'update':
+        $out=changeListItem('update',file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
+    case 'add':
+        $out=changeListItem('add',file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
 	default:
 		# code...
 		break;
+}
+
+function changeListItem($method,$xml,$id,$username,$password)
+{
+    global $ch;
+    
+        $ch=curl_init();
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/'.$method.'/'.$id.'.xml');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        $output=curl_exec($ch);
+        // close curl resource to free up system resources 
+        curl_close($ch);
+    return $output;
 }
 
 function getSearch($searchItem,$username,$password)

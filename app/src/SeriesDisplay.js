@@ -10,9 +10,15 @@ define(function (require, exports, module) {
     var StateModifier = require('famous/modifiers/StateModifier');
     var Surface = require('famous/core/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
+    var ContainerSurface=require('famous/surfaces/ContainerSurface');
+    var Scrollview = require('famous/views/Scrollview');
+
+    require('MALSupportFunctions');
 
     function createSeriesDisplay() {
         var series;
+
+        var transforms = [];
         var view = new View();
 
         var backgroundWidth=1000;
@@ -25,29 +31,47 @@ define(function (require, exports, module) {
                 borderRadius: '10px'
             }
         });
+        transforms.push(backgroundTransform);
         view.add(backgroundTransform).add(background);
 
         var imageTransform = new StateModifier();
         var image = new ImageSurface({
             size: [150,233]
         });
+        transforms.push(imageTransform);
         view.add(imageTransform).add(image);
 
         var titleTransform = new StateModifier();
         var title = new Surface({
             size: [true, true]
         });
+        transforms.push(titleTransform);
         view.add(titleTransform).add(title);
 
         var descriptionTransform = new StateModifier();
-        var description = new Surface({
+        var descriptionContainer = new ContainerSurface({
             size: [750, 250],
             properties: {
                 backgroundColor: 'white',
-                borderRadius: '5px'
+                borderRadius: '5px',
+                overflow: 'hidden'
             }
         });
-        view.add(descriptionTransform).add(description);
+        var descriptionScroll = new Scrollview({
+            direction: 1,
+            friction: 1,
+            drag: 1,
+            speedLimit: 1
+        });
+
+        descriptionContainer.pipe(descriptionScroll);
+        var description = new Surface({
+            size:[undefined,true]
+        });
+        descriptionScroll.sequenceFrom([description]);
+        descriptionContainer.add(descriptionScroll);
+        transforms.push(descriptionTransform);
+        view.add(descriptionTransform).add(descriptionContainer);
 
         var episodeDropdown = document.createElement('SELECT');
         var episodeDropdownTransform = new StateModifier();
@@ -55,6 +79,7 @@ define(function (require, exports, module) {
             size:[true,true],
             content:episodeDropdown
         });
+        transforms.push(episodeDropdownTransform);
         view.add(episodeDropdownTransform).add(episodeDropdownSurface);
 
         var playButtonTransform = new StateModifier();
@@ -74,7 +99,51 @@ define(function (require, exports, module) {
             view._eventOutput.emit('showSelected', { show: series.listData, episode: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
             view.hide();
         });
+        transforms.push(playButtonTransform);
         view.add(playButtonTransform).add(playButton);
+
+        var updateButtonTransform = new StateModifier();
+        var updateButton = new Surface({
+            size: [100, 50],
+            content: 'Update',
+            properties: {
+                //fontSize: fontSize + 'px',
+                textAlign: 'center',
+                lineHeight: 50 + 'px',
+                verticalAlign: 'middle',
+                backgroundColor: '#00fff8',
+                borderRadius: 25 + 'px'
+            }
+        });
+        updateButton.on('click', function ()
+        {
+            series.listData.my_watched_episodes = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) - 1;
+
+            updateAnime(series.listData);
+        });
+        transforms.push(updateButtonTransform);
+        view.add(updateButtonTransform).add(updateButton);
+
+        var closeButtonTransform = new StateModifier({
+        });
+        var closeButton = new Surface({
+            size: [30,30],
+            content: 'X',
+            properties: {
+                //fontSize: fontSize + 'px',
+                textAlign: 'center',
+                lineHeight: 30 + 'px',
+                verticalAlign: 'middle',
+                //backgroundColor: '#00fff8',
+                //borderRadius: 25 + 'px'
+            }
+        });
+        closeButton.on('click', function ()
+        {
+            view.hide();
+        });
+        transforms.push(closeButtonTransform);
+        view.add(closeButtonTransform).add(closeButton);
        
         view.setSeries = function (ser) {
             series = ser;
@@ -103,6 +172,8 @@ define(function (require, exports, module) {
             descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 75, 1), { duration: 1000, curve: Easing.outCubic });
             episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
             playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 270, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
+            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 430, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
+            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0]+backgroundWidth-30,backgroundPos[1], 2), { duration: 1000, curve: Easing.outCubic });
         }
 
         function getRandomPos() {
@@ -139,19 +210,11 @@ define(function (require, exports, module) {
             initialPositions(1000);
         }
         function initialPositions(duration) {
-            var backgroundPos = getRandomPos();
-            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0), { duration: duration, curve: Easing.outCubic });
-            var imagePos = getRandomPos();
-            imageTransform.setTransform(Transform.translate(imagePos[0], imagePos[1], 2), { duration: duration, curve: Easing.outCubic });
-            var titlePos = getRandomPos();
-            titleTransform.setTransform(Transform.translate(titlePos[0], titlePos[1], 1), { duration: duration, curve: Easing.outCubic });
-            var descriptionPos = getRandomPos();
-            descriptionTransform.setTransform(Transform.translate(descriptionPos[0], descriptionPos[1], 1), { duration: duration, curve: Easing.outCubic });
-            var episodeDropdownPos = getRandomPos();
-            episodeDropdownTransform.setTransform(Transform.translate(episodeDropdownPos[0], episodeDropdownPos[1], 1), { duration: duration, curve: Easing.outCubic });
-            var playButtonPos = getRandomPos();
-            playButtonTransform.setTransform(Transform.translate(playButtonPos[0], playButtonPos[1], 1), { duration: duration, curve: Easing.outCubic });
-
+            for (var i = 0; i < transforms.length; i++)
+            {
+                var pos = getRandomPos();
+                transforms[i].setTransform(Transform.translate(pos[0], pos[1], 1), { duration: duration, curve: Easing.outCubic });
+            }
         }
 
         initialPositions(0);
