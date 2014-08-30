@@ -56,15 +56,17 @@ switch ($_GET["m"])
 
 function changeListItem($method,$xml,$id,$username,$password)
 {
+    //echo($xml);
+
     global $ch;
     
         $ch=curl_init();
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, 'POST');
+        curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
-        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/'.$method.'/'.$id.'.xml');
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/'.$method.'/'.$id.'.xml?data="'.$xml.'"');
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $xml);
+        //curl_setopt($ch, CURLOPT_POSTFIELDS, array('data'=>$xml));//'data='.$xml);
         $output=curl_exec($ch);
         // close curl resource to free up system resources 
         curl_close($ch);
