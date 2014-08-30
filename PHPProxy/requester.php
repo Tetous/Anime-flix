@@ -68,6 +68,9 @@ function processTitle($title)
         case 'High School DxD New':
             return 'Highschool DxD New';
             break;
+        case 'Highschool of the Dead: Drifters of the Dead':
+            return 'Highschool of the Dead OVA';
+            break;
         default:
             return $title;
             break;
