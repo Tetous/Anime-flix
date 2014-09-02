@@ -37,8 +37,8 @@ define(function(require, exports, module) {
         	transform:Transform.translate(0,0,1)
         })
 		var backToBrowsingButton=new ImageSurface({
-			size:[100,100],
-			content:'/content/images/AnimeflixBack.png',
+			size:[75,75],
+			content:'/content/images/AnimeflixBack2.png',
 		});
 		backToBrowsingButton.on('mouseover',function(){
 			backToBrowsingButtonModifier.setOpacity(0.8,{duration:1000,curve: Easing.outCubic});
