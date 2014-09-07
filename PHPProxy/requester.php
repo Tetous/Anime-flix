@@ -57,7 +57,39 @@ switch ($_GET["m"])
 		break;
 }
 
-function changeListItem($method,$xml,$id,$username,$password)
+function MALLogin($ch,$username,$password)
+{
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/login.php');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'username='.$username.'&password='.$password.'&sublogin=+Login+'); 
+        curl_setopt ($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+        
+        curl_exec($ch);
+}
+
+function changeListItem($method,$body,$id,$username,$password)
+{
+    global $ch;
+    
+        $ch=curl_init();
+        
+        MALLogin($ch,$username,$password);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/editlist.php?type=anime&id='.$id);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body); 
+        $output=curl_exec($ch);
+        
+        // close curl resource to free up system resources 
+        curl_close($ch);
+    return $output;
+}
+
+function changeListItemOfficial($method,$xml,$id,$username,$password)
 {
     //echo($xml);
 
