@@ -3,7 +3,9 @@
  * Copyright: Copyright 2014 Richard Kopelow
  */
 
-define(function (require, exports, module) {
+define(function (require, exports, module)
+{
+    var Engine = require('famous/core/Engine');
     var View = require('famous/core/View');
     var Easing = require('famous/transitions/Easing');
     var Transform = require('famous/core/Transform');
@@ -15,7 +17,10 @@ define(function (require, exports, module) {
 
     require('MALSupportFunctions');
 
-    function createSeriesDisplay() {
+    function createSeriesDisplay()
+    {
+        var opened=false;
+
         var series;
 
         var transforms = [];
@@ -150,6 +155,13 @@ define(function (require, exports, module) {
             image.setContent(ser.listData.series_image);
             title.setContent(ser.listData.series_title);
             description.setContent(ser.searchData.synopsis);
+            Engine.nextTick(function ()
+            {
+                description.setOptions({
+                    size: [undefined, description._currTarget.clientHeight]
+                });
+            });
+
             while (episodeDropdown.options.length > 0) {
                 episodeDropdown.options.remove(0);
             }
@@ -173,7 +185,8 @@ define(function (require, exports, module) {
             episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
             playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 270, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
             updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 430, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
-            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0]+backgroundWidth-30,backgroundPos[1], 2), { duration: 1000, curve: Easing.outCubic });
+            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + backgroundWidth - 30, backgroundPos[1], 2), { duration: 1000, curve: Easing.outCubic });
+            opened = true;
         }
 
         function getRandomPos() {
@@ -208,6 +221,7 @@ define(function (require, exports, module) {
 
         view.hide = function () {
             initialPositions(1000);
+            opened = false;
         }
         function initialPositions(duration) {
             for (var i = 0; i < transforms.length; i++)
@@ -216,6 +230,18 @@ define(function (require, exports, module) {
                 transforms[i].setTransform(Transform.translate(pos[0], pos[1], 1), { duration: duration, curve: Easing.outCubic });
             }
         }
+
+        view.updatePosition = function ()
+        {
+            if(opened)
+            {
+                view.show();
+            }
+            else
+            {
+                initialPositions(0);
+            }
+        };
 
         initialPositions(0);
 

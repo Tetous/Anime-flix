@@ -49,6 +49,9 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
+    case 'tt':
+        echo (file_get_contents('php://input'));
+        break;
 	default:
 		# code...
 		break;
@@ -61,13 +64,36 @@ function changeListItem($method,$xml,$id,$username,$password)
     global $ch;
     
         $ch=curl_init();
+        
+        
+        /*
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://learnfamo.us/chard/requester.php?m=tt');
+        //curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'data='.urlencode($xml));//'data='.urlencode($xml));
+        //curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/plain')); 
+        $output=curl_exec($ch);
+*/        
+        
+        //curl_reset($ch);
+        //curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
-        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/'.$method.'/'.$id.'.xml?data="'.$xml.'"');
-        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
-        //curl_setopt($ch, CURLOPT_POSTFIELDS, array('data'=>$xml));//'data='.$xml);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/'.$method.'/'.$id.'.xml');//?data="'.$xml.'"');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: text/plain'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'data="'.urlencode($xml).'"'); 
         $output=curl_exec($ch);
+        
+        //echo('data='.urlencode($xml));
+        //echo('\n');
+        
+        echo(curl_getinfo($ch,CURLINFO_HEADER_OUT));
+        
         // close curl resource to free up system resources 
         curl_close($ch);
     return $output;
@@ -79,7 +105,7 @@ function getSearch($searchItem,$username,$password)
     
     $replacedItem=str_replace(' ','+',$searchItem);
         $ch=curl_init();
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
         curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/anime/search.xml?q='.$replacedItem);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));

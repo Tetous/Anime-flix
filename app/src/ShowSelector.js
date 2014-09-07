@@ -3,7 +3,9 @@
  * Copyright: Copyright 2014 Richard Kopelow
  */
 
-define(function(require, exports, module) {
+define(function (require, exports, module)
+{
+    var Engine = require('famous/core/Engine');
 	var View = require('famous/core/View');
 	var Easing = require('famous/transitions/Easing');
 	var Transform = require('famous/core/Transform');
@@ -226,6 +228,11 @@ define(function(require, exports, module) {
 		    seriesDisplay.show();
 			//view._eventOutput.emit('showSelected',data);
 		}
+
+		Engine.on('resize', function ()
+		{
+		    seriesDisplay.updatePosition();
+		});
 
 		var watchingIconView=IconView();
 		watchingIconView.on('iconClick',showSelectedPassThrough);
