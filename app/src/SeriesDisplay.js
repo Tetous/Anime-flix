@@ -53,6 +53,20 @@ define(function (require, exports, module)
         transforms.push(titleTransform);
         view.add(titleTransform).add(title);
 
+        var typeTransform = new StateModifier();
+        var type = new Surface({
+            size: [true, true]
+        });
+        transforms.push(typeTransform);
+        view.add(typeTransform).add(type);
+
+        var airedTransform = new StateModifier();
+        var aired = new Surface({
+            size: [true, true]
+        });
+        transforms.push(airedTransform);
+        view.add(airedTransform).add(aired);
+
         var descriptionTransform = new StateModifier();
         var descriptionContainer = new ContainerSurface({
             size: [750, 250],
@@ -77,6 +91,75 @@ define(function (require, exports, module)
         descriptionContainer.add(descriptionScroll);
         transforms.push(descriptionTransform);
         view.add(descriptionTransform).add(descriptionContainer);
+
+        var myStatusLabelTransform = new StateModifier();
+        var myStatusLabel = new Surface({
+            size:[true,true],
+            content:'My Status:'
+        });
+        transforms.push(myStatusLabelTransform);
+        view.add(myStatusLabelTransform).add(myStatusLabel);
+
+        var myStatus = document.createElement('SELECT');
+        var watchingOption = new Option('Watching', 1);
+        myStatus.options.add(watchingOption);
+        var completedOption = new Option('Completed', 2);
+        myStatus.options.add(completedOption);
+        var onHoldOption = new Option('On-Hold', 3);
+        myStatus.options.add(onHoldOption);
+        var droppedOption = new Option('Dropped', 4);
+        myStatus.options.add(droppedOption);
+        var planToWatchOption = new Option('Plan to Watch', 6);
+        myStatus.options.add(planToWatchOption);
+        var myStatusTransform = new StateModifier();
+        var myStatusSurface = new Surface({
+            size:[true,true],
+            content:myStatus
+        });
+        transforms.push(myStatusTransform);
+        view.add(myStatusTransform).add(myStatusSurface);
+
+        var scoreLabelTransform = new StateModifier();
+        var scoreLabel = new Surface({
+            size:[true,true],
+            content:'Score:'
+        });
+        transforms.push(scoreLabelTransform);
+        view.add(scoreLabelTransform).add(scoreLabel);
+
+        var score = document.createElement('SELECT');
+        score.options.add(new Option((10).toString()));
+        score.options.add(new Option((9).toString()));
+        score.options.add(new Option((8).toString()));
+        score.options.add(new Option((7).toString()));
+        score.options.add(new Option((6).toString()));
+        score.options.add(new Option((5).toString()));
+        score.options.add(new Option((4).toString()));
+        score.options.add(new Option((3).toString()));
+        score.options.add(new Option((2).toString()));
+        score.options.add(new Option((1).toString()));
+        var scoreTransform = new StateModifier();
+        var scoreSurface = new Surface({
+            size:[true,true],
+            content: score
+        });
+        transforms.push(scoreTransform);
+        view.add(scoreTransform).add(scoreSurface);
+
+        var statusTransform = new StateModifier();
+        var status = new Surface({
+            size: [150, true]
+        });
+        transforms.push(statusTransform);
+        view.add(statusTransform).add(status);
+
+        var episodeLabelTransform = new StateModifier();
+        var episodeLabel = new Surface({
+            size:[true,true],
+            content:'Episode:'
+        });
+        transforms.push(episodeLabelTransform);
+        view.add(episodeLabelTransform).add(episodeLabel);
 
         var episodeDropdown = document.createElement('SELECT');
         var episodeDropdownTransform = new StateModifier();
@@ -122,7 +205,23 @@ define(function (require, exports, module)
         });
         updateButton.on('click', function ()
         {
-            series.listData.my_watched_episodes = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) - 1;
+            if (episodeDropdown.options[episodeDropdown.options.selectedIndex] != undefined)
+            {
+                series.listData.my_watched_episodes = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) - 1;
+            }
+            else
+            {
+                series.listData.my_watched_episodes = 0;
+            }
+            if (score.options.selectedIndex > -1)
+            {
+                series.listData.my_score = 10 - score.options.selectedIndex;
+            }
+            else
+            {
+                series.listData.my_score = 0;
+            }
+            series.listData.my_status = myStatus.options[myStatus.selectedIndex].value;
 
             updateAnime(series.listData);
         });
@@ -154,6 +253,16 @@ define(function (require, exports, module)
             series = ser;
             image.setContent(ser.listData.series_image);
             title.setContent(ser.listData.series_title);
+            type.setContent(ser.searchData.type);
+            aired.setContent(ser.searchData.start_date + " to " + ser.searchData.end_date);
+            var myStatusIndex = ser.listData.my_status;
+            if (myStatusIndex>5)
+            {
+                myStatusIndex = 5;
+            }
+            myStatus.options.selectedIndex = myStatusIndex-1;
+            score.options.selectedIndex = 10 - ser.listData.my_score;
+            status.setContent('Status: '+ser.searchData.status);
             description.setContent(ser.searchData.synopsis);
             Engine.nextTick(function ()
             {
@@ -180,11 +289,19 @@ define(function (require, exports, module)
             var backgroundPos=[(windowSize[0] - backgroundWidth) / 2, (windowSize[1] - backgroundHeight) / 2];
             backgroundTransform.setTransform(Transform.translate(backgroundPos[0],backgroundPos[1], 0), { duration: 1000, curve: Easing.outCubic });
             imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), { duration: 1000, curve: Easing.outCubic });
-            titleTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 10, 1), { duration: 1000, curve: Easing.outCubic });
-            descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 75, 1), { duration: 1000, curve: Easing.outCubic });
-            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 170, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
-            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 270, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
-            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 430, backgroundPos[1] + 360, 1), { duration: 1000, curve: Easing.outCubic });
+            titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1), { duration: 1000, curve: Easing.outCubic });
+            typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), { duration: 1000, curve: Easing.outCubic });
+            airedTransform.setTransform(Transform.translate(backgroundPos[0] + 260, backgroundPos[1] + 35, 1), { duration: 1000, curve: Easing.outCubic });
+            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 260, 1), { duration: 1000, curve: Easing.outCubic });
+            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + 260, 1), { duration: 1000, curve: Easing.outCubic });
+            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), { duration: 1000, curve: Easing.outCubic });
+            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), { duration: 1000, curve: Easing.outCubic });
+            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), { duration: 1000, curve: Easing.outCubic });
+            descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), { duration: 1000, curve: Easing.outCubic });
+            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), { duration: 1000, curve: Easing.outCubic });
+            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), { duration: 1000, curve: Easing.outCubic });
+            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 390, 1), { duration: 1000, curve: Easing.outCubic });
+            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 370, backgroundPos[1] + 390, 1), { duration: 1000, curve: Easing.outCubic });
             closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + backgroundWidth - 30, backgroundPos[1], 2), { duration: 1000, curve: Easing.outCubic });
             opened = true;
         }

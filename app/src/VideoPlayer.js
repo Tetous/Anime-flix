@@ -11,13 +11,15 @@ define(function(require, exports, module) {
     var ImageSurface=require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
-	var VideoJsSurface=require('VideoJsSurface/VideoJsSurface');
+    var VideoJsSurface = require('VideoJsSurface/VideoJsSurface');
+
+    require('MALSupportFunctions');
 
 	function createVideoPlayer()
 	{
 		var focusedTransform;
 		var countdown;
-		var playData={};
+		var playData={show:undefined,episode:undefined};
 		var videoPlayerNode=new View();
 
 
@@ -25,12 +27,12 @@ define(function(require, exports, module) {
 		focusedTransform=playerTransform;
 		var playerSurface=VideoJsSurface({},
         { 
-            width:"100%",
-            height:"100%",
+            width:'100%',
+            height:'100%',
             controls : true,
             autoplay : false,
-            preload : "auto",
-            //poster : "http://video-js.zencoder.com/oceans-clip.png"
+            preload : 'auto',
+            poster: '/content/images/AnimeflixLogo.png'
         });
         var backToBrowsingButtonModifier=new StateModifier({
         	opacity:0,
@@ -69,10 +71,17 @@ define(function(require, exports, module) {
 			}
 		});
 		playerSurface.on('playerLoaded',function(){
-			playerSurface.player.poster('/content/images/AnimeflixLogo.png');
 			playerSurface.player.on('ended',function(){
 				transitionScreen.setContent('10');
 				show(transitionScreenTransform);
+
+			    //update anime list
+				if (playData.episode > playData.show.my_watched_episodes)
+				{
+				    playData.show.my_watched_episodes = playData.episode;
+				}
+				updateAnime(playData.show);
+
 				startTimer();
 			});
 			videoPlayerNode._eventOutput.emit('playerLoaded');
@@ -159,6 +168,7 @@ define(function(require, exports, module) {
 			trans.setAlign([1,0]);
 			trans.setAlign([0,0],{duration:duration,curve:curve},function(){focusedTransform=trans; if(callback!=undefined){callback();}});
 		}
+
 		function startTimer()
 		{
 			countdown=10;

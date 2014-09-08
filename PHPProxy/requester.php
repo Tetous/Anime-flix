@@ -40,12 +40,12 @@ switch ($_GET["m"])
         echo str_replace('utf-8','UTF-8',$out);
         break;
 	case 'update':
-        $out=changeListItem('update',file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        $out=changeListItem(file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
     case 'add':
-        $out=changeListItem('add',file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        $out=addListItem(file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
@@ -69,7 +69,31 @@ function MALLogin($ch,$username,$password)
         curl_exec($ch);
 }
 
-function changeListItem($method,$body,$id,$username,$password)
+function addListItem($body,$id,$username,$password)
+{
+    global $ch;
+    
+        $ch=curl_init();
+        
+        MALLogin($ch,$username,$password);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/panel.php?go=add&selected_series_id='.$id);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch,CURLOPT_REFERER,'http://myanimelist.net/panel.php?go=add&selected_series_id='.$id);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $body); 
+        $output=curl_exec($ch);
+        
+        echo(curl_getinfo($ch,CURLINFO_HEADER_OUT));
+        
+        // close curl resource to free up system resources 
+        curl_close($ch);
+    return $output;
+}
+
+function changeListItem($body,$id,$username,$password)
 {
     global $ch;
     

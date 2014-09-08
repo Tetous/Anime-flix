@@ -77,7 +77,8 @@ define(function (require, exports, module)
 				color:'white'
 			};
 
-		var watchingButton=new Surface({
+		var watchingButton = new Surface({
+		    size: [undefined, 25],
 			content:'Watching',
 			properties:buttonProps
 		});
@@ -86,7 +87,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		watchingButton.on('click',function(){lightbox.show(watchingIconView);})
 
-		var completedButton=new Surface({
+		var completedButton = new Surface({
+		    size: [undefined, 25],
 			content:'Completed',
 			properties:buttonProps
 		});
@@ -95,7 +97,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		completedButton.on('click',function(){lightbox.show(completedIconView);})
 
-		var onHoldButton=new Surface({
+		var onHoldButton = new Surface({
+		    size: [undefined, 25],
 			content:'On-Hold',
 			properties:buttonProps
 		});
@@ -104,7 +107,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		onHoldButton.on('click',function(){lightbox.show(onHoldIconView);})
 
-		var droppedButton=new Surface({
+		var droppedButton = new Surface({
+		    size: [undefined, 25],
 			content:'Dropped',
 			properties:buttonProps
 		});
@@ -113,7 +117,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		droppedButton.on('click',function(){lightbox.show(droppedIconView);})
 
-		var planToWatchButton=new Surface({
+		var planToWatchButton = new Surface({
+            size:[undefined,25],
 			content:'Plan To Watch',
 			properties:buttonProps
 		});
@@ -122,7 +127,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		planToWatchButton.on('click',function(){lightbox.show(planToWatchIconView);})
 
-		var searchButton=new Surface({
+		var searchButton = new Surface({
+		    size: [undefined, 25],
 			content:'Search',
 			properties:buttonProps
 		});
@@ -219,6 +225,7 @@ define(function (require, exports, module)
 		    baseData.series_end = data.end_date;
 		    baseData.series_episodes = data.episodes;
 		    baseData.series_synonyms = data.synonyms + '; ' + data.english;
+		    baseData.localConstruction = true;
 		    return baseData;
 		}
 
