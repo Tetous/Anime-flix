@@ -1,15 +1,17 @@
 function updateAnime(listData)
 {
     var request = new XMLHttpRequest();
-    if (listData.localCreation)
+    if (listData.localConstruction==undefined)
     {
-        request.open('post', 'http://learnfamo.us/chard/requester.php?m=update&i=' + listData.series_animedb_id + '&u=' + window.MALCreds.username + '&p=' + window.MALCreds.password, false);
-        request.send(createUpdateBody(listData));
+        request.open('post', 'http://learnfamo.us/chard/requester.php?m=update&i=' + listData.series_animedb_id, false);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password + '&data=' + encodeURIComponent(createUpdateBody(listData)));
     }
     else
     {
-        request.open('post', 'http://learnfamo.us/chard/requester.php?m=add&i=' + listData.series_animedb_id + '&u=' + window.MALCreds.username + '&p=' + window.MALCreds.password, false);
-        request.send(createAddBody(listData));
+        request.open('post', 'http://learnfamo.us/chard/requester.php?m=add&i=' + listData.series_animedb_id, false);
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password + '&data=' + encodeURIComponent(createAddBody(listData)));
     }
 }
 
@@ -42,7 +44,7 @@ function createAddBody(listData)
         '&last_completed_eps=0' +//listData.last_completed_eps needs to be added by series display. Using destructive hack right now
         '&score=' + listData.my_score +
         //these are unimportant and are not used my me (other and start and end date), these need to be set up to just pass original list data values through
-        '&tags=&unknownStart=1&unknownEnd=1&fansub_group=0&priority=0&storage=0&storageVal=0.00&list_downloaded_eps=0&list_times_watched=0&list_rewatch_value=0&list_comments=&discuss=1&submitIt=2';
+        '&tags=&startMonth=00&startDay=00&startYear=0000&unknownEnd=1&fansub_group=&priority=0&storage=0&storageVal=&list_downloaded_eps=&list_times_watched=&list_rewatch_value=0&list_comments=&discuss=1&submitIt=1';
 }
 
 function createSeriesXML(listData)

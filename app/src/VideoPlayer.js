@@ -218,7 +218,7 @@ define(function(require, exports, module) {
 			var done=false;
 
 			var titles;
-			if(show.series_synonyms != undefined)
+			if((typeof show.series_synonyms)=='string')
 			{
 				titles=show.series_synonyms.split('; ');
 			}

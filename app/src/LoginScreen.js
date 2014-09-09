@@ -117,13 +117,14 @@ define(function (require, exports, module)
         {
             view.username = usernameBox.getValue();
             view.password = passwordBox.getValue();
-            var url = "http://www.learnfamo.us/chard/requester.php?m=login&u=" + view.username + "&p=" + view.password;
+            var url = 'http://www.learnfamo.us/chard/requester.php?m=login';
             var request = new XMLHttpRequest();
-            request.open("GET", url, false);
-            request.send();
+            request.open("POST", url, false);
+            request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+            request.send('u=' + view.username + '&p=' + view.password);
 
             var bodyText = request.responseText;
-            if (bodyText == "Invalid credentials" || request.status != 200)
+            if (bodyText == 'Invalid credentials' || request.status != 200)
             {
                 loginTransitionable.set([0.5, 0.4], { duration: 500, curve: Easing.outCubic });
                 loginTransitionable.set([0.5, 0.5], { duration: 500, curve: Easing.outBounce });

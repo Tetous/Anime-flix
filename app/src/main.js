@@ -18,7 +18,6 @@ define(function(require, exports, module) {
     window.showSelectorZ=50;
     window.videoPlayerZ=0;
 
-
     //CSS
     var vidCSS=document.createElement("link");
     vidCSS.rel="stylesheet";
@@ -32,6 +31,12 @@ define(function(require, exports, module) {
     //Important Vars
     var username;
     var password;
+
+    //get CORS access
+    var url = 'http://www.learnfamo.us/chard/requester.php';
+    var request = new XMLHttpRequest();
+    request.open("GET", url, false);
+    request.send();
 
     // create the main context
     var mainContext = Engine.createContext();

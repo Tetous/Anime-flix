@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Origin: http://localhost:1337");
 
 // create curl resource 
 $ch;
@@ -8,12 +8,12 @@ $ch;
 switch ($_GET["m"])
 {
 	case 'login':
-        $out=checkLogin($_GET["u"],$_GET["p"]);
+        $out=checkLogin(htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
         header('Content-Length: '.strlen($out));
 		echo $out;
 		break;
 	case 'list':
-        $out=getMALList($_GET['u']);
+        $out=getMALList(htmlspecialchars($_POST["u"]));
         header('Content-Length: '.strlen($out));
         header('Content-type: text/xml');
         echo $out;
@@ -34,23 +34,20 @@ switch ($_GET["m"])
         echo $out;
         break;
     case 'search':
-        $out=getSearch($_GET['s'],$_GET['u'],$_GET['p']);
+        $out=getSearch($_GET['s'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
         header('Content-Length: '.strlen($out));
         header('Content-type: text/xml');
         echo str_replace('utf-8','UTF-8',$out);
         break;
 	case 'update':
-        $out=changeListItem(file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        $out=changeListItem(htmlspecialchars($_POST["data"]),$_GET['i'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
     case 'add':
-        $out=addListItem(file_get_contents('php://input'),$_GET['i'],$_GET['u'],$_GET['p']);
+        $out=addListItem(htmlspecialchars($_POST["data"]),$_GET['i'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
         header('Content-Length: '.strlen($out));
         echo $out;
-        break;
-    case 'tt':
-        echo (file_get_contents('php://input'));
         break;
 	default:
 		# code...
@@ -83,10 +80,11 @@ function addListItem($body,$id,$username,$password)
         curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/panel.php?go=add&selected_series_id='.$id);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
         curl_setopt($ch,CURLOPT_REFERER,'http://myanimelist.net/panel.php?go=add&selected_series_id='.$id);
+        $body=str_replace("&amp;", "&", $body);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body); 
         $output=curl_exec($ch);
         
-        echo(curl_getinfo($ch,CURLINFO_HEADER_OUT));
+        //echo(curl_getinfo($ch,CURLINFO_HEADER_OUT));
         
         // close curl resource to free up system resources 
         curl_close($ch);
@@ -102,39 +100,27 @@ function changeListItem($body,$id,$username,$password)
         MALLogin($ch,$username,$password);
         
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
         curl_setopt($ch, CURLOPT_POST, 1);
         curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/editlist.php?type=anime&id='.$id);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        $body=str_replace("&amp;", "&", $body);
         curl_setopt($ch, CURLOPT_POSTFIELDS, $body); 
         $output=curl_exec($ch);
+        
+        //echo(curl_getinfo($ch,CURLINFO_HEADER_OUT));
         
         // close curl resource to free up system resources 
         curl_close($ch);
     return $output;
 }
-
+/*
 function changeListItemOfficial($method,$xml,$id,$username,$password)
 {
-    //echo($xml);
 
     global $ch;
     
         $ch=curl_init();
-        
-        
-        /*
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
-        curl_setopt($ch, CURLOPT_POST, 1);
-        curl_setopt($ch, CURLOPT_URL, 'http://learnfamo.us/chard/requester.php?m=tt');
-        //curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
-        curl_setopt($ch, CURLOPT_POSTFIELDS, 'data='.urlencode($xml));//'data='.urlencode($xml));
-        //curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/plain')); 
-        $output=curl_exec($ch);
-*/        
-        
-        //curl_reset($ch);
-        //curl_setopt($ch, CURLOPT_VERBOSE, 1);
         
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLINFO_HEADER_OUT,1);
@@ -154,6 +140,7 @@ function changeListItemOfficial($method,$xml,$id,$username,$password)
         curl_close($ch);
     return $output;
 }
+*/
 
 function getSearch($searchItem,$username,$password)
 {
@@ -309,8 +296,6 @@ $title=processTitle($title);
 
 function checkLogin($username,$password)
 {
-	//Going to use the API but dummy for now
-
 	$ch=curl_init();
 	curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/account/verify_credentials.xml');
 	curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
@@ -319,11 +304,6 @@ function checkLogin($username,$password)
 	$output=curl_exec($ch);
 	curl_close($ch);
 	return $output;
-
-	
-	//"Invalid credentials";
-	/*return "<?xml version=\"1.0\" encoding=\"utf-8\"?><user><id>1</id><username>RichKop</username></user>";
-  */
 }
 
 function getMALList($user)

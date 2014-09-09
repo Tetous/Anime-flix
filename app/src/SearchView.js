@@ -123,8 +123,9 @@ define(function (require, exports, module)
                     }
                 }
             };
-            request.open("GET", 'http://www.learnfamo.us/chard/requester.php?m=search&u=' + window.MALCreds.username + '&p=' + window.MALCreds.password+'&s='+searchText);
-            request.send();
+            request.open("POST", 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + searchText, true);
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
         }
         return view;
     }

@@ -172,8 +172,9 @@ define(function (require, exports, module)
 		function searchShowWithID(title,id)
 		{
 		    var request = new XMLHttpRequest();
-		    request.open("GET", 'http://www.learnfamo.us/chard/requester.php?m=search&u=' + window.MALCreds.username + '&p=' + window.MALCreds.password + '&s=' + title,false);
-		    request.send();
+		    request.open('POST', 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + title, false);
+		    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+		    request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
 		    parser = new DOMParser();
 		    var domObj = parser.parseFromString(request.response, "text/xml");
 		    var obj = XML2jsobj(domObj).anime;
@@ -277,10 +278,11 @@ define(function (require, exports, module)
 
 		function getMALList()
 	    {
-	        var url="http://www.learnfamo.us/chard/requester.php?m=list&u="+window.MALCreds.username;
+	        var url='http://www.learnfamo.us/chard/requester.php?m=list';
 	        var request = new XMLHttpRequest();
-	        request.open("GET", url,false);
-	        request.send();
+	        request.open("POST", url, false);
+	        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+	        request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
 	        var body=request.responseText;
 
 	        malList=XML2jsobj(request.responseXML.documentElement);
