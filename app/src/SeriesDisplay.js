@@ -14,6 +14,8 @@ define(function (require, exports, module)
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var Scrollview = require('famous/views/Scrollview');
+    var Timer = require('famous/utilities/Timer');
+    var AlertView = require('AlertView');
 
     require('MALSupportFunctions');
 
@@ -170,6 +172,64 @@ define(function (require, exports, module)
         transforms.push(episodeDropdownTransform);
         view.add(episodeDropdownTransform).add(episodeDropdownSurface);
 
+        //play button alerts
+        var alertZTransform = new StateModifier({
+            transform:Transform.translate(0,0,10)
+        });
+        var alertZTransformNode = view.add(alertZTransform);
+
+        var skipBackAlert = AlertView({
+            size: [400, 200],
+            buttonSize: [185, 50],
+            buttonBuffer: 10,
+            content: '<br>You have selected an earlyer episode than your last watched episode, would you like to set your progress back to the selected episode?',
+            button1Content: 'Yes',
+            button2Content: 'No',
+            showTransitionable: { curve: Easing.outCubic, duration: 1000 },
+            hideTransitionable: { curve: Easing.inCubic, duration: 1000 },
+            properties: {
+                textAlign: 'center',
+                backgroundColor: 'white',
+                border: '3px solid black',
+                borderRadius: 25 + 'px'
+            },
+            buttonProperties: {
+                textAlign: 'center',
+                backgroundColor: '#00fff8',
+                lineHeight: 50 + 'px',
+                verticalAlign: 'middle',
+                //border: '3px solid gray',
+                borderRadius: 10 + 'px'
+            }
+        });
+        alertZTransformNode.add(skipBackAlert);
+
+        var changeStatusAlert = AlertView({
+            size: [400, 200],
+            buttonSize: [185, 50],
+            buttonBuffer: 10,
+            content: '<br>You have completed this anime, would you like to move it back to Watching?',
+            button1Content: 'Yes',
+            button2Content: 'No',
+            showTransitionable: { curve: Easing.outCubic, duration: 1000 },
+            hideTransitionable: { curve: Easing.inCubic, duration: 1000 },
+            properties: {
+                textAlign: 'center',
+                backgroundColor: 'white',
+                border: '3px solid black',
+                borderRadius: 25 + 'px'
+            },
+            buttonProperties: {
+                textAlign: 'center',
+                backgroundColor: '#00fff8',
+                lineHeight: 50 + 'px',
+                verticalAlign: 'middle',
+                //border: '3px solid gray',
+                borderRadius: 10 + 'px'
+            }
+        });
+        alertZTransformNode.add(changeStatusAlert);
+
         var playButtonTransform = new StateModifier();
         var playButton = new Surface({
             size:[100,50],
@@ -183,9 +243,65 @@ define(function (require, exports, module)
                 borderRadius: 25 + 'px'
             }
         });
-        playButton.on('click', function () {
-            view._eventOutput.emit('showSelected', { show: series.listData, episode: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
-            view.hide();
+        function asyncAlertChecker()
+        {
+            var alertsFinished = (changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked)&&(skipBackAlert.button1Clicked||skipBackAlert.button2Clicked);
+
+            if (alertsFinished)
+            {
+                //Work bassed on alerts
+                if (changeStatusAlert.button1Clicked)
+                {
+                    series.listData.my_status = 1;
+                }
+                if (skipBackAlert.button1Clicked)
+                {
+                    var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
+                    series.listData.my_watched_episodes = selectedEpisode - 1;
+                }
+
+                updateAnime(series.listData);
+
+                //Play
+                view._eventOutput.emit('showSelected', { show: series.listData, episode: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
+                view.hide();
+            }
+            else
+            {
+                Timer.after(asyncAlertChecker, 3);
+            }
+        }
+        playButton.on('click', function ()
+        {
+            //Run checks and update show data
+            if (episodeDropdown.options[episodeDropdown.options.selectedIndex] != undefined)
+            {
+                if (series.listData.my_status == 2)
+                {
+                    //Ask if they want to move it to watching
+                    changeStatusAlert.show();
+                }
+                else
+                {
+                    series.listData.my_status = 1;
+                }
+
+                var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
+                if (selectedEpisode < series.listData.my_watched_episodes)
+                {
+                    //Ask if the user wants to jump back
+                    skipBackAlert.show();
+                }
+                else
+                {
+                    series.listData.my_watched_episodes = selectedEpisode - 1;
+                }
+                Timer.after(asyncAlertChecker, 3);
+            }
+            else
+            {
+                alert('This show has no episodes to play.');
+            }
         });
         transforms.push(playButtonTransform);
         view.add(playButtonTransform).add(playButton);
@@ -256,7 +372,7 @@ define(function (require, exports, module)
             type.setContent(ser.searchData.type);
             aired.setContent(ser.searchData.start_date + " to " + ser.searchData.end_date);
             var myStatusIndex = ser.listData.my_status;
-            if (myStatusIndex>5)
+            if (myStatusIndex>5||myStatusIndex<1)
             {
                 myStatusIndex = 5;
             }
