@@ -11,6 +11,7 @@ define(function(require, exports, module) {
     var ImageSurface=require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
+    var EventHandler = require('famous/core/EventHandler');
     var VideoJsSurface = require('VideoJsSurface/VideoJsSurface');
 
     require('MALSupportFunctions');
@@ -34,21 +35,38 @@ define(function(require, exports, module) {
             preload : 'auto',
             poster: '/content/images/AnimeflixLogo.png'
         });
-        var backToBrowsingButtonModifier=new StateModifier({
-        	opacity:0,
-        	transform:Transform.translate(0,0,1)
-        })
+
+		var titleBarHeight = 75;
+		var titleBarEventHandler = new EventHandler();
+		var titleBarModifier = new StateModifier({
+		    opacity: 0,
+		    transform: Transform.translate(0, 0, 1)
+		});
+		var titleBarModifierNode = videoPlayerNode.add(titleBarModifier);
+		var titleBar = new Surface({
+		    size: [undefined, titleBarHeight],
+		    properties: {
+                color:'white',
+		        backgroundColor: '#2A2A2A',
+                textAlign:'center'
+		    }
+		});
+		titleBar.pipe(titleBarEventHandler);
+		titleBarEventHandler.on('mouseover', function ()
+		{
+		    titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
+		});
+		titleBarEventHandler.on('mouseout', function ()
+		{
+		    titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
+		});
+		titleBarModifierNode.add(titleBar);
+
 		var backToBrowsingButton=new ImageSurface({
-			size:[75,75],
+			size:[titleBarHeight,titleBarHeight],
 			content:'/content/images/AnimeflixBack2.png',
 		});
-		backToBrowsingButton.on('mouseover',function(){
-			backToBrowsingButtonModifier.setOpacity(0.8,{duration:1000,curve: Easing.outCubic});
-		});
-		backToBrowsingButton.on('mouseout',function(){
-			backToBrowsingButtonModifier.setOpacity(0,{duration:1000,curve: Easing.outCubic});
-		});
-
+		backToBrowsingButton.pipe(titleBarEventHandler);
 		function backToBrowsing(){
 		    if (playerSurface.player!=undefined) {
 		        //playerSurface.player.pause();
@@ -58,6 +76,7 @@ define(function(require, exports, module) {
 		    videoPlayerNode._eventOutput.emit('backToBrowsing');
 		}
 		backToBrowsingButton.on('click',backToBrowsing);
+		titleBarModifierNode.add(backToBrowsingButton);
 
 		var transitionScreenTransform=new StateModifier({
 			align:[1,0]
@@ -66,27 +85,38 @@ define(function(require, exports, module) {
 			properties:{
 			    backgroundColor: '#4494FD',//'#00fff8',
 				textAlign:'center',
-				lineHeight:window.mainContext.getSize()[1]+'px',
-				verticalAlign:'middle'
+				//lineHeight: window.mainContext.getSize()[1] + 'px',
+                display: 'table'
+				//verticalAlign:'middle'
 			}
 		});
 		playerSurface.on('playerLoaded',function(){
-			playerSurface.player.on('ended',function(){
-				transitionScreen.setContent('10');
-				show(transitionScreenTransform);
+		    playerSurface.player.on('ended', function ()
+		    {
 
 			    //update anime list
 				if (playData.episode > playData.show.my_watched_episodes)
 				{
 				    playData.show.my_watched_episodes = playData.episode;
 				}
-				updateAnime(playData.show);
 
-				startTimer();
+				if (playData.episode+1 >= playData.show.series_episodes)
+				{
+				    playData.show.my_status = 2;
+				    //replace with a more appropriate screen
+				    transitionScreen.setContent('<div style="vertical-align: middle; display: table-cell">You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)</div>');
+				    show(transitionScreenTransform);
+				}
+				else
+				{
+				    transitionScreen.setContent('10');
+				    show(transitionScreenTransform);
+				    startTimer();
+				}
+				updateAnime(playData.show);
 			});
 			videoPlayerNode._eventOutput.emit('playerLoaded');
 		});
-		videoPlayerNode.add(backToBrowsingButtonModifier).add(backToBrowsingButton);
 		videoPlayerNode.add(playerTransform).add(playerSurface);
 		videoPlayerNode.add(transitionScreenTransform).add(transitionScreen);
 
@@ -195,7 +225,10 @@ define(function(require, exports, module) {
 			playData.episode=episode;
 
 			var ledgerItem=getLedgerItem(playObject);
-			if (ledgerItem != undefined) {
+			if (ledgerItem != undefined)
+			{
+			    titleBar.setContent(playData.show.series_title+' - Episode '+episode);
+
 			    url = 'http://www.learnfamo.us/chard/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
 			    var request = new XMLHttpRequest();
 			    request.open('POST', url, false);

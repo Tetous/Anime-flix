@@ -182,7 +182,7 @@ define(function (require, exports, module)
             size: [400, 200],
             buttonSize: [185, 50],
             buttonBuffer: 10,
-            content: '<br>You have selected an earlyer episode than your last watched episode, would you like to set your progress back to the selected episode?',
+            content: '<br>You have selected an earlier episode than your last watched episode, would you like to set your progress back to the selected episode?',
             button1Content: 'Yes',
             button2Content: 'No',
             showTransitionable: { curve: Easing.outCubic, duration: 1000 },
