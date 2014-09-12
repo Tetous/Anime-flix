@@ -78,6 +78,38 @@ define(function(require, exports, module) {
 		backToBrowsingButton.on('click',backToBrowsing);
 		titleBarModifierNode.add(backToBrowsingButton);
 
+		var nextEpisodeButtonTransform = new StateModifier({
+		    align: [1, 0],
+            origin:[1,0]
+		});
+		var nextEpisodeButton = new ImageSurface({
+            size:[true,75],
+            content:'/content/images/AnimeflixNextEpisode.png'
+		});
+		nextEpisodeButton.on('click', function ()
+		{
+		    //update anime list
+		    if (playData.episode > playData.show.my_watched_episodes)
+		    {
+		        playData.show.my_watched_episodes = playData.episode;
+		    }
+
+		    if (playData.episode + 1 >= playData.show.series_episodes)
+		    {
+		        playData.show.my_status = 2;
+		        //replace with a more appropriate screen
+		        transitionScreen.setContent('<div style="vertical-align: middle; display: table-cell">You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)</div>');
+		        show(transitionScreenTransform);
+		    }
+		    else
+		    {
+		        playData.episode++;
+		        videoPlayerNode.play(playData.show, playData.episode);
+		    }
+		    updateAnime(playData.show);
+		});
+		titleBarModifierNode.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
+
 		var transitionScreenTransform=new StateModifier({
 			align:[1,0]
 		});

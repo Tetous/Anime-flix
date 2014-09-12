@@ -1,5 +1,5 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:1337");
+header("Access-Control-Allow-Origin: *");
 
 // create curl resource 
 $ch;
