@@ -11,7 +11,6 @@ define(function(require, exports, module) {
     var ImageSurface=require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
-    var EventHandler = require('famous/core/EventHandler');
     var VideoJsSurface = require('VideoJsSurface/VideoJsSurface');
 
     require('MALSupportFunctions');
@@ -35,9 +34,20 @@ define(function(require, exports, module) {
             preload : 'auto',
             poster: '/content/images/AnimeflixLogo.png'
         });
+		playerSurface.on('becameActive', function ()
+		{
+		    titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
+		});
+		playerSurface.on('becameInactive', function ()
+		{
+		    if (focusedTransform == playerTransform)
+		    {
+		        titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
+		    }
+		});
+
 
 		var titleBarHeight = 75;
-		var titleBarEventHandler = new EventHandler();
 		var titleBarModifier = new StateModifier({
 		    opacity: 0,
 		    transform: Transform.translate(0, 0, 1)
@@ -51,22 +61,12 @@ define(function(require, exports, module) {
                 textAlign:'center'
 		    }
 		});
-		titleBar.pipe(titleBarEventHandler);
-		titleBarEventHandler.on('mouseover', function ()
-		{
-		    titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
-		});
-		titleBarEventHandler.on('mouseout', function ()
-		{
-		    titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
-		});
 		titleBarModifierNode.add(titleBar);
 
 		var backToBrowsingButton=new ImageSurface({
 			size:[titleBarHeight,titleBarHeight],
 			content:'/content/images/AnimeflixBack2.png',
 		});
-		backToBrowsingButton.pipe(titleBarEventHandler);
 		function backToBrowsing(){
 		    if (playerSurface.player!=undefined) {
 		        //playerSurface.player.pause();
@@ -80,10 +80,11 @@ define(function(require, exports, module) {
 
 		var nextEpisodeButtonTransform = new StateModifier({
 		    align: [1, 0],
-            origin:[1,0]
+		    origin: [1, 0],
+            transform:Transform.translate(0,8,0)
 		});
 		var nextEpisodeButton = new ImageSurface({
-            size:[true,75],
+            size:[true,59],
             content:'/content/images/AnimeflixNextEpisode.png'
 		});
 		nextEpisodeButton.on('click', function ()
@@ -125,7 +126,7 @@ define(function(require, exports, module) {
 		playerSurface.on('playerLoaded',function(){
 		    playerSurface.player.on('ended', function ()
 		    {
-
+		        titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
 			    //update anime list
 				if (playData.episode > playData.show.my_watched_episodes)
 				{
@@ -254,7 +255,12 @@ define(function(require, exports, module) {
 		videoPlayerNode.play=function (playObject,episode)
 		{
 			playData.show=playObject;
-			playData.episode=episode;
+			playData.episode = episode;
+
+			if (focusedTransform == transitionScreen)
+			{
+			    show(playerTransform);
+			}
 
 			var ledgerItem=getLedgerItem(playObject);
 			if (ledgerItem != undefined)
@@ -268,8 +274,7 @@ define(function(require, exports, module) {
 
 			    var body = request.responseText;
 			    console.log(body);
-			    playerSurface.player.src(body);
-			    playerSurface.player.play();
+			    playerSurface.play(body);
 			}
 			else {
 			    window.alert('The show could not be found. Sorry');
@@ -331,7 +336,7 @@ define(function(require, exports, module) {
 
 		function clear()
 		{
-			playerSurface.player.src();
+		    playerSurface.player.src('/content/images/AnimeflixNextEpisode.png');
 		};
 
 		return videoPlayerNode;

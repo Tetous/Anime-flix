@@ -4506,7 +4506,11 @@ vjs.Player.prototype.error = function(err){
 
   // log the name of the error type and any message
   // ie8 just logs "[object object]" if you just log the error object
-  vjs.log.error('(CODE:'+this.error_.code+' '+vjs.MediaError.errorTypes[this.error_.code]+')', this.error_.message, this.error_);
+  vjs.log.error('(CODE:' + this.error_.code + ' ' + vjs.MediaError.errorTypes[this.error_.code] + ')', this.error_.message, this.error_);
+
+  //Fire a Famous event with the error
+  console.log('logging player error to famous');
+  this.famousEvents.emit('playerError', this.error_);
 
   return this;
 };
@@ -4534,6 +4538,10 @@ vjs.Player.prototype.userActive = function(bool){
         this.removeClass('vjs-user-inactive');
         this.addClass('vjs-user-active');
         this.trigger('useractive');
+        if (this.famousEvents!=undefined)
+        {
+            this.famousEvents.emit('becameActive');
+        }
       } else {
         // We're switching the state to inactive manually, so erase any other
         // activity
@@ -4552,6 +4560,11 @@ vjs.Player.prototype.userActive = function(bool){
             e.stopPropagation();
             e.preventDefault();
           });
+        }
+
+        if (this.famousEvents != undefined)
+        {
+            this.famousEvents.emit('becameInactive');
         }
 
         this.removeClass('vjs-user-active');

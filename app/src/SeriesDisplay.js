@@ -253,11 +253,11 @@ define(function (require, exports, module)
                 if (changeStatusAlert.button1Clicked)
                 {
                     series.listData.my_status = 1;
-                }
-                if (skipBackAlert.button1Clicked)
-                {
-                    var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
-                    series.listData.my_watched_episodes = selectedEpisode - 1;
+                    if (skipBackAlert.button1Clicked)
+                    {
+                        var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
+                        series.listData.my_watched_episodes = selectedEpisode - 1;
+                    }
                 }
 
                 updateAnime(series.listData);
@@ -284,18 +284,19 @@ define(function (require, exports, module)
                 else
                 {
                     series.listData.my_status = 1;
+
+                    var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
+                    if (selectedEpisode <= series.listData.my_watched_episodes)
+                    {
+                        //Ask if the user wants to jump back
+                        skipBackAlert.show();
+                    }
+                    else
+                    {
+                        series.listData.my_watched_episodes = selectedEpisode - 1;
+                    }
                 }
 
-                var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
-                if (selectedEpisode < series.listData.my_watched_episodes)
-                {
-                    //Ask if the user wants to jump back
-                    skipBackAlert.show();
-                }
-                else
-                {
-                    series.listData.my_watched_episodes = selectedEpisode - 1;
-                }
                 Timer.after(asyncAlertChecker, 3);
             }
             else
@@ -321,9 +322,14 @@ define(function (require, exports, module)
         });
         updateButton.on('click', function ()
         {
+            series.listData.my_status = myStatus.options[myStatus.selectedIndex].value;
             if (episodeDropdown.options[episodeDropdown.options.selectedIndex] != undefined)
             {
                 series.listData.my_watched_episodes = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) - 1;
+                if (series.listData.my_status==2)
+                {
+                    series.listData.my_watched_episodes++;
+                }
             }
             else
             {
@@ -337,7 +343,6 @@ define(function (require, exports, module)
             {
                 series.listData.my_score = 0;
             }
-            series.listData.my_status = myStatus.options[myStatus.selectedIndex].value;
 
             updateAnime(series.listData);
         });

@@ -168,6 +168,12 @@ function processTitle($title)
         case 'Highschool of the Dead: Drifters of the Dead':
             return 'Highschool of the Dead OVA';
             break;
+        case 'Fullmetal Alchemist: Brotherhood':
+            return 'Forcing Default Case';
+            break;
+        case 'Fullmetal Alchemist':
+            return 'Forcing Default Case';
+            break;
         default:
             return $title;
             break;
@@ -211,34 +217,38 @@ $title=processTitle($title);
             $link=substr($output, $searchIndex,$endLinkIndex-$searchIndex);
 
             $episodeLinks[$loopCount]=$link;
-            $baseShowCheck=$link.'">'.$title;
-            //echo($baseShowCheck);
-            $showChecks=array(
-                0=>$baseShowCheck.' Episode',
-                1=>$baseShowCheck.' 1',
-                2=>$baseShowCheck.' 2',
-                3=>$baseShowCheck.' 3',
-                4=>$baseShowCheck.' 4',
-                5=>$baseShowCheck.' 5',
-                6=>$baseShowCheck.' 6',
-                7=>$baseShowCheck.' 7',
-                8=>$baseShowCheck.' 8',
-                9=>$baseShowCheck.' 9',
-                10=>$baseShowCheck.' 0',
-                11=>$baseShowCheck.' episode',
-                12=>$baseShowCheck.' </a>',
-                13=>$baseShowCheck.' OVA',
-                14=>$baseShowCheck.' ova'
-            );
-            $showChecksCount=count($showChecks);
-            $done=false;
-            for ($i = 0; $i <= $showChecksCount&&!$done; $i++) {
-                if(strpos($output,$showChecks[$i])!==false)
-                {
-                    $done=true;
-                    $showEpisodeLinks[$showLinksCount]=$link;
-                    $showLinksCount++;
-                    //echo('got show\n');
+            if(strpos($link,'.',22)===false)
+            {
+                $baseShowCheck=$link.'">'.$title;
+                //echo($baseShowCheck);
+                $showChecks=array(
+                    0=>$baseShowCheck.' Episode',
+                    1=>$baseShowCheck.' 1',
+                    2=>$baseShowCheck.' 2',
+                    3=>$baseShowCheck.' 3',
+                    4=>$baseShowCheck.' 4',
+                    5=>$baseShowCheck.' 5',
+                    6=>$baseShowCheck.' 6',
+                    7=>$baseShowCheck.' 7',
+                    8=>$baseShowCheck.' 8',
+                    9=>$baseShowCheck.' 9',
+                    //10=>$baseShowCheck.' 0',
+                    11=>$baseShowCheck.' episode',
+                    12=>$baseShowCheck.' </a>',
+                    13=>$baseShowCheck.' OVA',
+                    10=>$baseShowCheck.' ova',
+                );
+            
+                $showChecksCount=count($showChecks);
+                $done=false;
+                for ($i = 0; $i <= $showChecksCount&&!$done; $i++) {
+                    if(strpos($output,$showChecks[$i])!==false)
+                    {
+                        $done=true;
+                        $showEpisodeLinks[$showLinksCount]=$link;
+                        $showLinksCount++;
+                        //echo('got show\n');
+                    }
                 }
             }
 
