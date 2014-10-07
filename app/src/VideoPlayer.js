@@ -12,6 +12,7 @@ define(function(require, exports, module) {
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
     var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
+    var VideoTransitionScreen = require('videoTransitionScreen');
 
     require('xml2jsobj/xml2jsobj');
     require('MALSupportFunctions');
@@ -88,7 +89,10 @@ define(function(require, exports, module) {
             size:[true,59],
             content:'/content/images/AnimeflixNextEpisode.png'
 		});
-		nextEpisodeButton.on('click', function ()
+		nextEpisodeButton.on('click', nextEpisode);
+		titleBarModifierNode.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
+
+		function nextEpisode()
 		{
 		    //update anime list
 		    if (playData.episode > playData.show.my_watched_episodes)
@@ -109,12 +113,24 @@ define(function(require, exports, module) {
 		        videoPlayerNode.play(playData.show, playData.episode);
 		    }
 		    updateAnime(playData.show);
-		});
-		titleBarModifierNode.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
+		}
 
 		var transitionScreenTransform=new StateModifier({
 			align:[1,0]
 		});
+		var transitionScreen = VideoTransitionScreen();
+		transitionScreen.on('backToBrowsing', backToBrowsing);
+		transitionScreen.on('finishedCountdown', function ()
+		{
+		    show(playerTransform, function ()
+		    {
+		        playData.episode++;
+		        videoPlayerNode.play(playData.show, playData.episode);
+		    });
+		});
+		transitionScreen.on('nextEpisode',nextEpisode);
+		videoPlayerNode.add(transitionScreenTransform).add(transitionScreen);
+        /*
 		var transitionScreen=new Surface({
 			properties:{
 			    backgroundColor: '#4494FD',//'#00fff8',
@@ -122,10 +138,10 @@ define(function(require, exports, module) {
 				verticalAlign:'middle'
 			}
 		});
+        */
 		playerSurface.on('playerLoaded',function(){
 		    playerSurface.player.on('ended', function ()
 		    {
-		        titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
 			    //update anime list
 				if (playData.episode > playData.show.my_watched_episodes)
 				{
@@ -141,16 +157,14 @@ define(function(require, exports, module) {
 				}
 				else
 				{
-				    transitionScreen.setContent('10');
 				    show(transitionScreenTransform);
-				    startTimer();
+				    transitionScreen.startCountdown();
 				}
 				updateAnime(playData.show);
 			});
 			videoPlayerNode._eventOutput.emit('playerLoaded');
 		});
 		videoPlayerNode.add(playerTransform).add(playerSurface);
-		videoPlayerNode.add(transitionScreenTransform).add(transitionScreen);
 
 		var ledgerSwaps=[];
 		var showLedger=[];
@@ -201,26 +215,6 @@ define(function(require, exports, module) {
 			focusedTransform.setAlign([-1,0],{duration:duration,curve:curve});//function(){focusedTransform.setAlign([1,0]);}
 			trans.setAlign([1,0]);
 			trans.setAlign([0,0],{duration:duration,curve:curve},function(){focusedTransform=trans; if(callback!=undefined){callback();}});
-		}
-
-		function startTimer()
-		{
-			countdown=10;
-			Timer.setTimeout(timerTick,1000);
-		}
-
-		function timerTick()
-		{
-			if (countdown==0){
-				show(playerTransform,function(){
-					playData.episode++;
-					videoPlayerNode.play(playData.show,playData.episode);
-				});
-				return;
-			};
-			transitionScreen.setContent(countdown);
-			Timer.setTimeout(timerTick,1000);
-			countdown--;
 		}
 
 		videoPlayerNode.play=function (playObject,episode)
