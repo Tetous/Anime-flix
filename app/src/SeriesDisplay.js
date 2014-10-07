@@ -24,7 +24,6 @@ define(function (require, exports, module)
         var opened=false;
 
         var series;
-
         var transforms = [];
         var view = new View();
 
@@ -196,7 +195,6 @@ define(function (require, exports, module)
             buttonProperties: {
                 textAlign: 'center',
                 backgroundColor: '#00fff8',
-                lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 //border: '3px solid gray',
                 borderRadius: 10 + 'px'

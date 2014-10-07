@@ -6,7 +6,8 @@ require.config({
     paths: {
         famous: '../lib/famous',
         requirejs: '../lib/requirejs/require',
-        almond: '../lib/almond/almond'
+        almond: '../lib/almond/almond',
+        RichFamous: '../lib/RichFamous'
     }
 });
 require(['main']);

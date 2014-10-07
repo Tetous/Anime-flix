@@ -125,7 +125,7 @@ define(function (require, exports, module)
             };
             request.open("POST", 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + searchText, true);
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
+            request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
         }
         return view;
     }

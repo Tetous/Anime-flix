@@ -3,8 +3,10 @@
  * Copyright: Copyright 2014 Richard Kopelow
  */
 
+
 define(function (require, exports, module)
 {
+    //#region Requires
     var Engine = require('famous/core/Engine');
 	var View = require('famous/core/View');
 	var Easing = require('famous/transitions/Easing');
@@ -23,6 +25,7 @@ define(function (require, exports, module)
 	var SearchView = require('SearchView');
 
 	require('xml2jsobj/xml2jsobj');
+    //#endregion
 
 	function createShowSelector(animeList)
 	{
@@ -67,7 +70,7 @@ define(function (require, exports, module)
 		});
 
 		layout.header.add(gridTransform).add(grid);
-
+        //#region Catagory Buttons
 		var buttons=[];
 		grid.sequenceFrom(buttons);
 
@@ -135,9 +138,10 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(searchButton);
 		buttons.push(buttonView);
-		searchButton.on('click',function(){lightbox.show(searchView);});
+		searchButton.on('click', function () { lightbox.show(searchView); });
+        //#endregion
 
-	    //Series Display
+	    //#region Series Display
 		var seriesDisplayTransform = new StateModifier({
 		    transform:Transform.translate(0,0,15)
 		});
@@ -146,15 +150,18 @@ define(function (require, exports, module)
 		seriesDisplay.on('showSelected', function (data) {
 		    view._eventOutput.emit('showSelected', data);
 		});
+        //#endregion
 
-        //Background
+        //#region Background
 		var background=new Surface({
 			properties:{
 				backgroundColor:'white',
 			}
 		});
 		layout.content.add(background);
+        //#endregion
 
+        //#region Lightbox
 		var screenWidth=window.mainContext.getSize()[0];
 
 		var lightboxTransform=new StateModifier({
@@ -168,14 +175,15 @@ define(function (require, exports, module)
 			inTransition: { duration: 500, curve: Easing.outBack },
 			outTransition: { duration: 500, curve: Easing.easeOut }
 		});
+        //#endregion
 
 		function searchShowWithID(title,id)
 		{
 		    var request = new XMLHttpRequest();
 		    request.open('POST', 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + title, false);
 		    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		    request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
-		    parser = new DOMParser();
+		    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+		    var parser = new DOMParser();
 		    var domObj = parser.parseFromString(request.response, "text/xml");
 		    var obj = XML2jsobj(domObj).anime;
 		    if (obj.entry.length==undefined)
@@ -282,7 +290,7 @@ define(function (require, exports, module)
 	        var request = new XMLHttpRequest();
 	        request.open("POST", url, false);
 	        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-	        request.send('u=' + window.MALCreds.username + '&p=' + window.MALCreds.password);
+	        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 	        var body=request.responseText;
 
 	        malList=XML2jsobj(request.responseXML.documentElement);

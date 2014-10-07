@@ -10,7 +10,7 @@ define(function (require, exports, module)
     var Easing = require('famous/transitions/Easing');
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var Surface = require('famous/core/Surface');
+    var Surface = require('RichFamous/Surface');
 
     function createAlertView(options,button1Callback,button2Callback)
     {
@@ -22,13 +22,13 @@ define(function (require, exports, module)
         var alertTransform = new StateModifier();
         var alertTransformNode = view.add(alertTransform);
 
-        var background = new Surface(options);
+        var background = Surface(options);
         alertTransformNode.add(background);
 
         var button1Transform = new StateModifier({
             transform: Transform.translate(options.buttonBuffer, options.size[1] - options.buttonBuffer - options.buttonSize[1],1)
         });
-        var button1 = new Surface({
+        var button1 = Surface({
             size: options.buttonSize,
             content: options.button1Content,
             properties: options.buttonProperties
@@ -44,7 +44,7 @@ define(function (require, exports, module)
         var button2Transform = new StateModifier({
             transform:Transform.translate(2*options.buttonBuffer+options.buttonSize[0],options.size[1]-options.buttonBuffer-options.buttonSize[1],1)
         });
-        var button2 = new Surface({
+        var button2 = Surface({
             size: options.buttonSize,
             content: options.button2Content,
             properties: options.buttonProperties

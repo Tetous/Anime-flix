@@ -11,8 +11,9 @@ define(function(require, exports, module) {
     var ImageSurface=require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
-    var VideoJsSurface = require('VideoJsSurface/VideoJsSurface');
+    var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
 
+    require('xml2jsobj/xml2jsobj');
     require('MALSupportFunctions');
 
 	function createVideoPlayer()
@@ -95,11 +96,11 @@ define(function(require, exports, module) {
 		        playData.show.my_watched_episodes = playData.episode;
 		    }
 
-		    if (playData.episode + 1 >= playData.show.series_episodes)
+		    if (playData.episode + 1 > playData.show.series_episodes)
 		    {
 		        playData.show.my_status = 2;
 		        //replace with a more appropriate screen
-		        transitionScreen.setContent('<div style="vertical-align: middle; display: table-cell">You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)</div>');
+		        transitionScreen.setContent('You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)');
 		        show(transitionScreenTransform);
 		    }
 		    else
@@ -118,9 +119,7 @@ define(function(require, exports, module) {
 			properties:{
 			    backgroundColor: '#4494FD',//'#00fff8',
 				textAlign:'center',
-				//lineHeight: window.mainContext.getSize()[1] + 'px',
-                display: 'table'
-				//verticalAlign:'middle'
+				verticalAlign:'middle'
 			}
 		});
 		playerSurface.on('playerLoaded',function(){
@@ -153,10 +152,18 @@ define(function(require, exports, module) {
 		videoPlayerNode.add(playerTransform).add(playerSurface);
 		videoPlayerNode.add(transitionScreenTransform).add(transitionScreen);
 
+		var ledgerSwaps=[];
 		var showLedger=[];
 
 	    function getLedger()
-	    {
+		{
+	        var swapsRequest = new XMLHttpRequest();
+	        swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
+	        swapsRequest.send();
+	        var parser = new DOMParser();
+	        var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
+	        ledgerSwaps = XML2jsobj(domObj).Root.swap;
+
 	        var url="http://www.learnfamo.us/chard/requester.php?m=ledger";
 	        var request = new XMLHttpRequest();
 	        request.onreadystatechange=function () {
@@ -173,46 +180,10 @@ define(function(require, exports, module) {
 	                        var showLink=body.substring(index,body.indexOf("\"",index));
 	                        var index2=body.indexOf(">",index)+1;
 	                        showName=body.substring(index2,body.indexOf("<",index2));
-
 	                        showLedger.push({name:showName,link:showLink});
 	                    }
 	                    showLedger.pop();
-                        /*
-	                    for (var i = 0; i < showLedger.length; i++)
-	                    {
-	                        var ledgerItem = showLedger[i];
-	                        var titlesRequest = new XMLHttpRequest();
-	                        //titlesRequest.onreadystatechange = function ()
-	                        
-	                        titlesRequest.open('POST', 'http://learnfamo.us/chard/requester.php?m=alts',false);
-	                        titlesRequest.send(ledgerItem.link);
-	                        {
-	                            if (titlesRequest.readyState == 4)
-	                            {
-	                                if (titlesRequest.status == 200)
-	                                {
-	                                    var body = titlesRequest.responseText;
-	                                    var titles = body.split(', ');
-	                                    for (var title in titles)
-	                                    {
-	                                        var done = false;
-	                                        for (var j = 0; j < showLedger.length && !done; j++)
-	                                        {
-	                                            if (showLedger[j].name == title)
-	                                            {
-	                                                done = true;
-	                                            };
-	                                        };
-	                                        if (!done)
-	                                        {
-	                                            showLedger.push({ name: title, link: ledgerItem.link });
-	                                        }
-	                                    }
-	                                }
-	                            }
-	                        }
-	                    }
-                        */
+                        
 	                    console.log('ledger loaded');
 	                }
 	            }
@@ -308,14 +279,35 @@ define(function(require, exports, module) {
 			        {
 			            if (showLedger[i].name == workingTitle)
 			            {
-			                value = { name: titles[j], link: showLedger[i].link };
-			                showLedger.push(value);
+			                value = { name: titles[0], link: showLedger[i].link };
+			                if (j>0) {
+			                    showLedger.push(value);
+			                }
 			                done = true;
 			            };
 			        };
 			        workingTitle = trimTitle(workingTitle);
 			    };
 			};
+			if (!value)
+			{
+			    for (var i = 0; i < ledgerSwaps.length&&!done; i++)
+			    {
+			        if (ledgerSwaps[i].malName == show.series_title)
+			        {
+			            for (var j = 0; j < showLedger.length && !done; j++)
+			            {
+			                if (ledgerSwaps[i].ledgerName == showLedger[j].name)
+			                {
+			                    showLedger[j].name = ledgerSwaps[i].malName;
+			                    value = { name: showLedger[j].name, link: showLedger[j].link };
+			                    showLedger.push(value);
+			                    done = true;
+			                }
+			            }
+			        }
+			    }
+			}
 			return value;
 		}
 

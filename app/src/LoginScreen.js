@@ -11,7 +11,7 @@ define(function (require, exports, module)
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transitionable = require('famous/transitions/Transitionable');
     var Easing = require('famous/transitions/Easing');
-    var Surface = require('famous/core/Surface');
+    var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var InputSurface = require('famous/surfaces/InputSurface');
 
@@ -96,13 +96,12 @@ define(function (require, exports, module)
             transform: Transform.translate(0, buttonHeight + boxHeight, 1),
             origin: [0.5, 0.5]
         });
-        var button = new Surface({
+        var button = Surface({
             size: [buttonWidth, buttonHeight],
             content: 'Login',
             properties: {
                 fontSize: fontSize + 'px',
                 textAlign: 'center',
-                lineHeight: buttonHeight + 'px',
                 verticalAlign: 'middle',
                 backgroundColor: '#4494FD',//'#00fff8',
                 border: '1px solid gray',

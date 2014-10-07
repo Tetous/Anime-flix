@@ -21,7 +21,7 @@ define(function(require, exports, module) {
     //CSS
     var vidCSS=document.createElement("link");
     vidCSS.rel="stylesheet";
-    vidCSS.href="src/VideoJsSurface/video-js/video-js.min.css";
+    vidCSS.href="css/video-js.min.css";
     vidCSS.type="text/css";
     document.head.appendChild(vidCSS);
 
@@ -69,7 +69,8 @@ define(function(require, exports, module) {
     mainContext.add(videoPlayerTransform).add(videoPlayer);
 
     loginScreen.on('loggedIn',function(){
-        window.MALCreds={username:loginScreen.username,password:loginScreen.password};
+        sessionStorage.username = loginScreen.username;
+        sessionStorage.password = loginScreen.password;
         showSelector.refreshList();
         //videoPlayer.play({series_title: 'Sword Art Online'},1);
     });
