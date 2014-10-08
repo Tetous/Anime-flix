@@ -25,6 +25,8 @@ define(function (require, exports, module)
         view.add(backgroundSurface);
 
         var backToBrowsingButtonTransform = new StateModifier({
+            origin: [0, 0],
+            align:[0,0],
             transform:Transform.translate(25,25,1)
         });
         var backToBrowsingButtonSize = 125;
@@ -32,7 +34,11 @@ define(function (require, exports, module)
             size: [backToBrowsingButtonSize, backToBrowsingButtonSize],
             content: '/content/images/AnimeflixBack2.png',
         });
-        backToBrowsingButton.on('click', function () { view._eventOutput.emit('backToBrowsing'); });
+        backToBrowsingButton.on('click', function ()
+        {
+            countDown = -1;
+            view._eventOutput.emit('backToBrowsing');
+        });
         view.add(backToBrowsingButtonTransform).add(backToBrowsingButton);
 
         var nextEpisodeButtonTransform = new StateModifier({
@@ -44,7 +50,7 @@ define(function (require, exports, module)
             size: [true, 80],
             content: '/content/images/AnimeflixNextEpisode.png'
         });
-        nextEpisodeButton.on('click', function () { view._eventOutput.emit('nextEpisode'); });
+        nextEpisodeButton.on('click', function () { countdown = 0; });
         view.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
 
         var countdown;
@@ -57,14 +63,18 @@ define(function (require, exports, module)
 
         function timerTick()
         {
-            countdown--;
+            if (countdown==-1)
+            {
+                return;
+            }
             if (countdown == 0)
             {
                 view._eventOutput.emit('finishedCountdown');
                 return;
-            };
+            }
             backgroundSurface.setContent('<img src="content/images/player/Timer'+countdown+'.png" height="400" width="400">');
             Timer.setTimeout(timerTick, 1000);
+            countdown--;
         }
 
         return view;

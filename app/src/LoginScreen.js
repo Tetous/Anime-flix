@@ -45,6 +45,19 @@ define(function (require, exports, module)
             content: '/content/images/AnimeflixLogo.png'
         });
 
+        var betaHeight = 60;
+        var betaTransform = new StateModifier({
+            transform: Transform.translate(330, -boxHeight - logoHeight-20),
+            origin: [0.5, 0.5]
+        });
+        var betaRotate = new StateModifier({
+            transform:Transform.rotate(0,0,3.14/6)
+        });
+        var beta = new ImageSurface({
+            size: [true, betaHeight],
+            content:'content/images/Beta.png'
+        });
+
         var textboxProperties = {
             fontSize: fontSize + 'px',
             border: '1px solid gray',
@@ -116,7 +129,7 @@ define(function (require, exports, module)
         {
             view.username = usernameBox.getValue();
             view.password = passwordBox.getValue();
-            var url = 'http://www.learnfamo.us/chard/requester.php?m=login';
+            var url = 'http://www.anime-flix.com/requester.php?m=login';
             var request = new XMLHttpRequest();
             request.open("POST", url, false);
             request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
@@ -138,6 +151,7 @@ define(function (require, exports, module)
         var bouncerNode = view.add(loginTransform);
         bouncerNode.add(loginBackground);
         bouncerNode.add(logoTransform).add(logo);
+        bouncerNode.add(betaTransform).add(betaRotate).add(beta);
         bouncerNode.add(usernameBoxTransform).add(usernameBox);
         bouncerNode.add(passwordBoxTransform).add(passwordBox);
         bouncerNode.add(buttonTransform).add(button);

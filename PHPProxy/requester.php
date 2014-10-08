@@ -23,6 +23,11 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
 		break;
+   case 'movieLedger':
+        $out=getAnimePlusMovieList();
+        header('Content-Length: '.strlen($out));
+        echo $out;
+		break;
     case 'alts':
         $out=getAlternateTitles(file_get_contents('php://input'));
         header('Content-Length: '.strlen($out));
@@ -236,7 +241,9 @@ $title=processTitle($title);
                     11=>$baseShowCheck.' episode',
                     12=>$baseShowCheck.' </a>',
                     13=>$baseShowCheck.' OVA',
-                    10=>$baseShowCheck.' ova',
+                    14=>$baseShowCheck.' Movie',
+                    15=>$baseShowCheck.' movie',
+                    10=>$baseShowCheck.' ova'
                 );
             
                 $showChecksCount=count($showChecks);
@@ -337,6 +344,29 @@ function getAnimePlusList()
       $ch=curl_init();
         // set url 
         curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-show-list'); 
+
+        //return the transfer as a string 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain', 'Accept-Encoding: '));
+
+        curl_setopt ($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+
+        // $output contains the output string 
+        $output = curl_exec($ch); 
+
+        $output = curl_exec($ch);
+        // close curl resource to free up system resources 
+        curl_close($ch);
+
+        return $output;
+}
+function getAnimePlusMovieList()
+{ 
+      global $ch;
+      $ch=curl_init();
+        // set url 
+        curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-movies'); 
 
         //return the transfer as a string 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 

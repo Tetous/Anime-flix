@@ -83,19 +83,28 @@ define(function (require, exports, module)
 
         function searchCallback(data)
         {
-            var displaysToConvert = ((allCreatedSearchItemDisplays.length < data.entry.length) ? allCreatedSearchItemDisplays.length : data.entry.length);
-            var displaysToCreate = ((allCreatedSearchItemDisplays.length < data.entry.length) ? data.entry.length - allCreatedSearchItemDisplays.length : 0);
+            var entries;
+            if (data.entry.length==undefined)
+            {
+                entries = [data.entry];
+            }
+            else
+            {
+                entries = data.entry;
+            }
+            var displaysToConvert = ((allCreatedSearchItemDisplays.length < entries.length) ? allCreatedSearchItemDisplays.length : entries.length);
+            var displaysToCreate = ((allCreatedSearchItemDisplays.length < entries.length) ? entries.length - allCreatedSearchItemDisplays.length : 0);
 
             searchItemDisplaysToShow = [];
             var entryCounter = 0;
             for (var i = 0; i < displaysToConvert; i++,entryCounter++)
             {
-                allCreatedSearchItemDisplays[i].update(data.entry[entryCounter]);
+                allCreatedSearchItemDisplays[i].update(entries[entryCounter]);
                 searchItemDisplaysToShow.push(allCreatedSearchItemDisplays[i]);
             }
             for (var i = 0; i < displaysToCreate; i++,entryCounter++)
             {
-                var searchDisplay = SearchItemDisplay(data.entry[entryCounter]);
+                var searchDisplay = SearchItemDisplay(entries[entryCounter]);
                 allCreatedSearchItemDisplays.push(searchDisplay);
                 searchItemDisplaysToShow.push(searchDisplay);
                 searchDisplay.on('searchSeriesSelected', function (data)
@@ -123,7 +132,7 @@ define(function (require, exports, module)
                     }
                 }
             };
-            request.open("POST", 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + searchText, true);
+            request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + searchText, true);
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
         }

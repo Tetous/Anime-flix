@@ -3,13 +3,13 @@ function updateAnime(listData)
     var request = new XMLHttpRequest();
     if (listData.localConstruction==undefined)
     {
-        request.open('post', 'http://learnfamo.us/chard/requester.php?m=update&i=' + listData.series_animedb_id);
+        request.open('post', 'http://anime-flix.com/requester.php?m=update&i=' + listData.series_animedb_id);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createUpdateBody(listData)));
     }
     else
     {
-        request.open('post', 'http://learnfamo.us/chard/requester.php?m=add&i=' + listData.series_animedb_id);
+        request.open('post', 'http://anime-flix.com/requester.php?m=add&i=' + listData.series_animedb_id);
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createAddBody(listData)));
     }

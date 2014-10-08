@@ -180,7 +180,7 @@ define(function (require, exports, module)
 		function searchShowWithID(title,id)
 		{
 		    var request = new XMLHttpRequest();
-		    request.open('POST', 'http://www.learnfamo.us/chard/requester.php?m=search&s=' + title, false);
+		    request.open('POST', 'http://www.anime-flix.com/requester.php?m=search&s=' + title, false);
 		    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 		    var parser = new DOMParser();
@@ -286,7 +286,7 @@ define(function (require, exports, module)
 
 		function getMALList()
 	    {
-	        var url='http://www.learnfamo.us/chard/requester.php?m=list';
+	        var url='http://www.anime-flix.com/requester.php?m=list';
 	        var request = new XMLHttpRequest();
 	        request.open("POST", url, false);
 	        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

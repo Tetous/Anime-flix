@@ -3,8 +3,11 @@
  * Copyright: Copyright 2014 Richard Kopelow
  */
 
-define(function(require, exports, module) {
-	var View = require('famous/core/View');
+define(function (require, exports, module)
+{
+    var Engine = require('famous/core/Engine');
+    var View = require('famous/core/View');
+    var Lightbox = require('famous/views/Lightbox');
 	var StateModifier= require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
@@ -13,20 +16,38 @@ define(function(require, exports, module) {
     var Timer = require('famous/utilities/Timer');
     var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
     var VideoTransitionScreen = require('videoTransitionScreen');
+    var SeriesEndScreen = require('SeriesEndScreen');
 
     require('xml2jsobj/xml2jsobj');
     require('MALSupportFunctions');
 
 	function createVideoPlayer()
-	{
-		var focusedTransform;
+    {
 		var countdown;
 		var playData={show:undefined,episode:undefined};
-		var videoPlayerNode=new View();
+		var videoPlayerNode = new View();
+		var screenWidth = window.mainContext.getSize()[0];
+		var lightboxTransform = new StateModifier({
+		    transform:Transform.translate(0,0,1)
+		});
+		var lightbox = new Lightbox({
+		    inOpacity: 1,
+		    outOpacity: 1,
+		    inTransform: Transform.translate(screenWidth, 0, 1),
+		    outTransform: Transform.translate(-1 * screenWidth, 0, 1),
+		    inTransition: { duration: 1000, curve: Easing.outBack },
+		    outTransition: { duration: 1000, curve: Easing.inBack }
+		});
+		Engine.on('resize', function ()
+		{
+		    screenWidth = window.mainContext.getSize()[0];
+		    lightbox.setOptions({
+		        inTransform: Transform.translate(screenWidth, 0, 1),
+		        outTransform: Transform.translate(-1 * screenWidth, 0, 1)
+		    });
+		});
+		videoPlayerNode.add(lightboxTransform).add(lightbox);
 
-
-		var playerTransform=new StateModifier();
-		focusedTransform=playerTransform;
 		var playerSurface=VideoJsSurface({},
         { 
             width:'100%',
@@ -42,12 +63,9 @@ define(function(require, exports, module) {
 		});
 		playerSurface.on('becameInactive', function ()
 		{
-		    if (focusedTransform == playerTransform)
-		    {
-		        titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
-		    }
+		    titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
 		});
-
+		videoPlayerNode.add(playerSurface);
 
 		var titleBarHeight = 75;
 		var titleBarModifier = new StateModifier({
@@ -104,8 +122,7 @@ define(function(require, exports, module) {
 		    {
 		        playData.show.my_status = 2;
 		        //replace with a more appropriate screen
-		        transitionScreen.setContent('You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)');
-		        show(transitionScreenTransform);
+		        lightbox.show(seriesEndScreen);
 		    }
 		    else
 		    {
@@ -115,30 +132,21 @@ define(function(require, exports, module) {
 		    updateAnime(playData.show);
 		}
 
-		var transitionScreenTransform=new StateModifier({
-			align:[1,0]
-		});
 		var transitionScreen = VideoTransitionScreen();
 		transitionScreen.on('backToBrowsing', backToBrowsing);
 		transitionScreen.on('finishedCountdown', function ()
 		{
-		    show(playerTransform, function ()
+		    lightbox.show(playerSurface, function ()
 		    {
 		        playData.episode++;
 		        videoPlayerNode.play(playData.show, playData.episode);
+		        updateAnime(playData.show);
 		    });
 		});
-		transitionScreen.on('nextEpisode',nextEpisode);
-		videoPlayerNode.add(transitionScreenTransform).add(transitionScreen);
-        /*
-		var transitionScreen=new Surface({
-			properties:{
-			    backgroundColor: '#4494FD',//'#00fff8',
-				textAlign:'center',
-				verticalAlign:'middle'
-			}
-		});
-        */
+
+		var seriesEndScreen = SeriesEndScreen();
+		seriesEndScreen.on('backToBrowsing',backToBrowsing);
+
 		playerSurface.on('playerLoaded',function(){
 		    playerSurface.player.on('ended', function ()
 		    {
@@ -148,104 +156,128 @@ define(function(require, exports, module) {
 				    playData.show.my_watched_episodes = playData.episode;
 				}
 
-				if (playData.episode+1 >= playData.show.series_episodes)
+				if (playData.episode+1 > playData.show.series_episodes)
 				{
 				    playData.show.my_status = 2;
-				    //replace with a more appropriate screen
-				    transitionScreen.setContent('<div style="vertical-align: middle; display: table-cell">You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)</div>');
-				    show(transitionScreenTransform);
+				    lightbox.show(seriesEndScreen);
 				}
 				else
 				{
-				    show(transitionScreenTransform);
+				    lightbox.show(transitionScreen);
 				    transitionScreen.startCountdown();
 				}
 				updateAnime(playData.show);
 			});
 			videoPlayerNode._eventOutput.emit('playerLoaded');
 		});
-		videoPlayerNode.add(playerTransform).add(playerSurface);
 
 		var ledgerSwaps=[];
 		var showLedger=[];
 
-	    function getLedger()
+		function processLedger(body)
 		{
-	        var swapsRequest = new XMLHttpRequest();
-	        swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
-	        swapsRequest.send();
-	        var parser = new DOMParser();
-	        var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
-	        ledgerSwaps = XML2jsobj(domObj).Root.swap;
+		    var swapsRequest = new XMLHttpRequest();
+		    swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
+		    swapsRequest.send();
+		    var parser = new DOMParser();
+		    var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
+		    ledgerSwaps = XML2jsobj(domObj).Root.swap;
 
-	        var url="http://www.learnfamo.us/chard/requester.php?m=ledger";
-	        var request = new XMLHttpRequest();
-	        request.onreadystatechange=function () {
-                if (request.readyState==4)
-	            {
-	                if (request.status==200)
-	                {
-	                    var body=request.responseText;
-	                    var index=body.indexOf("class=\"series_index\"");
-	                    var showName="";
-	                    while(showName!=="Login")
-	                    {
-	                        index=body.indexOf("<a href=\"",index)+9;
-	                        var showLink=body.substring(index,body.indexOf("\"",index));
-	                        var index2=body.indexOf(">",index)+1;
-	                        showName=body.substring(index2,body.indexOf("<",index2));
-	                        showLedger.push({name:showName,link:showLink});
-	                    }
-	                    showLedger.pop();
-                        
-	                    console.log('ledger loaded');
-	                }
-	            }
-	        };
-	        request.open("GET", url, true);
-	        request.send();
+		    var resultLedger=[];
+
+		    var index = body.indexOf("class=\"series_index\"");
+		    var showName = "";
+		    while (showName !== "Login")
+		    {
+		        index = body.indexOf("<a href=\"", index) + 9;
+		        var showLink = body.substring(index, body.indexOf("\"", index));
+		        var index2 = body.indexOf(">", index) + 1;
+		        showName = body.substring(index2, body.indexOf("<", index2));
+		        resultLedger.push({ name: showName, link: showLink });
+		    }
+		    resultLedger.pop();
+
+		    return resultLedger;
+		}
+
+		function getAnimeLedger()
+		{
+		    var url = "http://www.anime-flix.com/requester.php?m=ledger";
+		    var request = new XMLHttpRequest();
+		    request.onreadystatechange = function ()
+		    {
+		        if (request.readyState == 4)
+		        {
+		            if (request.status == 200)
+		            {
+		                var processedLedger = processLedger(request.responseText);
+		                showLedger = showLedger.concat(processedLedger);
+		            }
+		        }
+		    };
+		    request.open("GET", url, true);
+		    request.send();
+		}
+		function getMovieLedger()
+		{
+		    var url = "http://www.anime-flix.com/requester.php?m=movieLedger";
+		    var request = new XMLHttpRequest();
+		    request.onreadystatechange = function ()
+		    {
+		        if (request.readyState == 4)
+		        {
+		            if (request.status == 200)
+		            {
+		                showLedger = showLedger.concat(processLedger(request.responseText));
+		            }
+		        }
+		    };
+		    request.open("GET", url, true);
+		    request.send();
+		}
+
+	    function getLedger()
+	    {
+	        showLedger = [];
+	        getAnimeLedger();
+	        getMovieLedger();
 	    }
 	    getLedger();
 
-		function show(trans, callback)
-		{
-			var curve=Easing.outBounce;
-			var duration=2500;
+	    videoPlayerNode.play = function (playObject, episode)
+	    {
+	        playData.show = playObject;
+	        playData.episode = episode;
 
-			focusedTransform.setAlign([-1,0],{duration:duration,curve:curve});//function(){focusedTransform.setAlign([1,0]);}
-			trans.setAlign([1,0]);
-			trans.setAlign([0,0],{duration:duration,curve:curve},function(){focusedTransform=trans; if(callback!=undefined){callback();}});
-		}
+	        lightbox.show(playerSurface);
 
-		videoPlayerNode.play=function (playObject,episode)
-		{
-			playData.show=playObject;
-			playData.episode = episode;
+	        var ledgerItem = getLedgerItem(playObject);
+	        if (ledgerItem)
+	        {
+	            titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
 
-			if (focusedTransform == transitionScreen)
-			{
-			    show(playerTransform);
-			}
-
-			var ledgerItem=getLedgerItem(playObject);
-			if (ledgerItem != undefined)
-			{
-			    titleBar.setContent(playData.show.series_title+' - Episode '+episode);
-
-			    url = 'http://www.learnfamo.us/chard/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
-			    var request = new XMLHttpRequest();
-			    request.open('POST', url, false);
-			    request.send(ledgerItem.link);
-
-			    var body = request.responseText;
-			    console.log(body);
-			    playerSurface.play(body);
-			}
-			else {
-			    window.alert('The show could not be found. Sorry');
-			    backToBrowsing();
-			}
-		};
+	            url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
+	            var request = new XMLHttpRequest();
+	            request.onreadystatechange = function ()
+	            {
+	                if (request.readyState == 4)
+	                {
+	                    if (request.status == 200)
+	                    {
+	                        var body = request.responseText;
+	                        playerSurface.play(body);
+	                    }
+	                }
+	            };
+	            request.open('POST', url);
+	            request.send(ledgerItem.link);
+	        }
+	        else
+	        {
+	            window.alert('The show could not be found. Sorry');
+	            backToBrowsing();
+	        }
+	    };
 
 		function getLedgerItem(show)
 		{
@@ -268,7 +300,6 @@ define(function(require, exports, module) {
 			    var workingTitle=titles[j];
 			    while (workingTitle && !done)
 			    {
-			        console.log(workingTitle);
 			        for (var i = 0; i < showLedger.length && !done; i++)
 			        {
 			            if (showLedger[i].name == workingTitle)
@@ -325,6 +356,7 @@ define(function(require, exports, module) {
 		    playerSurface.player.src('/content/images/AnimeflixNextEpisode.png');
 		};
 
+		lightbox.show(playerSurface);
 		return videoPlayerNode;
 	}
 	module.exports=createVideoPlayer;
