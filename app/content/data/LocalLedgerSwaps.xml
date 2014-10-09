@@ -12,4 +12,8 @@
     <ledgerName>Spirited Away Movie</ledgerName>
     <malName>Sen to Chihiro no Kamikakushi</malName>
   </swap>
+<swap>
+    <ledgerName>Another (Anime)</ledgerName>
+    <malName>Another</malName>
+  </swap>
 </Root>

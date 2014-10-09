@@ -12,7 +12,7 @@ define(function (require, exports, module)
 	var Easing = require('famous/transitions/Easing');
 	var Transform = require('famous/core/Transform');
 	var StateModifier= require('famous/modifiers/StateModifier');
-	var Surface=require('famous/core/Surface');
+	var Surface=require('RichFamous/Surface');
 	var ContainerSurface=require('famous/surfaces/ContainerSurface');
 	var ImageSurface = require('famous/surfaces/ImageSurface');
 	var Scrollview=require('famous/views/Scrollview');
@@ -40,32 +40,36 @@ define(function (require, exports, module)
 		var view=new View();
 
 		var layout=new HeaderFooterLayout({
-			headerSize:50,
-			footerSize:25
+			headerSize:100,
+			footerSize:50
 		});
 		view.add(layout);
 
-		var headerNode=layout.header.add(new Surface({
-			content:'Anime-flix',
+		var headerNode=layout.header.add(Surface({
 			properties:{
-				color:'white',
-				backgroundColor:'#0066CC'
+			    backgroundColor: '#0066CC'
 			}
 		}));
-		layout.footer.add(new Surface({
+		layout.header.add(new ImageSurface({
+		    size: [true, 50],
+            content: 'content/images/AnimeflixLogo.png'
+		}));
+		layout.footer.add(Surface({
 			content:'By Richard Kopelow',
 			properties:{
 				color:'white',
-				backgroundColor:'#0066CC'
+				backgroundColor: '#0066CC',
+				verticalAlign:'middle'
 			}
 		}));
 
 		var gridTransform=new StateModifier({
-			transform:Transform.translate(0,25,1)
+			transform:Transform.translate(0,50,1)
 		});
 
+		var gridHeight = 50;
 		var grid=new GridLayout({
-			size:[undefined,25],
+		    size: [undefined, gridHeight],
 			dimensions:[6,1]
 		});
 
@@ -80,8 +84,8 @@ define(function (require, exports, module)
 				color:'white'
 			};
 
-		var watchingButton = new Surface({
-		    size: [undefined, 25],
+		var watchingButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'Watching',
 			properties:buttonProps
 		});
@@ -90,8 +94,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		watchingButton.on('click',function(){lightbox.show(watchingIconView);})
 
-		var completedButton = new Surface({
-		    size: [undefined, 25],
+		var completedButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'Completed',
 			properties:buttonProps
 		});
@@ -100,8 +104,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		completedButton.on('click',function(){lightbox.show(completedIconView);})
 
-		var onHoldButton = new Surface({
-		    size: [undefined, 25],
+		var onHoldButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'On-Hold',
 			properties:buttonProps
 		});
@@ -110,8 +114,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		onHoldButton.on('click',function(){lightbox.show(onHoldIconView);})
 
-		var droppedButton = new Surface({
-		    size: [undefined, 25],
+		var droppedButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'Dropped',
 			properties:buttonProps
 		});
@@ -120,8 +124,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		droppedButton.on('click',function(){lightbox.show(droppedIconView);})
 
-		var planToWatchButton = new Surface({
-            size:[undefined,25],
+		var planToWatchButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'Plan To Watch',
 			properties:buttonProps
 		});
@@ -130,8 +134,8 @@ define(function (require, exports, module)
 		buttons.push(buttonView);
 		planToWatchButton.on('click',function(){lightbox.show(planToWatchIconView);})
 
-		var searchButton = new Surface({
-		    size: [undefined, 25],
+		var searchButton = Surface({
+		    size: [undefined, gridHeight],
 			content:'Search',
 			properties:buttonProps
 		});
@@ -153,7 +157,7 @@ define(function (require, exports, module)
         //#endregion
 
         //#region Background
-		var background=new Surface({
+		var background=Surface({
 			properties:{
 				backgroundColor:'white',
 			}
@@ -184,7 +188,8 @@ define(function (require, exports, module)
 		    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 		    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 		    var parser = new DOMParser();
-		    var domObj = parser.parseFromString(request.response, "text/xml");
+		    var decodedRes = request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'');
+		    var domObj = parser.parseFromString(decodedRes, "text/xml");
 		    var obj = XML2jsobj(domObj).anime;
 		    if (obj.entry.length==undefined)
 		    {
@@ -293,7 +298,15 @@ define(function (require, exports, module)
 	        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 	        var body=request.responseText;
 
-	        malList=XML2jsobj(request.responseXML.documentElement);
+	        malList = XML2jsobj(request.responseXML.documentElement);
+	        if (malList.anime==undefined)
+	        {
+	            malList.anime = [];
+	        }
+	        if (malList.anime.length==undefined)
+	        {
+	            malList.anime = [malList.anime];
+	        }
 	        var i=0;
 	    }
 	    function sortMALList()

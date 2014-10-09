@@ -25,7 +25,32 @@ define(function (require, exports, module)
             align: function () { return loginTransitionable.get(); }
         });
 
-        loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce });
+        //#region Session Relogin
+        /*
+        if (sessionStorage.username!=undefined)
+        {
+            view.username = sessionStorage.username;
+            view.password = sessionStorage.password;
+
+            var url = 'http://www.anime-flix.com/requester.php?m=login';
+            var request = new XMLHttpRequest();
+            request.open("POST", url, false);
+            request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+            request.send('u=' + view.username + '&p=' + view.password);
+
+            var bodyText = request.responseText;
+            if (bodyText == 'Invalid credentials' || request.status != 200)
+            {
+                loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
+            }
+            else
+            {
+                view._eventOutput.emit('loggedIn');
+            }
+        }
+        */
+        //#endregion
+        loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
 
         var loginBackground = new ImageSurface({
             content: "/content/images/AnimeflixLogin2.png"
@@ -124,6 +149,32 @@ define(function (require, exports, module)
 
         button.on('click', login)
 
+        var credentialInfoTransform = new StateModifier({
+            origin: [0.5,0.5],
+            transform:Transform.translate(-350,0,5)
+        });
+        function credentialInfoBounce()
+        {
+            credentialInfoTransform.setTransform(Transform.translate(-400, 0, 5), { duration: 1000, curve: Easing.outCubic });
+            credentialInfoTransform.setTransform(Transform.translate(-350, 0, 5), { duration: 1000, curve: Easing.outBounce });
+            //credentialInfoTransform.setTransform(Transform.translate(-350, 0, 5), { duration: 500, curve: Easing.outBounce },credentialInfoBounce);
+        }
+
+        var credentialInfoBackground = new ImageSurface({
+            size:[250,150],
+            content:'content/images/InfoBubble.png'
+        });
+        var credentialInfoTransform2 = new StateModifier({
+            transform:Transform.translate(-15,0,0)
+        });
+        var credentialInfo = Surface({
+            size: [200, true],
+            content: 'Login with your MyAnimeList credentials. Anime-flix uses MyAnimeList to track your viewing progress as you watch.',
+            properties: {
+                textAlign: 'center',
+                vericalAlign:'middle'
+            }
+        });
 
         function login()
         {
@@ -155,6 +206,9 @@ define(function (require, exports, module)
         bouncerNode.add(usernameBoxTransform).add(usernameBox);
         bouncerNode.add(passwordBoxTransform).add(passwordBox);
         bouncerNode.add(buttonTransform).add(button);
+        var credentialInfoNode = bouncerNode.add(credentialInfoTransform);
+        credentialInfoNode.add(credentialInfoBackground);
+        credentialInfoNode.add(credentialInfoTransform2).add(credentialInfo);
         return view;
     }
     module.exports = createLoginScreen;

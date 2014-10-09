@@ -28,12 +28,8 @@ define(function(require, exports, module) {
     //Read Hash
     var hash= window.location.hash;
 
-    //Important Vars
-    var username;
-    var password;
-
     //get CORS access
-    var url = 'http://www.learnfamo.us/chard/requester.php';
+    var url = 'http://www.anime-flix.com/requester.php';
     var request = new XMLHttpRequest();
     request.open("GET", url, false);
     request.send();
