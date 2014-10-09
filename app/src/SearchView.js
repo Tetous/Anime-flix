@@ -17,6 +17,7 @@ define(function (require, exports, module)
     var SearchItemDisplay = require('SearchItemDisplay');
 
     require('xml2jsobj/xml2jsobj');
+    require('MALSupportFunctions');
 
     function createSearchView()
     {
@@ -37,6 +38,9 @@ define(function (require, exports, module)
             }
         }));
         */
+        var textBoxTransform = new StateModifier({
+            transform: Transform.translate(0, 0, window.showSelectorZ + 2)
+        });
         var textboxProperties = {
             fontSize: '12px',
             border: '1px solid gray',
@@ -65,10 +69,10 @@ define(function (require, exports, module)
                 search(textBox.getValue(), searchCallback);
             };
         });
-        container.add(textBox);
+        container.add(textBoxTransform).add(textBox);
         
         var scrollTransform = new StateModifier({
-            transform: Transform.translate(0, 30, 0)
+            transform: Transform.translate(0, 30, 1 + window.showSelectorZ + 1)
         });
         var scroll = new Scrollview({
             //size:[undefined,undefined],
@@ -117,24 +121,7 @@ define(function (require, exports, module)
 
         function search(searchText,callback)
         {
-            var request = new XMLHttpRequest();
-            request.onreadystatechange = function ()
-            {
-                if (request.readyState == 4)
-                {
-                    if (request.status == 200)
-                    {
-                        parser = new DOMParser();
-                        var domObj = parser.parseFromString(request.response, "text/xml");
-                        obj = XML2jsobj(domObj).anime;
-                        //obj = XML2jsobj(request.responseXML.documentElement);
-                        callback(obj);
-                    }
-                }
-            };
-            request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + searchText, true);
-            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+            searchMALAsync(searchText,callback);
         }
         return view;
     }

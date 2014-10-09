@@ -8,7 +8,8 @@ define(function (require, exports, module)
 {
     //#region Requires
     var Engine = require('famous/core/Engine');
-	var View = require('famous/core/View');
+    var View = require('famous/core/View');
+    var EventHandler = require('famous/core/EventHandler');
 	var Easing = require('famous/transitions/Easing');
 	var Transform = require('famous/core/Transform');
 	var StateModifier= require('famous/modifiers/StateModifier');
@@ -25,43 +26,92 @@ define(function (require, exports, module)
 	var SearchView = require('SearchView');
 
 	require('xml2jsobj/xml2jsobj');
+	require('MALSupportFunctions');
     //#endregion
 
 	function createShowSelector(animeList)
 	{
-		var malList;
+	    var malList;
 
-		var watching=[];
-		var completed=[];
-		var onHold=[];
-		var dropped=[];
-		var planToWatch=[];
+	    var watching=[];
+	    var completed=[];
+	    var onHold=[];
+	    var dropped=[];
+	    var planToWatch=[];
 
-		var view=new View();
+	    var view=new View();
 
-		var layout=new HeaderFooterLayout({
-			headerSize:100,
-			footerSize:50
-		});
-		view.add(layout);
+	    var layout=new HeaderFooterLayout({
+	        headerSize:100,
+	        footerSize:50
+	    });
+	    view.add(layout);
 
-		var headerNode=layout.header.add(Surface({
-			properties:{
-			    backgroundColor: '#0066CC'
-			}
-		}));
-		layout.header.add(new ImageSurface({
-		    size: [true, 50],
-            content: 'content/images/AnimeflixLogo.png'
-		}));
-		layout.footer.add(Surface({
-			content:'By Richard Kopelow',
-			properties:{
-				color:'white',
-				backgroundColor: '#0066CC',
-				verticalAlign:'middle'
-			}
-		}));
+	    var headerFooterColor='#0066CC';
+
+	    var headerNode=layout.header.add(Surface({
+	        properties:{
+	            backgroundColor: headerFooterColor
+	        }
+	    }));
+	    layout.header.add(new ImageSurface({
+	        size: [true, 50],
+	        content: 'content/images/AnimeflixLogo.png'
+	    }));
+	    layout.footer.add(Surface({
+	        content:'By Richard Kopelow',
+	        properties:{
+	            color:'white',
+	            backgroundColor: headerFooterColor,
+	            verticalAlign:'middle'
+	        }
+	    }));
+
+	    var buttonProps={
+	        textAlign:'center',
+	        verticalAlign:'middle',
+	        color: 'white',
+	        borderTopRightRadius: '5px',
+	        borderTopLeftRadius: '5px'
+	    };
+
+	    var buttonColorEvents = new EventHandler();
+	    buttonColorEvents.on('mouseover', function (button)
+	    {
+	        button.origin.setProperties({
+                color:'black',
+	            backgroundColor: 'white'
+	        });
+	    });
+	    buttonColorEvents.on('mouseout', function (button)
+	    {
+	        button.origin.setProperties({
+                color:'white',
+	            backgroundColor: headerFooterColor
+	        });
+	    });
+
+	    var logoutButtonTransform = new StateModifier({
+	        origin: [1,0],
+	        align:[1,0],
+	        transform:Transform.translate(-5,-5,1)
+	    });
+	    var logoutButton = Surface({
+	        size:[100,40],
+	        content: 'Logout',
+	        properties:buttonProps
+	    });
+	    logoutButton.setProperties({
+            borderRadius:'5px'
+	    });
+	    logoutButton.on('click', function ()
+	    {
+	        sessionStorage.username = undefined;
+	        sessionStorage.password = undefined;
+	        window.location.href = 'http://anime-flix.com';
+	    });
+		logoutButton.pipe(buttonColorEvents);
+		layout.header.add(logoutButtonTransform).add(logoutButton);
 
 		var gridTransform=new StateModifier({
 			transform:Transform.translate(0,50,1)
@@ -78,12 +128,6 @@ define(function (require, exports, module)
 		var buttons=[];
 		grid.sequenceFrom(buttons);
 
-		var buttonProps={
-				textAlign:'center',
-				verticalAlign:'middle',
-				color:'white'
-			};
-
 		var watchingButton = Surface({
 		    size: [undefined, gridHeight],
 			content:'Watching',
@@ -92,7 +136,8 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(watchingButton);
 		buttons.push(buttonView);
-		watchingButton.on('click',function(){lightbox.show(watchingIconView);})
+		watchingButton.on('click', function () { lightbox.show(watchingIconView); });
+		watchingButton.pipe(buttonColorEvents);
 
 		var completedButton = Surface({
 		    size: [undefined, gridHeight],
@@ -102,7 +147,8 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(completedButton);
 		buttons.push(buttonView);
-		completedButton.on('click',function(){lightbox.show(completedIconView);})
+		completedButton.on('click', function () { lightbox.show(completedIconView); });
+		completedButton.pipe(buttonColorEvents);
 
 		var onHoldButton = Surface({
 		    size: [undefined, gridHeight],
@@ -112,7 +158,8 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(onHoldButton);
 		buttons.push(buttonView);
-		onHoldButton.on('click',function(){lightbox.show(onHoldIconView);})
+		onHoldButton.on('click', function () { lightbox.show(onHoldIconView); });
+		onHoldButton.pipe(buttonColorEvents);
 
 		var droppedButton = Surface({
 		    size: [undefined, gridHeight],
@@ -122,7 +169,8 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(droppedButton);
 		buttons.push(buttonView);
-		droppedButton.on('click',function(){lightbox.show(droppedIconView);})
+		droppedButton.on('click', function () { lightbox.show(droppedIconView); });
+		droppedButton.pipe(buttonColorEvents);
 
 		var planToWatchButton = Surface({
 		    size: [undefined, gridHeight],
@@ -132,7 +180,8 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(planToWatchButton);
 		buttons.push(buttonView);
-		planToWatchButton.on('click',function(){lightbox.show(planToWatchIconView);})
+		planToWatchButton.on('click', function () { lightbox.show(planToWatchIconView); });
+		planToWatchButton.pipe(buttonColorEvents);
 
 		var searchButton = Surface({
 		    size: [undefined, gridHeight],
@@ -143,6 +192,7 @@ define(function (require, exports, module)
 		buttonView.add(searchButton);
 		buttons.push(buttonView);
 		searchButton.on('click', function () { lightbox.show(searchView); });
+		searchButton.pipe(buttonColorEvents);
         //#endregion
 
 	    //#region Series Display
@@ -183,14 +233,7 @@ define(function (require, exports, module)
 
 		function searchShowWithID(title,id)
 		{
-		    var request = new XMLHttpRequest();
-		    request.open('POST', 'http://www.anime-flix.com/requester.php?m=search&s=' + title, false);
-		    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-		    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
-		    var parser = new DOMParser();
-		    var decodedRes = request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'');
-		    var domObj = parser.parseFromString(decodedRes, "text/xml");
-		    var obj = XML2jsobj(domObj).anime;
+		    var obj=searchMAL(title);
 		    if (obj.entry.length==undefined)
 		    {
 		        return obj.entry;

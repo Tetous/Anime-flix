@@ -69,3 +69,36 @@ function createSeriesXML(listData)
 	           '<tags></tags>'+
            '</entry>';
 }
+
+function searchMAL(search)
+{
+    var request = new XMLHttpRequest();
+    request.open('POST', 'http://www.anime-flix.com/requester.php?m=search&s=' + search, false);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+    var parser = new DOMParser();
+    var decodedRes = request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'');
+    var domObj = parser.parseFromString(decodedRes, "text/xml");
+    return XML2jsobj(domObj).anime;
+}
+function searchMALAsync(search, callback)
+{
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function ()
+    {
+        if (request.readyState == 4)
+        {
+            if (request.status == 200)
+            {
+                parser = new DOMParser();
+                var domObj = parser.parseFromString(request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\''), "text/xml");
+                obj = XML2jsobj(domObj).anime;
+                //obj = XML2jsobj(request.responseXML.documentElement);
+                callback(obj);
+            }
+        }
+    };
+    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search, true);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+}

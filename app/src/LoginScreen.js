@@ -25,35 +25,42 @@ define(function (require, exports, module)
             align: function () { return loginTransitionable.get(); }
         });
 
-        //#region Session Relogin
-        /*
-        if (sessionStorage.username!=undefined)
-        {
-            view.username = sessionStorage.username;
-            view.password = sessionStorage.password;
-
-            var url = 'http://www.anime-flix.com/requester.php?m=login';
-            var request = new XMLHttpRequest();
-            request.open("POST", url, false);
-            request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-            request.send('u=' + view.username + '&p=' + view.password);
-
-            var bodyText = request.responseText;
-            if (bodyText == 'Invalid credentials' || request.status != 200)
-            {
-                loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
-            }
-            else
-            {
-                view._eventOutput.emit('loggedIn');
-            }
-        }
-        */
-        //#endregion
-        loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
+        
+        //loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
 
         var loginBackground = new ImageSurface({
             content: "/content/images/AnimeflixLogin2.png"
+        });
+        loginBackground.on("deploy", function ()
+        {
+            //#region Session Relogin
+
+            if (sessionStorage.username != undefined)
+            {
+                view.username = sessionStorage.username;
+                view.password = sessionStorage.password;
+
+                var url = 'http://www.anime-flix.com/requester.php?m=login';
+                var request = new XMLHttpRequest();
+                request.open("POST", url, false);
+                request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+                request.send('u=' + view.username + '&p=' + view.password);
+
+                var bodyText = request.responseText;
+                if (bodyText == 'Invalid credentials' || request.status != 200)
+                {
+                    loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
+                }
+                else
+                {
+                    view._eventOutput.emit('loggedIn');
+                }
+            }
+            else
+            {
+                loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
+            }
+            //#endregion
         });
 
         var fontSize = 25;

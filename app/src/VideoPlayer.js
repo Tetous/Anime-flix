@@ -324,9 +324,7 @@ define(function (require, exports, module)
 			            {
 			                if (ledgerSwaps[i].ledgerName == showLedger[j].name)
 			                {
-			                    showLedger[j].name = ledgerSwaps[i].malName;
 			                    value = { name: showLedger[j].name, link: showLedger[j].link };
-			                    showLedger.push(value);
 			                    done = true;
 			                }
 			            }
