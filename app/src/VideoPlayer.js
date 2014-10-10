@@ -121,6 +121,24 @@ define(function (require, exports, module)
 		    if (playData.episode + 1 > playData.show.series_episodes)
 		    {
 		        playData.show.my_status = 2;
+		        if (playData.show.my_finish_date ='000-00-00')
+		        {
+		            var today = new Date();
+		            var dd = today.getDate();
+		            var mm = today.getMonth() + 1; //January is 0!
+		            var yyyy = today.getFullYear();
+
+		            if (dd < 10)
+		            {
+		                dd = '0' + dd
+		            }
+
+		            if (mm < 10)
+		            {
+		                mm = '0' + mm
+		            }
+		            playData.show.my_finish_date = yyyy + '-' + mm + '-' + dd;
+		        }
 		        //replace with a more appropriate screen
 		        lightbox.show(seriesEndScreen);
 		    }

@@ -25,7 +25,7 @@ function deleteAnime(id)
 
 function createUpdateBody(listData)
 {
-    return 'series_id=' + listData.series_animedb_id +
+    var ret= 'series_id=' + listData.series_animedb_id +
         '&anime_db_series_id=' + listData.series_animedb_id +
         '&series_title=' + listData.series_animedb_id +
         '&aeps=' + listData.series_episodes +
@@ -35,8 +35,27 @@ function createUpdateBody(listData)
         '&completed_eps=' + listData.my_watched_episodes +
         '&last_completed_eps=0' +//listData.last_completed_eps needs to be added by series display. Using destructive hack right now
         '&score=' + listData.my_score +
+        '&submitIt=2';
         //these are unimportant and are not used my me (other and start and end date), these need to be set up to just pass original list data values through
-        '&tags=&unknownStart=1&unknownEnd=1&fansub_group=0&priority=0&storage=0&storageVal=0.00&list_downloaded_eps=0&list_times_watched=0&list_rewatch_value=0&list_comments=&discuss=1&submitIt=2';
+        //'&tags=&fansub_group=0&priority=0&storage=0&storageVal=0.00&list_downloaded_eps=0&list_times_watched=0&list_rewatch_value=0&list_comments=&discuss=1';
+    if (listData.my_start_date!='0000-00-00')
+    {
+        var dateParts = listData.my_start_date.split('-');
+        ret+='&startMonth='+dateParts[1]+'&startDay='+dateParts[2]+'&startYear='+dateParts[0];
+    }
+    else {
+        ret+='&unknownStart=1';
+    }
+    if (listData.my_finish_date != '0000-00-00')
+    {
+        var dateParts = listData.my_finish_date.split('-');
+        ret += '&endMonth=' + dateParts[1] + '&endDay=' + dateParts[2] + '&endYear=' + dateParts[0];
+    }
+    else
+    {
+        ret+='&unknownEnd=1';
+    }
+    return ret;
 }
 
 function createAddBody(listData)
@@ -51,8 +70,9 @@ function createAddBody(listData)
         '&completed_eps=' + listData.my_watched_episodes +
         '&last_completed_eps=0' +//listData.last_completed_eps needs to be added by series display. Using destructive hack right now
         '&score=' + listData.my_score +
+        '&startMonth=00&startDay=00&startYear=0000&submitIt=1';
         //these are unimportant and are not used my me (other and start and end date), these need to be set up to just pass original list data values through
-        '&tags=&startMonth=00&startDay=00&startYear=0000&unknownEnd=1&fansub_group=&priority=0&storage=0&storageVal=&list_downloaded_eps=&list_times_watched=&list_rewatch_value=0&list_comments=&discuss=1&submitIt=1';
+        //'&tags=&unknownEnd=1&fansub_group=&priority=0&storage=0&storageVal=&list_downloaded_eps=&list_times_watched=&list_rewatch_value=0&list_comments=&discuss=1';
 }
 
 function createSeriesXML(listData)

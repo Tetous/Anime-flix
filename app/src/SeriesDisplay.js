@@ -263,9 +263,9 @@ define(function (require, exports, module)
                     }
                 }
                 changeStatusAlert.button1Clicked = false;
-                changeStatusAlert.button2Clicked = false;
+                changeStatusAlert.button2Clicked = true;
                 skipBackAlert.button1Clicked = false;
-                skipBackAlert.button2Clicked = false;
+                skipBackAlert.button2Clicked = true;
 
                 updateAnime(series.listData);
 
@@ -290,6 +290,22 @@ define(function (require, exports, module)
                 }
                 else
                 {
+                    if (series.listData.my_status==6)
+                    {
+                        var today = new Date();
+                        var dd = today.getDate();
+                        var mm = today.getMonth()+1; //January is 0!
+                        var yyyy = today.getFullYear();
+
+                        if(dd<10) {
+                            dd='0'+dd
+                        } 
+
+                        if(mm<10) {
+                            mm='0'+mm
+                        }
+                        series.listData.my_start_date = yyyy + '-' + mm + '-' + dd;
+                    }
                     series.listData.my_status = 1;
 
                     var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
@@ -336,6 +352,24 @@ define(function (require, exports, module)
                 if (series.listData.my_status==2)
                 {
                     series.listData.my_watched_episodes++;
+                    if (series.listData.my_finish_date == '0000-00-00')
+                    {
+                        var today = new Date();
+                        var dd = today.getDate();
+                        var mm = today.getMonth() + 1; //January is 0!
+                        var yyyy = today.getFullYear();
+
+                        if (dd < 10)
+                        {
+                            dd = '0' + dd
+                        }
+
+                        if (mm < 10)
+                        {
+                            mm = '0' + mm
+                        }
+                        series.listData.my_finish_date = yyyy + '-' + mm + '-' + dd;
+                    }
                 }
             }
             else
@@ -372,8 +406,8 @@ define(function (require, exports, module)
         deleteButton.on('click', function ()
         {
             deleteAnime(series.listData.series_animedb_id);
-            window.location.href = 'http://anime-flix.com'; //Hack until I make a better refresh for the list
-            close();
+            window.location.reload(); //Hack until I make a better refresh for the list
+            view.hide();
         });
         transforms.push(deleteButtonTransform);
         view.add(deleteButtonTransform).add(deleteButton);

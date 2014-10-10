@@ -87,6 +87,7 @@ function deleteListItem($id,$username,$password)
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLINFO_HEADER_OUT,1);
         curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_USERPWD, $username.':'.$password);
         curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/delete/'.$id.'.xml');
         curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
         $output=curl_exec($ch);

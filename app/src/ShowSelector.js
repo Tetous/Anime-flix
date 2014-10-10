@@ -337,7 +337,7 @@ define(function (require, exports, module)
 		        my_start_date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
 		        my_finish_date: '000-00-00',
 		        my_score: 0,
-		        my_status: 0,
+		        my_status: 2,
 		        my_rewatching: 0,
 		        my_rewatching_ep: 0,
 		        my_last_updated: 0
