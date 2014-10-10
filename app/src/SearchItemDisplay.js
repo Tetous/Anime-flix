@@ -33,7 +33,7 @@ define(function (require, exports, module)
             transform:Transform.translate(5,5,1)
         });
         var image = new ImageSurface({
-            size:[true,120]
+            size:[91,true]
         });
         view.add(imageTransform).add(image);
 

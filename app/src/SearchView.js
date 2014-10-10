@@ -39,7 +39,7 @@ define(function (require, exports, module)
         }));
         */
         var textBoxTransform = new StateModifier({
-            transform: Transform.translate(0, 0, window.showSelectorZ + 2)
+            transform: Transform.translate(0, 0, window.showSelectorZ + 15)
         });
         var textboxProperties = {
             fontSize: '12px',

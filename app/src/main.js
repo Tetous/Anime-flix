@@ -1,32 +1,35 @@
 /* globals define */
-define(function(require, exports, module) {
+define(function (require, exports, module)
+{
     'use strict';
     // import dependencies
     var Engine = require('famous/core/Engine');
     var RenderNode = require('famous/core/RenderNode');
     var Modifier = require('famous/core/Modifier');
-    var StateModifier= require('famous/modifiers/StateModifier');
+    var StateModifier = require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
     var Surface = require('famous/core/Surface');
     var Easing = require('famous/transitions/Easing');
-    var Transitionable=require('famous/transitions/Transitionable');
-    var LoginScreen=require('LoginScreen');
-    var ShowSelector=require('ShowSelector');
-    var VideoPlayer=require('VideoPlayer');
+    var Transitionable = require('famous/transitions/Transitionable');
+    var LoginScreen = require('LoginScreen');
+    var ShowSelector = require('ShowSelector');
+    var VideoPlayer = require('VideoPlayer');
 
-    window.loginZ=100;
-    window.showSelectorZ=50;
-    window.videoPlayerZ=0;
+    require('MALSupportFunctions');
+
+    window.loginZ = 100;
+    window.showSelectorZ = 50;
+    window.videoPlayerZ = 0;
 
     //CSS
-    var vidCSS=document.createElement("link");
-    vidCSS.rel="stylesheet";
-    vidCSS.href="css/video-js.min.css";
-    vidCSS.type="text/css";
+    var vidCSS = document.createElement("link");
+    vidCSS.rel = "stylesheet";
+    vidCSS.href = "css/video-js.min.css";
+    vidCSS.type = "text/css";
     document.head.appendChild(vidCSS);
 
     //Read Hash
-    var hash= window.location.hash;
+    var hash = window.location.hash;
 
     //get CORS access
     var url = 'http://www.anime-flix.com/requester.php';
@@ -36,39 +39,66 @@ define(function(require, exports, module) {
 
     // create the main context
     var mainContext = Engine.createContext();
-    window.mainContext=mainContext
+    window.mainContext = mainContext
 
-    Engine.nextTick(function(){
-
-    var videoPlayerTransform=new StateModifier({
-        transform:Transform.translate(0,0,window.videoPlayerZ)
-    });
-    var videoPlayer=VideoPlayer();
-    videoPlayer.on('backToBrowsing',function(){
-        showSelectorTransform.setAlign([0,0],{duration:2000,curve:Easing.outCubic});
-    });
-
-    var showSelectorTransform=new StateModifier({
-        transform:Transform.translate(0,0,window.showSelectorZ)
-    });
-    var showSelector=ShowSelector();
-    showSelector.on('showSelected',function(data){
-        showSelectorTransform.setAlign([0,-1],{duration:2000,curve:Easing.outCubic},function(){
-            videoPlayer.play(data.show,data.episode);
+    Engine.nextTick(function ()
+    {
+        var videoPlayerTransform = new StateModifier({
+            transform: Transform.translate(0, 0, window.videoPlayerZ)
         });
-    });
+        var videoPlayer = VideoPlayer();
+        videoPlayer.on('backToBrowsing', function ()
+        {
+            window.location.hash = 'sdisplay&'+showSelector.getShowingSection();
+            showSelectorTransform.setAlign([0, 0], { duration: 2000, curve: Easing.outCubic });
+        });
+        mainContext.add(videoPlayerTransform).add(videoPlayer);
 
-    var loginScreenTransform=new Modifier({transform: Transform.translate(0,0,window.loginZ)});
-    var loginScreen=LoginScreen(mainContext.getSize());
-    mainContext.add(loginScreenTransform).add(loginScreen);
-    mainContext.add(showSelectorTransform).add(showSelector);
-    mainContext.add(videoPlayerTransform).add(videoPlayer);
+        var showSelectorTransform = new StateModifier({
+            transform: Transform.translate(0, 0, window.showSelectorZ)
+        });
+        var showSelector = ShowSelector();
+        function showSelected(data)
+        {
+            showSelectorTransform.setAlign([0, -1], { duration: 2000, curve: Easing.outCubic }, function ()
+            {
+                videoPlayer.play(data.show, data.episode);
+            });
+        }
+        showSelector.on('showSelected', showSelected);
+        mainContext.add(showSelectorTransform).add(showSelector);
 
-    loginScreen.on('loggedIn',function(){
-        sessionStorage.username = loginScreen.username;
-        sessionStorage.password = loginScreen.password;
-        showSelector.refreshList();
-        //videoPlayer.play({series_title: 'Sword Art Online'},1);
+        var loginScreenTransform = new Modifier({ transform: Transform.translate(0, 0, window.loginZ) });
+        var loginScreen = LoginScreen(mainContext.getSize());
+        loginScreen.on('loggedIn', function ()
+        {
+            sessionStorage.username = loginScreen.username;
+            sessionStorage.password = loginScreen.password;
+            showSelector.refreshList();
+            //#region Process Hash
+            var params = hash.split('&');
+            switch (params[0])
+            {
+                case '#video':
+                    var episode = parseInt(params[2]);
+                    var showData = showSelector.selectShowById(parseInt(params[1]));
+                    if (episode > showData.my_watched_episodes)
+                    {
+                        showData.my_watched_episodes = episode-1;
+                    }
+                    updateAnime(showData);
+                    showSelected({ show: showData, episode: episode });
+                    showSelector.showSection('1');
+                    break;
+                case '#sdisplay':
+                    showSelector.showSection(params[1]);
+                    break;
+                default:
+                    showSelector.showSection('1');
+                    break;
+            }
+            //#endregion
+        });
+        mainContext.add(loginScreenTransform).add(loginScreen);
     });
-});
 });

@@ -14,6 +14,14 @@ function updateAnime(listData)
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createAddBody(listData)));
     }
 }
+function deleteAnime(id)
+{
+    var request = new XMLHttpRequest();
+    request.open('post', 'http://anime-flix.com/requester.php?m=delete&i=' + id);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+}
+
 
 function createUpdateBody(listData)
 {

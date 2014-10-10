@@ -54,6 +54,11 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
+    case 'delete':
+        $out=deleteListItem($_GET['i'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
 	default:
 		# code...
 		break;
@@ -69,6 +74,25 @@ function MALLogin($ch,$username,$password)
         curl_setopt ($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
         
         curl_exec($ch);
+}
+
+function deleteListItem($id,$username,$password)
+{
+    global $ch;
+    
+        $ch=curl_init();
+        
+        MALLogin($ch,$username,$password);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/delete/'.$id.'.xml');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        $output=curl_exec($ch);
+        
+        curl_close($ch);
+    return $output;
 }
 
 function addListItem($body,$id,$username,$password)

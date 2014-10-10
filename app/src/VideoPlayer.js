@@ -172,7 +172,11 @@ define(function (require, exports, module)
 		});
 
 		var ledgerSwaps=[];
-		var showLedger=[];
+		var showLedger = [];
+		if (localStorage.ledger)
+		{
+		    JSON.parse(localStorage.ledger);
+		}
 
 		function processLedger(body)
 		{
@@ -212,6 +216,7 @@ define(function (require, exports, module)
 		            {
 		                var processedLedger = processLedger(request.responseText);
 		                showLedger = showLedger.concat(processedLedger);
+		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
 		        }
 		    };
@@ -229,6 +234,7 @@ define(function (require, exports, module)
 		            if (request.status == 200)
 		            {
 		                showLedger = showLedger.concat(processLedger(request.responseText));
+		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
 		        }
 		    };
@@ -254,6 +260,9 @@ define(function (require, exports, module)
 	        var ledgerItem = getLedgerItem(playObject);
 	        if (ledgerItem)
 	        {
+	            //setting hash
+	            window.location.hash = 'video&' + playData.show.series_animedb_id+'&'+playData.episode;
+
 	            titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
 
 	            url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;

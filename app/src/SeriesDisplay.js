@@ -243,7 +243,7 @@ define(function (require, exports, module)
         });
         function asyncAlertChecker()
         {
-            var alertsFinished = (changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked)&&(skipBackAlert.button1Clicked||skipBackAlert.button2Clicked);
+            var alertsFinished = changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked||skipBackAlert.button1Clicked||skipBackAlert.button2Clicked;
 
             if (alertsFinished)
             {
@@ -251,12 +251,21 @@ define(function (require, exports, module)
                 if (changeStatusAlert.button1Clicked)
                 {
                     series.listData.my_status = 1;
+                    var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
+                    series.listData.my_watched_episodes = selectedEpisode - 1;
+                }
+                else
+                {
                     if (skipBackAlert.button1Clicked)
                     {
                         var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
                         series.listData.my_watched_episodes = selectedEpisode - 1;
                     }
                 }
+                changeStatusAlert.button1Clicked = false;
+                changeStatusAlert.button2Clicked = false;
+                skipBackAlert.button1Clicked = false;
+                skipBackAlert.button2Clicked = false;
 
                 updateAnime(series.listData);
 
@@ -347,6 +356,28 @@ define(function (require, exports, module)
         transforms.push(updateButtonTransform);
         view.add(updateButtonTransform).add(updateButton);
 
+        var deleteButtonTransform = new StateModifier();
+        var deleteButton = new Surface({
+            size: [100, 50],
+            content: 'Delete',
+            properties: {
+                //fontSize: fontSize + 'px',
+                textAlign: 'center',
+                lineHeight: 50 + 'px',
+                verticalAlign: 'middle',
+                backgroundColor: '#00fff8',
+                borderRadius: 25 + 'px'
+            }
+        });
+        deleteButton.on('click', function ()
+        {
+            deleteAnime(series.listData.series_animedb_id);
+            window.location.href = 'http://anime-flix.com'; //Hack until I make a better refresh for the list
+            close();
+        });
+        transforms.push(deleteButtonTransform);
+        view.add(deleteButtonTransform).add(deleteButton);
+
         var closeButtonTransform = new StateModifier({
         });
         var closeButton = new Surface({
@@ -406,22 +437,24 @@ define(function (require, exports, module)
         view.show = function () {
             var windowSize=window.mainContext.getSize();
             var backgroundPos=[(windowSize[0] - backgroundWidth) / 2, (windowSize[1] - backgroundHeight) / 2];
-            backgroundTransform.setTransform(Transform.translate(backgroundPos[0],backgroundPos[1], 0), { duration: 1000, curve: Easing.outCubic });
-            imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), { duration: 1000, curve: Easing.outCubic });
-            titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1), { duration: 1000, curve: Easing.outCubic });
-            typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), { duration: 1000, curve: Easing.outCubic });
-            airedTransform.setTransform(Transform.translate(backgroundPos[0] + 260, backgroundPos[1] + 35, 1), { duration: 1000, curve: Easing.outCubic });
-            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 260, 1), { duration: 1000, curve: Easing.outCubic });
-            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + 260, 1), { duration: 1000, curve: Easing.outCubic });
-            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), { duration: 1000, curve: Easing.outCubic });
-            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), { duration: 1000, curve: Easing.outCubic });
-            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), { duration: 1000, curve: Easing.outCubic });
-            descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), { duration: 1000, curve: Easing.outCubic });
-            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), { duration: 1000, curve: Easing.outCubic });
-            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), { duration: 1000, curve: Easing.outCubic });
-            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 390, 1), { duration: 1000, curve: Easing.outCubic });
-            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 370, backgroundPos[1] + 390, 1), { duration: 1000, curve: Easing.outCubic });
-            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + backgroundWidth - 30, backgroundPos[1], 2), { duration: 1000, curve: Easing.outCubic });
+            var inTransition={ duration: 1000, curve: Easing.outCubic };
+            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0), inTransition);
+            imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), inTransition);
+            titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1),inTransition);
+            typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), inTransition);
+            airedTransform.setTransform(Transform.translate(backgroundPos[0] + 260, backgroundPos[1] + 35, 1), inTransition);
+            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 260, 1), inTransition);
+            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + 260, 1), inTransition);
+            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), inTransition);
+            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), inTransition);
+            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), inTransition);
+            descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), inTransition);
+            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), inTransition);
+            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), inTransition);
+            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 390, 1), inTransition);
+            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 370, backgroundPos[1] + 390, 1), inTransition);
+            deleteButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 530, backgroundPos[1] + 390, 1), inTransition);
+            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + backgroundWidth - 30, backgroundPos[1], 2), inTransition);
             opened = true;
         }
 

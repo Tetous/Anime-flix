@@ -33,6 +33,7 @@ define(function (require, exports, module)
 	{
 	    var malList;
 
+	    var sectionDisplaying=1;
 	    var watching=[];
 	    var completed=[];
 	    var onHold=[];
@@ -41,9 +42,11 @@ define(function (require, exports, module)
 
 	    var view=new View();
 
+	    var headerHeight = 100;
+	    var footerHeight = 50;
 	    var layout=new HeaderFooterLayout({
-	        headerSize:100,
-	        footerSize:50
+	        headerSize:headerHeight,
+	        footerSize:footerHeight
 	    });
 	    view.add(layout);
 
@@ -58,14 +61,52 @@ define(function (require, exports, module)
 	        size: [true, 50],
 	        content: 'content/images/AnimeflixLogo.png'
 	    }));
+	    //#region Footer
 	    layout.footer.add(Surface({
-	        content:'By Richard Kopelow',
-	        properties:{
-	            color:'white',
-	            backgroundColor: headerFooterColor,
-	            verticalAlign:'middle'
+	        properties: {
+                backgroundColor:headerFooterColor
 	        }
 	    }));
+
+	    var footerElements = [];
+	    var footerGrid = new GridLayout({
+	        size: [undefined, footerHeight],
+            dimensions:[3,1]
+	    });
+	    footerGrid.sequenceFrom(footerElements);
+	    layout.footer.add(footerGrid);
+        
+	    var byRichard = Surface({
+	        content: 'By Richard Kopelow',
+	        properties: {
+                size:[undefined,footerHeight],
+                color: 'white',
+                textAlign:'center',
+	            verticalAlign: 'middle',
+	        }
+	    });
+	    footerElements.push(byRichard);
+	    var supportContact = Surface({
+	        content: '<a href="mailto:support@anime-flix.com">support@anime-flix.com</a>',
+	        properties: {
+	            size: [undefined, footerHeight],
+	            color: 'white',
+	            textAlign: 'center',
+	            verticalAlign: 'middle',
+	        }
+	    });
+	    footerElements.push(supportContact);
+	    var supportContact = Surface({
+	        content: '<a href="mailto:features@anime-flix.com?subject=Feature Request">features@anime-flix.com</a>',
+	        properties: {
+	            size: [undefined, footerHeight],
+	            color: 'white',
+	            textAlign: 'center',
+	            verticalAlign: 'middle',
+	        }
+	    });
+	    footerElements.push(supportContact);
+        //#endregion
 
 	    var buttonProps={
 	        textAlign:'center',
@@ -113,11 +154,11 @@ define(function (require, exports, module)
 		logoutButton.pipe(buttonColorEvents);
 		layout.header.add(logoutButtonTransform).add(logoutButton);
 
+		var gridHeight = headerHeight / 2;
 		var gridTransform=new StateModifier({
-			transform:Transform.translate(0,50,1)
+			transform:Transform.translate(0,headerHeight-gridHeight,1)
 		});
 
-		var gridHeight = 50;
 		var grid=new GridLayout({
 		    size: [undefined, gridHeight],
 			dimensions:[6,1]
@@ -136,7 +177,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(watchingButton);
 		buttons.push(buttonView);
-		watchingButton.on('click', function () { lightbox.show(watchingIconView); });
+		watchingButton.on('click', function ()
+		{
+		    lightbox.show(watchingIconView);
+		    sectionDisplaying = 1;
+		    window.location.hash = 'sdisplay&1';
+		});
 		watchingButton.pipe(buttonColorEvents);
 
 		var completedButton = Surface({
@@ -147,7 +193,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(completedButton);
 		buttons.push(buttonView);
-		completedButton.on('click', function () { lightbox.show(completedIconView); });
+		completedButton.on('click', function ()
+		{
+		    lightbox.show(completedIconView);
+		    sectionDisplaying = 2;
+		    window.location.hash = 'sdisplay&2';
+		});
 		completedButton.pipe(buttonColorEvents);
 
 		var onHoldButton = Surface({
@@ -158,7 +209,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(onHoldButton);
 		buttons.push(buttonView);
-		onHoldButton.on('click', function () { lightbox.show(onHoldIconView); });
+		onHoldButton.on('click', function ()
+		{
+		    lightbox.show(onHoldIconView);
+		    sectionDisplaying = 3;
+		    window.location.hash = 'sdisplay&3';
+		});
 		onHoldButton.pipe(buttonColorEvents);
 
 		var droppedButton = Surface({
@@ -169,7 +225,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(droppedButton);
 		buttons.push(buttonView);
-		droppedButton.on('click', function () { lightbox.show(droppedIconView); });
+		droppedButton.on('click', function ()
+		{
+		    lightbox.show(droppedIconView);
+		    sectionDisplaying = 4;
+		    window.location.hash = 'sdisplay&4';
+		});
 		droppedButton.pipe(buttonColorEvents);
 
 		var planToWatchButton = Surface({
@@ -180,7 +241,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(planToWatchButton);
 		buttons.push(buttonView);
-		planToWatchButton.on('click', function () { lightbox.show(planToWatchIconView); });
+		planToWatchButton.on('click', function ()
+		{
+		    lightbox.show(planToWatchIconView);
+		    sectionDisplaying = 6;
+		    window.location.hash = 'sdisplay&6';
+		});
 		planToWatchButton.pipe(buttonColorEvents);
 
 		var searchButton = Surface({
@@ -191,7 +257,12 @@ define(function (require, exports, module)
 		var buttonView=new View();
 		buttonView.add(searchButton);
 		buttons.push(buttonView);
-		searchButton.on('click', function () { lightbox.show(searchView); });
+		searchButton.on('click', function ()
+		{
+		    lightbox.show(searchView);
+		    sectionDisplaying = 7;
+		    window.location.hash = 'sdisplay&7';
+		});
 		searchButton.pipe(buttonColorEvents);
         //#endregion
 
@@ -386,7 +457,51 @@ define(function (require, exports, module)
 			droppedIconView.populate(dropped);
 			planToWatchIconView.populate(planToWatch);
 
-			lightbox.show(watchingIconView);
+			//lightbox.show(watchingIconView);
+		}
+
+		view.selectShowById = function (id)
+		{
+		    for (var i = 0; i < malList.anime.length; i++)
+		    {
+		        if (malList.anime[i].series_animedb_id==id)
+		        {
+		            return malList.anime[i];
+		        }
+		    }
+		    var blank = createBlankListData();
+		    blank.series_animedb_id = id;
+		    blank.my_status = 1;
+		    blank.localConstruction = true;
+		    return blank;
+		}
+		view.showSection = function (section)
+		{
+		    switch (section)
+		    {
+		        case '1':
+		            lightbox.show(watchingIconView);
+		            break;
+		        case '2':
+		            lightbox.show(completedIconView);
+		            break;
+		        case '3':
+		            lightbox.show(onHoldIconView);
+		            break;
+		        case '4':
+		            lightbox.show(droppedIconView);
+		            break;
+		        case '6':
+		            lightbox.show(planToWatchIconView);
+		            break;
+		        case '7':
+		            lightbox.show(searchView);
+		            break;
+		    }
+		}
+		view.getShowingSection = function ()
+		{
+		    return sectionDisplaying;
 		}
 
 		return view;
