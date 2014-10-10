@@ -59,6 +59,11 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
+    case 'discuss':
+        $out=getDiscussionURL($_GET['e'],$_GET['i'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
 	default:
 		# code...
 		break;
@@ -75,14 +80,39 @@ function MALLogin($ch,$username,$password)
         
         curl_exec($ch);
 }
-
-function deleteListItem($id,$username,$password)
+function getDiscussionURL($id,$episode,$username,$password)
 {
     global $ch;
     
         $ch=curl_init();
         
         MALLogin($ch,$username,$password);
+        
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLINFO_HEADER_OUT,1);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/includes/ajax.inc.php?t=50');
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array( 'Accept-Encoding: ','User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+        curl_setopt($ch, CURLOPT_POSTFIELDS, 'epNum='.$episode.'&aid='.$id.'&id='.$id); 
+        $output=curl_exec($ch);
+        
+        curl_close($ch);
+        return output;
+        $urlStart=strpos($output,'/forum/?topicid=');
+        if($urlStart===false)
+        {
+            return 'false';
+        }
+        $urlEnd=strpos($output,'\';"',$urlStart);
+        $urlPart=substr($output,$urlStart,$urlEnd-$urlStart);
+    return 'http://myanimelist.net'.$urlPart;
+}
+
+function deleteListItem($id,$username,$password)
+{
+    global $ch;
+    
+        $ch=curl_init();
         
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLINFO_HEADER_OUT,1);

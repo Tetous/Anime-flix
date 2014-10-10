@@ -12,8 +12,12 @@ define(function (require, exports, module)
     var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
+    require('MALSupportFunctions');
+
     function createVideoTransitionScreen()
     {
+        var discussionURL = '';
+
         var view = new View();
         var backgroundSurface = Surface({
             properties: {
@@ -52,13 +56,35 @@ define(function (require, exports, module)
         });
         nextEpisodeButton.on('click', function () { countdown = 0; });
         view.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
+        /*
+        var discussEpisodeButtonTransform = new StateModifier({
+            origin: [0, 1],
+            align:[0,1],
+            transform:Transform.translate(20,-20,1)
+        });
+        var discussEpisodeButton = Surface({
+            size:[200,50],
+            content: 'Discuss this Episode',
+            properties: {
+                backgroundColor: 'white',
+                borderRadius:'10px'
+            }
+        });
+        discussEpisodeButton.on('click', function()
+        {
+            window.open(discussionURL);
+        });
+        view.add(discussEpisodeButtonTransform).add(discussEpisodeButton);
+        */
 
         var countdown;
-        view.startCountdown = function()
+        view.startCountdown = function(episode,showId)
         {
             countdown = 10;
             backgroundSurface.setContent('<img src="content/images/player/Timer10.png" height="400" width="400">');
             Timer.setTimeout(timerTick, 1000);
+            discussionURL = getDiscussionURL(episode, showId);
+
         }
 
         function timerTick()

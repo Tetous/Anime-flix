@@ -22,6 +22,15 @@ function deleteAnime(id)
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }
 
+function getDiscussionURL(episode,showId)
+{
+    var request = new XMLHttpRequest();
+    request.open('post', 'http://anime-flix.com/requester.php?m=discuss&i=' + showId+'&e='+episode,false);
+    request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+    request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
+    return request.response;
+}
+
 
 function createUpdateBody(listData)
 {

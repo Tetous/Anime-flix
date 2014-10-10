@@ -243,7 +243,7 @@ define(function (require, exports, module)
         });
         function asyncAlertChecker()
         {
-            var alertsFinished = changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked||skipBackAlert.button1Clicked||skipBackAlert.button2Clicked;
+            var alertsFinished = (changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked)&&(skipBackAlert.button1Clicked||skipBackAlert.button2Clicked);
 
             if (alertsFinished)
             {

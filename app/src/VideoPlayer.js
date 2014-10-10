@@ -182,7 +182,7 @@ define(function (require, exports, module)
 				else
 				{
 				    lightbox.show(transitionScreen);
-				    transitionScreen.startCountdown();
+				    transitionScreen.startCountdown(playData.episode,playData.show.series_animedb_id);
 				}
 				updateAnime(playData.show);
 			});
