@@ -17,7 +17,7 @@ define(function (require, exports, module)
         var open = false;
 
         var view = new View();
-        view.button1Clicked = true;
+        view.button1Clicked = false;
         view.button2Clicked = true;
         var alertTransform = new StateModifier();
         var alertTransformNode = view.add(alertTransform);

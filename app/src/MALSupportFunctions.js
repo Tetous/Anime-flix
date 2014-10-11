@@ -1,23 +1,62 @@
-function updateAnime(listData)
+function updateAnime(listData,callBack)
 {
     var request = new XMLHttpRequest();
     if (listData.localConstruction==undefined)
     {
         request.open('post', 'http://anime-flix.com/requester.php?m=update&i=' + listData.series_animedb_id);
+        request.onreadystatechange = function ()
+        {
+            if (request.readyState == 4)
+            {
+                if (request.status == 200)
+                {
+                    if (callBack)
+                    {
+                        callBack(request.response);
+                    }
+                }
+            }
+        };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createUpdateBody(listData)));
     }
     else
     {
         request.open('post', 'http://anime-flix.com/requester.php?m=add&i=' + listData.series_animedb_id);
+        request.onreadystatechange = function ()
+        {
+            if (request.readyState == 4)
+            {
+                if (request.status == 200)
+                {
+                    if (callBack)
+                    {
+                        callBack(request.response);
+                    }
+                }
+            }
+        };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createAddBody(listData)));
     }
 }
-function deleteAnime(id)
+function deleteAnime(id,callBack)
 {
     var request = new XMLHttpRequest();
     request.open('post', 'http://anime-flix.com/requester.php?m=delete&i=' + id);
+    request.onreadystatechange = function ()
+    {
+        if (request.readyState == 4)
+        {
+            if (request.status == 200)
+            {
+                if (callBack)
+                {
+                    callBack(request.response);
+                }
+            }
+        }
+    };
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }

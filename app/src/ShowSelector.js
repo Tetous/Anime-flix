@@ -275,6 +275,10 @@ define(function (require, exports, module)
 		seriesDisplay.on('showSelected', function (data) {
 		    view._eventOutput.emit('showSelected', data);
 		});
+		seriesDisplay.on('refreshList', function ()
+		{
+		    view.refreshList();
+		});
         //#endregion
 
         //#region Background
@@ -424,7 +428,12 @@ define(function (require, exports, module)
 	        var i=0;
 	    }
 	    function sortMALList()
-	    {
+		{
+	        watching = [];
+	        completed = [];
+	        onHold = [];
+	        dropped = [];
+	        planToWatch = [];
 	    	malList.anime.forEach(function(anime){
 	    		switch(anime.my_status)
 	    		{

@@ -5,8 +5,9 @@
 
 define(function (require, exports, module)
 {
-    var Transform = require('famous/core/Transform');
+    var Engine = require('famous/core/Engine');
     var View = require('famous/core/View');
+    var Transform = require('famous/core/Transform');
     var Modifier = require('famous/core/Modifier');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transitionable = require('famous/transitions/Transitionable');
@@ -205,6 +206,26 @@ define(function (require, exports, module)
                 loginTransitionable.set([0.5, -1.5], { duration: 3000, curve: Easing.outQuint });
             }
         }
+
+        Engine.on('resize', function ()
+        {
+            var scaleFactor=1;
+            var windowSize = window.mainContext.getSize();
+            if(windowSize[0]<954)
+            {
+                scaleFactor = windowSize[0] / 954;
+            }
+            var proportions = [scaleFactor, scaleFactor];
+            loginTransform.proportionsFrom(proportions);
+            logoTransform.setProportions(proportions);
+            betaTransform.setProportions(proportions);
+            usernameBoxTransform.setProportions(proportions);
+            passwordBoxTransform.setProportions(proportions);;
+            buttonTransform.setProportions(proportions);
+            credentialInfoTransform.setProportions(proportions);;
+            credentialInfoTransform2.setProportions(proportions);
+
+        });
 
         var bouncerNode = view.add(loginTransform);
         bouncerNode.add(loginBackground);

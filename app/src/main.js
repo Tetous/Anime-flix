@@ -28,6 +28,9 @@ define(function (require, exports, module)
     vidCSS.type = "text/css";
     document.head.appendChild(vidCSS);
 
+    //Read UserAgent
+    var userAgent=navigator.userAgent;
+    var isFirefox=userAgent.indexOf('Firefox')>-1;
     //Read Hash
     var hash = window.location.hash;
 
@@ -49,6 +52,7 @@ define(function (require, exports, module)
         var videoPlayer = VideoPlayer();
         videoPlayer.on('backToBrowsing', function ()
         {
+            showSelector.refreshList();
             window.location.hash = 'sdisplay&'+showSelector.getShowingSection();
             showSelectorTransform.setAlign([0, 0], { duration: 2000, curve: Easing.outCubic });
         });
@@ -60,10 +64,8 @@ define(function (require, exports, module)
         var showSelector = ShowSelector();
         function showSelected(data)
         {
-            showSelectorTransform.setAlign([0, -1], { duration: 2000, curve: Easing.outCubic }, function ()
-            {
-                videoPlayer.play(data.show, data.episode);
-            });
+            showSelectorTransform.setAlign([0, -1], { duration: 2000, curve: Easing.outCubic });
+            videoPlayer.play(data.show, data.episode);
         }
         showSelector.on('showSelected', showSelected);
         mainContext.add(showSelectorTransform).add(showSelector);
@@ -99,6 +101,11 @@ define(function (require, exports, module)
             }
             //#endregion
         });
+        /*
+        Engine.on('resize', function ()
+        {
+        });
+        */
         mainContext.add(loginScreenTransform).add(loginScreen);
     });
 });

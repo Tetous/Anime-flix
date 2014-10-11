@@ -54,7 +54,7 @@ define(function (require, exports, module)
             height:'100%',
             controls : true,
             autoplay : false,
-            preload : 'auto',
+            preload : 'none',//'auto',
             poster: '/content/images/AnimeflixLogo.png'
         });
 		playerSurface.on('becameActive', function ()
@@ -64,6 +64,18 @@ define(function (require, exports, module)
 		playerSurface.on('becameInactive', function ()
 		{
 		    titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
+		});
+		playerSurface.on('playerError', function (error)
+		{
+		    switch (error.code)
+		    {
+		        case 4:
+		            playerSurface.reload();
+		            break;
+		        default:
+		            break;
+
+		    }
 		});
 		videoPlayerNode.add(playerSurface);
 
@@ -291,8 +303,19 @@ define(function (require, exports, module)
 	                {
 	                    if (request.status == 200)
 	                    {
-	                        var body = request.responseText;
-	                        playerSurface.play(body);
+	                        if (window.location.hash.indexOf('video')>-1)
+	                        {
+	                            var body = request.responseText;
+	                            if (body == 'Link not found')
+	                            {
+	                                window.alert('The episode can not be found. Sorry for the inconvenience. Please contact support@anime-flix.com and we will sort it out as soon as possible.');
+	                                backToBrowsing();
+	                            }
+	                            else
+	                            {
+	                                playerSurface.play(body);
+	                            }
+	                        }
 	                    }
 	                }
 	            };
@@ -378,7 +401,11 @@ define(function (require, exports, module)
 
 		function clear()
 		{
-		    playerSurface.player.src('/content/images/AnimeflixNextEpisode.png');
+		    playerSurface.player.currentTime(0);
+		    //var element=playerSurface.player.contentEl().childNodes[0];
+		    //element.removeAttribute('src');
+		    playerSurface.player.src('no src');
+		    playerSurface.player.posterImage.show();
 		};
 
 		lightbox.show(playerSurface);

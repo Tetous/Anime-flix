@@ -324,10 +324,22 @@ $title=processTitle($title);
 
         if($showLinksCount==0)
         {
+            if(count($episodeLinks)<$episode)
+            {
+                return 'Link not found';
+            }
             curl_setopt($ch, CURLOPT_URL, $episodeLinks[$episodeLinksCount-$episode]);
         }
         else
         {
+            if(count($showEpisodeLinks)<$episode)
+            {
+                if(count($episodeLinks)<$episode)
+                {
+                    return 'Link not found';
+                }
+                curl_setopt($ch, CURLOPT_URL, $episodeLinks[$episodeLinksCount-$episode]);
+            }
             curl_setopt($ch, CURLOPT_URL, $showEpisodeLinks[$showLinksCount-$episode]);
         }
           $pageBody=curl_exec($ch);

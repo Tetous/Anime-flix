@@ -6,7 +6,8 @@
 define(function (require, exports, module)
 {
     var Engine = require('famous/core/Engine');
-	var View = require('famous/core/View');
+    var View = require('famous/core/View');
+    var RenderController = require('famous/views/RenderController');
 	var Transform = require('famous/core/Transform');
 	var Easing = require('famous/transitions/Easing');
 	var StateModifier= require('famous/modifiers/StateModifier');
@@ -16,8 +17,12 @@ define(function (require, exports, module)
 	var Scrollview=require('famous/views/Scrollview');
 	var Icon=require('NillaIcon');
 
-	function createNillaIconView() {
+	function createNillaIconView()
+	{
+	    var numberOfRenderingIcons=0;
 	    var iconStateMods = [];
+	    var iconRenderControllers = [];
+	    var surfaces = [];
 
 		var view=new View();
 		var container=new ContainerSurface({
@@ -41,6 +46,45 @@ define(function (require, exports, module)
 
 		view.populate=function populate(shows)
 		{
+		    numberOfRenderingIcons = shows.length;
+		    for (var i = 0; i < iconRenderControllers.length; i++)
+		    {
+		        iconRenderControllers[i].hide();
+		    }
+		    var iconsToReUse = 0;
+		    var iconsToCreate = 0;
+		    if (shows.length>surfaces.length)
+		    {
+		        iconsToReUse = surfaces.length;
+		        iconsToCreate = shows.length - surfaces.length;
+		    }
+		    else
+		    {
+		        iconsToReUse = shows.length;
+		        iconsToCreate = 0;
+		    }
+		    for (var i = 0; i < iconsToReUse; i++)
+		    {
+		        surfaces[i].setSeries(shows[i]);
+		        iconRenderControllers[i].show(surfaces[i]);
+		    }
+		    for (var i = 0; i < iconsToCreate; i++)
+		    {
+		        var iconTransform = new StateModifier();
+		        iconStateMods.push(iconTransform);
+		        var iconRenderController = new RenderController();
+		        iconRenderControllers.push(iconRenderController);
+		        var icon = Icon(shows[i+iconsToReUse]);
+		        icon.on('click', function (icon)
+		        {
+		            view._eventOutput.emit('iconClick', icon.data);
+		        });
+		        surfaces.push(icon);
+
+		        iconView.add(iconTransform).add(iconRenderController);
+		        iconRenderController.show(icon);
+		    }
+            /*
 			for (var i = 0; i < shows.length; i++) {
 				var showData=shows[i];
 
@@ -54,7 +98,8 @@ define(function (require, exports, module)
 
 				iconView.add(iconTransform).add(icon);
 			};
-			positionIcons(0);
+            )*/
+			positionIcons(1000);
 		}
 
 		function positionIcons(duration)
@@ -67,18 +112,18 @@ define(function (require, exports, module)
 		    var imagesPerRow = Math.floor((windowSize[0] - minIconBufferX) / (iconWidth + minIconBufferX));
 
 		    var iconBufferX=0;
-		    if (imagesPerRow <= iconStateMods.length)
+		    if (imagesPerRow <= numberOfRenderingIcons)
 		    {
 		        iconBufferX = (windowSize[0] - (minIconBufferX + (minIconBufferX + iconWidth) * imagesPerRow)) / (imagesPerRow + 1) + minIconBufferX;
 		    }
 		    else
 		    {
-		        iconBufferX = minIconBufferX + (iconWidth + minIconBufferX) / (iconStateMods.length+1);
+		        iconBufferX = minIconBufferX + (iconWidth + minIconBufferX) / (numberOfRenderingIcons+1);
 		    }
 
-		    iconView.setOptions({ size: [undefined, 100 + Math.floor(iconStateMods.length / imagesPerRow + 0.95) * (iconHeight + 100)] });
+		    iconView.setOptions({ size: [undefined, 100 + Math.floor(numberOfRenderingIcons / imagesPerRow + 0.95) * (iconHeight + 100)] });
 
-		    for (var i = 0; i < iconStateMods.length; i++)
+		    for (var i = 0; i < numberOfRenderingIcons; i++)
 		    {
 		        iconStateMods[i].halt();
 		        iconStateMods[i].setTransform(Transform.translate(i % imagesPerRow * (iconWidth + iconBufferX) + iconBufferX, 100 + Math.floor(i / imagesPerRow) * (iconHeight + 100), window.showSelectorZ + 10), { duration: duration, curve: Easing.outCubic });

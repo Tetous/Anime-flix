@@ -17,8 +17,7 @@ define(function(require, exports, module) {
 		var view = new View();
 		view.data=data;
 		var image=new ImageSurface({
-				size:[iconWidth,iconHeight],
-				content:data.series_image
+				size:[iconWidth,iconHeight]
 			});
         
 		var titleTransform=new StateModifier({
@@ -26,7 +25,6 @@ define(function(require, exports, module) {
 		});
 		var title=new Surface({
 			size:[iconWidth,true],
-			content:data.series_title,
 			properties:{
 				textAlign:'center'
 			}
@@ -37,6 +35,15 @@ define(function(require, exports, module) {
 
 		view.add(image);
 		view.add(titleTransform).add(title);
+
+		view.setSeries = function (series)
+		{
+		    view.data = series;
+		    title.setContent(series.series_title);
+		    image.setContent(series.series_image);
+		}
+
+		view.setSeries(data);
 		return view;
 	}
 	module.exports=createNillaIcon;

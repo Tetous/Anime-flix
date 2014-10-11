@@ -10,7 +10,7 @@ define(function (require, exports, module)
     var Easing = require('famous/transitions/Easing');
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var Surface = require('famous/core/Surface');
+    var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var Scrollview = require('famous/views/Scrollview');
@@ -30,7 +30,7 @@ define(function (require, exports, module)
         var backgroundWidth=1000;
         var backgroundHeight=600;
         var backgroundTransform = new StateModifier();
-        var background = new Surface({
+        var background = Surface({
             size: [backgroundWidth, backgroundHeight],
             properties: {
                 backgroundColor: 'grey',
@@ -48,21 +48,21 @@ define(function (require, exports, module)
         view.add(imageTransform).add(image);
 
         var titleTransform = new StateModifier();
-        var title = new Surface({
+        var title = Surface({
             size: [true, true]
         });
         transforms.push(titleTransform);
         view.add(titleTransform).add(title);
 
         var typeTransform = new StateModifier();
-        var type = new Surface({
+        var type = Surface({
             size: [true, true]
         });
         transforms.push(typeTransform);
         view.add(typeTransform).add(type);
 
         var airedTransform = new StateModifier();
-        var aired = new Surface({
+        var aired = Surface({
             size: [true, true]
         });
         transforms.push(airedTransform);
@@ -85,7 +85,7 @@ define(function (require, exports, module)
         });
 
         descriptionContainer.pipe(descriptionScroll);
-        var description = new Surface({
+        var description = Surface({
             size:[undefined,true]
         });
         descriptionScroll.sequenceFrom([description]);
@@ -94,7 +94,7 @@ define(function (require, exports, module)
         view.add(descriptionTransform).add(descriptionContainer);
 
         var myStatusLabelTransform = new StateModifier();
-        var myStatusLabel = new Surface({
+        var myStatusLabel = Surface({
             size:[true,true],
             content:'My Status:'
         });
@@ -113,7 +113,7 @@ define(function (require, exports, module)
         var planToWatchOption = new Option('Plan to Watch', 6);
         myStatus.options.add(planToWatchOption);
         var myStatusTransform = new StateModifier();
-        var myStatusSurface = new Surface({
+        var myStatusSurface = Surface({
             size:[true,true],
             content:myStatus
         });
@@ -121,7 +121,7 @@ define(function (require, exports, module)
         view.add(myStatusTransform).add(myStatusSurface);
 
         var scoreLabelTransform = new StateModifier();
-        var scoreLabel = new Surface({
+        var scoreLabel = Surface({
             size:[true,true],
             content:'Score:'
         });
@@ -140,7 +140,7 @@ define(function (require, exports, module)
         score.options.add(new Option((2).toString()));
         score.options.add(new Option((1).toString()));
         var scoreTransform = new StateModifier();
-        var scoreSurface = new Surface({
+        var scoreSurface = Surface({
             size:[true,true],
             content: score
         });
@@ -148,14 +148,32 @@ define(function (require, exports, module)
         view.add(scoreTransform).add(scoreSurface);
 
         var statusTransform = new StateModifier();
-        var status = new Surface({
+        var status = Surface({
             size: [150, true]
         });
         transforms.push(statusTransform);
         view.add(statusTransform).add(status);
 
+        var viewOnMALTransform = new StateModifier();
+        var viewOnMALButton = Surface({
+            size: [150, 40],
+            content: 'View On MyAnimeList',
+            properties: {
+                borderRadius: '5px',
+                backgroundColor: 'white',
+                textAlign: 'center',
+                verticalAlign:'middle'
+            }
+        });
+        viewOnMALButton.on('click', function ()
+        {
+            window.open('http://myanimelist.net/anime/' + series.listData.series_animedb_id);
+        });
+        transforms.push(viewOnMALTransform);
+        view.add(viewOnMALTransform).add(viewOnMALButton)
+
         var episodeLabelTransform = new StateModifier();
-        var episodeLabel = new Surface({
+        var episodeLabel = Surface({
             size:[true,true],
             content:'Episode:'
         });
@@ -164,7 +182,7 @@ define(function (require, exports, module)
 
         var episodeDropdown = document.createElement('SELECT');
         var episodeDropdownTransform = new StateModifier();
-        var episodeDropdownSurface = new Surface({
+        var episodeDropdownSurface = Surface({
             size:[true,true],
             content:episodeDropdown
         });
@@ -229,13 +247,12 @@ define(function (require, exports, module)
         alertZTransformNode.add(changeStatusAlert);
 
         var playButtonTransform = new StateModifier();
-        var playButton = new Surface({
+        var playButton = Surface({
             size:[100,50],
             content: 'Play',
             properties: {
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
-                lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 backgroundColor: '#00fff8',
                 borderRadius: 25 + 'px'
@@ -331,13 +348,12 @@ define(function (require, exports, module)
         view.add(playButtonTransform).add(playButton);
 
         var updateButtonTransform = new StateModifier();
-        var updateButton = new Surface({
+        var updateButton = Surface({
             size: [100, 50],
             content: 'Update',
             properties: {
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
-                lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 backgroundColor: '#00fff8',
                 borderRadius: 25 + 'px'
@@ -385,19 +401,21 @@ define(function (require, exports, module)
                 series.listData.my_score = 0;
             }
 
-            updateAnime(series.listData);
+            updateAnime(series.listData, function ()
+            {
+                view._eventOutput.emit('refreshList');
+            });
         });
         transforms.push(updateButtonTransform);
         view.add(updateButtonTransform).add(updateButton);
 
         var deleteButtonTransform = new StateModifier();
-        var deleteButton = new Surface({
+        var deleteButton = Surface({
             size: [100, 50],
             content: 'Delete',
             properties: {
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
-                lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 backgroundColor: '#00fff8',
                 borderRadius: 25 + 'px'
@@ -405,22 +423,23 @@ define(function (require, exports, module)
         });
         deleteButton.on('click', function ()
         {
-            deleteAnime(series.listData.series_animedb_id);
-            window.location.reload(); //Hack until I make a better refresh for the list
-            view.hide();
+            deleteAnime(series.listData.series_animedb_id, function ()
+            {
+                view._eventOutput.emit('refreshList');
+                view.hide();
+            });
         });
         transforms.push(deleteButtonTransform);
         view.add(deleteButtonTransform).add(deleteButton);
 
         var closeButtonTransform = new StateModifier({
         });
-        var closeButton = new Surface({
+        var closeButton = Surface({
             size: [30,30],
             content: 'X',
             properties: {
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
-                lineHeight: 30 + 'px',
                 verticalAlign: 'middle',
                 //backgroundColor: '#00fff8',
                 //borderRadius: 25 + 'px'
@@ -468,7 +487,12 @@ define(function (require, exports, module)
             episodeDropdown.options.selectedIndex = indexToSelect;
         }
 
-        view.show = function () {
+        view.show = function ()
+        {
+            for (var i = 0; i < transforms.length; i++)
+            {
+                transforms[i].halt();
+            }
             var windowSize=window.mainContext.getSize();
             var backgroundPos=[(windowSize[0] - backgroundWidth) / 2, (windowSize[1] - backgroundHeight) / 2];
             var inTransition={ duration: 1000, curve: Easing.outCubic };
@@ -482,6 +506,7 @@ define(function (require, exports, module)
             scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), inTransition);
             scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), inTransition);
             statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), inTransition);
+            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 350, 1), inTransition);
             descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), inTransition);
             episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), inTransition);
             episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), inTransition);
