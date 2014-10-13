@@ -119,17 +119,13 @@ define(function (require, exports, module)
 	    var buttonColorEvents = new EventHandler();
 	    buttonColorEvents.on('mouseover', function (button)
 	    {
-	        button.origin.setProperties({
-                color:'black',
-	            backgroundColor: 'white'
-	        });
+	        button.currentTarget.style.color = 'black';
+	        button.currentTarget.style.backgroundColor = 'white';
 	    });
 	    buttonColorEvents.on('mouseout', function (button)
 	    {
-	        button.origin.setProperties({
-                color:'white',
-	            backgroundColor: headerFooterColor
-	        });
+	        button.currentTarget.style.color = 'white';
+	        button.currentTarget.style.backgroundColor = headerFooterColor;
 	    });
 
 	    var logoutButtonTransform = new StateModifier({

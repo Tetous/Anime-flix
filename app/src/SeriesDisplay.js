@@ -86,7 +86,7 @@ define(function (require, exports, module)
 
         descriptionContainer.pipe(descriptionScroll);
         var description = Surface({
-            size:[undefined,true]
+            size:[undefined,0]
         });
         descriptionScroll.sequenceFrom([description]);
         descriptionContainer.add(descriptionScroll);
@@ -467,13 +467,16 @@ define(function (require, exports, module)
             score.options.selectedIndex = 10 - ser.listData.my_score;
             status.setContent('Status: '+ser.searchData.status);
             description.setContent(ser.searchData.synopsis);
+            /*
             Engine.nextTick(function ()
             {
+                
                 description.setOptions({
-                    size: [undefined, description._currTarget.clientHeight]
+                    size: [undefined, description._currentTarget.childNodes[0].clientHeight]
                 });
+                
             });
-
+            */
             while (episodeDropdown.options.length > 0) {
                 episodeDropdown.options.remove(0);
             }
@@ -506,7 +509,7 @@ define(function (require, exports, module)
             scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), inTransition);
             scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), inTransition);
             statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), inTransition);
-            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 350, 1), inTransition);
+            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 370, 1), inTransition);
             descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), inTransition);
             episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), inTransition);
             episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), inTransition);

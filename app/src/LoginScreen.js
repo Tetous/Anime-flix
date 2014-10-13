@@ -215,16 +215,17 @@ define(function (require, exports, module)
             {
                 scaleFactor = windowSize[0] / 954;
             }
-            var proportions = [scaleFactor, scaleFactor];
-            loginTransform.proportionsFrom(proportions);
-            logoTransform.setProportions(proportions);
-            betaTransform.setProportions(proportions);
-            usernameBoxTransform.setProportions(proportions);
-            passwordBoxTransform.setProportions(proportions);;
-            buttonTransform.setProportions(proportions);
-            credentialInfoTransform.setProportions(proportions);;
-            credentialInfoTransform2.setProportions(proportions);
-
+            //var proportions = [scaleFactor, scaleFactor];
+            //loginTransform.proportionsFrom(proportions);
+            /*
+            logoTransform.setSize(proportions);
+            betaTransform.setSize(proportions);
+            usernameBoxTransform.setSize(proportions);
+            passwordBoxTransform.setSize(proportions);
+            buttonTransform.setSize(proportions);
+            credentialInfoTransform.setSize(proportions);
+            credentialInfoTransform2.setSize(proportions);
+            */
         });
 
         var bouncerNode = view.add(loginTransform);

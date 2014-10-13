@@ -201,11 +201,16 @@ define(function (require, exports, module)
 			videoPlayerNode._eventOutput.emit('playerLoaded');
 		});
 
+		var dirtyLedger = false;
 		var ledgerSwaps=[];
 		var showLedger = [];
 		if (localStorage.ledger)
 		{
-		    JSON.parse(localStorage.ledger);
+		    showLedger=JSON.parse(localStorage.ledger);
+		}
+		if (localStorage.swaps)
+		{
+		    ledgerSwaps = JSON.parse(localStorage.swaps);
 		}
 
 		function processLedger(body)
@@ -216,6 +221,7 @@ define(function (require, exports, module)
 		    var parser = new DOMParser();
 		    var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
 		    ledgerSwaps = XML2jsobj(domObj).Root.swap;
+		    localStorage.swaps = JSON.stringify(ledgerSwaps);
 
 		    var resultLedger=[];
 
@@ -244,6 +250,11 @@ define(function (require, exports, module)
 		        {
 		            if (request.status == 200)
 		            {
+		                if (dirtyLedger)
+		                {
+		                    showLedger = [];
+		                    dirtyLedger = false;
+		                }
 		                var processedLedger = processLedger(request.responseText);
 		                showLedger = showLedger.concat(processedLedger);
 		                localStorage.ledger = JSON.stringify(showLedger);
@@ -263,6 +274,11 @@ define(function (require, exports, module)
 		        {
 		            if (request.status == 200)
 		            {
+		                if(dirtyLedger)
+		                {
+		                    showLedger = [];
+		                    dirtyLedger = false;
+		                }
 		                showLedger = showLedger.concat(processLedger(request.responseText));
 		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
@@ -274,7 +290,8 @@ define(function (require, exports, module)
 
 	    function getLedger()
 	    {
-	        showLedger = [];
+	        //showLedger = [];
+	        dirtyLedger = true;
 	        getAnimeLedger();
 	        getMovieLedger();
 	    }
