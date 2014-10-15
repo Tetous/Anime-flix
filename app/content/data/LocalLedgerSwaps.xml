@@ -16,4 +16,8 @@
     <ledgerName>Another (Anime)</ledgerName>
     <malName>Another</malName>
   </swap>
+<swap>
+    <ledgerName>Steins Gate</ledgerName>
+    <malName>Steins;Gate</malName>
+  </swap>
 </Root>
