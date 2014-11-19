@@ -258,6 +258,8 @@ $title=processTitle($title);
         
         $episodeLinks=array();
         $showEpisodeLinks=array();
+        $loopCount=0;
+          $showLinksCount=0;
         do
         {
           $pageIndex++;
@@ -270,8 +272,7 @@ $title=processTitle($title);
           $searchIndex=strpos($output,'<a href="',$vidDivIndex)+9;
           $endVidIndex=strpos($output, '</div>',$vidDivIndex);
 
-          $loopCount=0;
-          $showLinksCount=0;
+          
           while ($searchIndex<$endVidIndex) {
             $endLinkIndex=strpos($output, '"',$searchIndex);
             $link=substr($output, $searchIndex,$endLinkIndex-$searchIndex);
@@ -321,7 +322,7 @@ $title=processTitle($title);
 
         $result="";
         $episodeLinksCount=count($episodeLinks);
-
+        
         if($showLinksCount==0)
         {
             if(count($episodeLinks)<$episode)

@@ -149,8 +149,7 @@ define(function (require, exports, module)
                 fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: '#4494FD',//'#00fff8',
-                border: '1px solid gray',
+                backgroundColor: window.colorScheme.main,//'#4494FD',//'#00fff8',
                 borderRadius: boxHeight / 2 + 'px'
             }
         });
@@ -169,18 +168,19 @@ define(function (require, exports, module)
         }
 
         var credentialInfoBackground = new ImageSurface({
-            size:[250,150],
-            content:'content/images/InfoBubble.png'
+            size:[250*1.15,150*1.15],
+            content:'content/images/InfoBubble2.png'
         });
         var credentialInfoTransform2 = new StateModifier({
-            transform:Transform.translate(-15,0,0)
+            transform:Transform.translate(-20,0,0)
         });
         var credentialInfo = Surface({
             size: [200, true],
             content: 'Login with your MyAnimeList credentials. Anime-flix uses MyAnimeList to track your viewing progress as you watch.',
             properties: {
                 textAlign: 'center',
-                vericalAlign:'middle'
+                vericalAlign: 'middle',
+                color:'white'
             }
         });
 

@@ -33,7 +33,7 @@ define(function (require, exports, module)
         var background = Surface({
             size: [backgroundWidth, backgroundHeight],
             properties: {
-                backgroundColor: 'grey',
+                backgroundColor: window.colorScheme.third,
                 borderRadius: '10px'
             }
         });
@@ -212,7 +212,7 @@ define(function (require, exports, module)
             },
             buttonProperties: {
                 textAlign: 'center',
-                backgroundColor: '#00fff8',
+                backgroundColor: window.colorScheme.second,
                 verticalAlign: 'middle',
                 //border: '3px solid gray',
                 borderRadius: 10 + 'px'
@@ -237,7 +237,7 @@ define(function (require, exports, module)
             },
             buttonProperties: {
                 textAlign: 'center',
-                backgroundColor: '#00fff8',
+                backgroundColor: window.colorScheme.second,
                 lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 //border: '3px solid gray',
@@ -254,7 +254,7 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: '#00fff8',
+                backgroundColor: window.colorScheme.second,
                 borderRadius: 25 + 'px'
             }
         });
@@ -355,7 +355,7 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: '#00fff8',
+                backgroundColor: window.colorScheme.second,
                 borderRadius: 25 + 'px'
             }
         });
@@ -417,7 +417,7 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: '#00fff8',
+                backgroundColor: window.colorScheme.second,
                 borderRadius: 25 + 'px'
             }
         });

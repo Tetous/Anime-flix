@@ -19,7 +19,7 @@ define(function (require, exports, module)
             content: 'You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)',
             properties: {
                 color:'white',
-                backgroundColor: '#002EB8',
+                backgroundColor: window.colorScheme.main,
                 textAlign: 'center',
                 verticalAlign: 'middle',
                 fontSize:'30px'

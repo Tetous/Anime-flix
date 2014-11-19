@@ -100,7 +100,8 @@ define(function (require, exports, module)
 			content:'/content/images/AnimeflixBack2.png',
 		});
 		function backToBrowsing(){
-		    if (playerSurface.player!=undefined) {
+		    if (playerSurface.player != undefined)
+		    {
 		        //playerSurface.player.pause();
 		        clear();
 		        playerSurface.player.exitFullscreen();
@@ -225,9 +226,9 @@ define(function (require, exports, module)
 
 		    var resultLedger=[];
 
-		    var index = body.indexOf("class=\"series_index\"");
+		    var index = body.indexOf('class="series_index"');
 		    var showName = "";
-		    while (showName !== "Login")
+		    while (showName !== 'Dubbed Anime & Cartoon')
 		    {
 		        index = body.indexOf("<a href=\"", index) + 9;
 		        var showLink = body.substring(index, body.indexOf("\"", index));

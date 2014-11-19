@@ -50,7 +50,7 @@ define(function (require, exports, module)
 	    });
 	    view.add(layout);
 
-	    var headerFooterColor='#0066CC';
+	    var headerFooterColor=window.colorScheme.main;
 
 	    var headerNode=layout.header.add(Surface({
 	        properties:{
@@ -280,7 +280,7 @@ define(function (require, exports, module)
         //#region Background
 		var background=Surface({
 			properties:{
-				backgroundColor:'white',
+				backgroundColor:window.colorScheme.background,
 			}
 		});
 		layout.content.add(background);

@@ -20,6 +20,37 @@ define(function (require, exports, module)
     window.loginZ = 100;
     window.showSelectorZ = 50;
     window.videoPlayerZ = 0;
+    window.colorScheme = {
+        main: '#FF9200',//'#0066CC',
+        second: '#BF8230',
+        third: '#A65F00',
+        background:'white'
+    }
+    window.formatting = { scale: 1 };
+
+    function detectmob()
+    {
+        if (navigator.userAgent.match(/Android/i)
+        || navigator.userAgent.match(/webOS/i)
+        || navigator.userAgent.match(/iPhone/i)
+        || navigator.userAgent.match(/iPad/i)
+        || navigator.userAgent.match(/iPod/i)
+        || navigator.userAgent.match(/BlackBerry/i)
+        || navigator.userAgent.match(/Windows Phone/i)
+        )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    window.isMobile = detectmob();
+    if (window.isMobile)
+    {
+
+    }
 
     //CSS
     var vidCSS = document.createElement("link");
@@ -101,11 +132,12 @@ define(function (require, exports, module)
             }
             //#endregion
         });
-        /*
+
         Engine.on('resize', function ()
         {
+
         });
-        */
+        
         mainContext.add(loginScreenTransform).add(loginScreen);
     });
 });

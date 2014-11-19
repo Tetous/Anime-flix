@@ -21,7 +21,7 @@ define(function (require, exports, module)
         var view = new View();
         var backgroundSurface = Surface({
             properties: {
-                backgroundColor:'#002EB8',
+                backgroundColor:window.colorScheme.main,
                 textAlign: 'center',
                 verticalAlign:'middle'
             }
