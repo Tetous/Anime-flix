@@ -125,6 +125,7 @@ define(function (require, exports, module)
 
 		function nextEpisode()
 		{
+		    clear();
 		    //update anime list
 		    if (playData.episode > playData.show.my_watched_episodes)
 		    {
@@ -152,7 +153,6 @@ define(function (require, exports, module)
 		            }
 		            playData.show.my_finish_date = yyyy + '-' + mm + '-' + dd;
 		        }
-		        //replace with a more appropriate screen
 		        lightbox.show(seriesEndScreen);
 		    }
 		    else

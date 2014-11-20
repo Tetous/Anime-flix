@@ -31,7 +31,6 @@ define(function (require, exports, module)
         var backgroundHeight=600;
         var backgroundTransform = new StateModifier();
         var background = Surface({
-            size: [backgroundWidth, backgroundHeight],
             properties: {
                 backgroundColor: window.colorScheme.third,
                 borderRadius: '10px'
@@ -41,9 +40,7 @@ define(function (require, exports, module)
         view.add(backgroundTransform).add(background);
 
         var imageTransform = new StateModifier();
-        var image = new ImageSurface({
-            size: [150,233]
-        });
+        var image = new ImageSurface();
         transforms.push(imageTransform);
         view.add(imageTransform).add(image);
 
@@ -70,7 +67,6 @@ define(function (require, exports, module)
 
         var descriptionTransform = new StateModifier();
         var descriptionContainer = new ContainerSurface({
-            size: [750, 250],
             properties: {
                 backgroundColor: 'white',
                 borderRadius: '5px',
@@ -248,7 +244,6 @@ define(function (require, exports, module)
 
         var playButtonTransform = new StateModifier();
         var playButton = Surface({
-            size:[100,50],
             content: 'Play',
             properties: {
                 //fontSize: fontSize + 'px',
@@ -349,7 +344,6 @@ define(function (require, exports, module)
 
         var updateButtonTransform = new StateModifier();
         var updateButton = Surface({
-            size: [100, 50],
             content: 'Update',
             properties: {
                 //fontSize: fontSize + 'px',
@@ -411,7 +405,6 @@ define(function (require, exports, module)
 
         var deleteButtonTransform = new StateModifier();
         var deleteButton = Surface({
-            size: [100, 50],
             content: 'Delete',
             properties: {
                 //fontSize: fontSize + 'px',
@@ -490,6 +483,20 @@ define(function (require, exports, module)
             episodeDropdown.options.selectedIndex = indexToSelect;
         }
 
+        view.resize = function ()
+        {
+            background.setSize([window.formatting.scale * backgroundWidth, window.formatting.scale * backgroundHeight]);
+            playButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
+            updateButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
+            deleteButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
+            descriptionContainer.setSize([window.formatting.scale * backgroundWidth - 250, window.formatting.scale * 250]);
+            image.setSize([window.formatting.scale * 150, window.formatting.scale * 233]);
+            if (opened)
+            {
+                view.show();
+            }
+        }
+
         view.show = function ()
         {
             for (var i = 0; i < transforms.length; i++)
@@ -497,26 +504,26 @@ define(function (require, exports, module)
                 transforms[i].halt();
             }
             var windowSize=window.mainContext.getSize();
-            var backgroundPos=[(windowSize[0] - backgroundWidth) / 2, (windowSize[1] - backgroundHeight) / 2];
+            var backgroundPos = [(windowSize[0] - window.formatting.scale * backgroundWidth) / 2, (windowSize[1] - window.formatting.scale * backgroundHeight) / 2];
             var inTransition={ duration: 1000, curve: Easing.outCubic };
             backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0), inTransition);
             imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), inTransition);
             titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1),inTransition);
             typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), inTransition);
             airedTransform.setTransform(Transform.translate(backgroundPos[0] + 260, backgroundPos[1] + 35, 1), inTransition);
-            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 260, 1), inTransition);
-            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + 260, 1), inTransition);
-            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 290, 1), inTransition);
-            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + 290, 1), inTransition);
-            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 320, 1), inTransition);
-            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 370, 1), inTransition);
+            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260, 1), inTransition);
+            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + window.formatting.scale * 260, 1), inTransition);
+            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260+30, 1), inTransition);
+            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + window.formatting.scale * 260+30, 1), inTransition);
+            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260 + 60, 1), inTransition);
+            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260 + 110, 1), inTransition);
             descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), inTransition);
-            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 350, 1), inTransition);
-            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + 350, 1), inTransition);
-            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 390, 1), inTransition);
-            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 370, backgroundPos[1] + 390, 1), inTransition);
-            deleteButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 530, backgroundPos[1] + 390, 1), inTransition);
-            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + backgroundWidth - 30, backgroundPos[1], 2), inTransition);
+            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + window.formatting.scale * 275 + 75, 1), inTransition);
+            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + window.formatting.scale * 275+75, 1), inTransition);
+            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
+            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 160, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
+            deleteButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 320, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
+            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + window.formatting.scale * backgroundWidth - 30, backgroundPos[1], 2), inTransition);
             opened = true;
         }
 

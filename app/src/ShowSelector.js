@@ -44,10 +44,7 @@ define(function (require, exports, module)
 
 	    var headerHeight = 100;
 	    var footerHeight = 50;
-	    var layout=new HeaderFooterLayout({
-	        headerSize:headerHeight,
-	        footerSize:footerHeight
-	    });
+	    var layout=new HeaderFooterLayout();
 	    view.add(layout);
 
 	    var headerFooterColor=window.colorScheme.main;
@@ -57,10 +54,10 @@ define(function (require, exports, module)
 	            backgroundColor: headerFooterColor
 	        }
 	    }));
-	    layout.header.add(new ImageSurface({
-	        size: [true, 50],
+	    var logo = new ImageSurface({
 	        content: 'content/images/AnimeflixLogo.png'
-	    }));
+	    });
+	    layout.header.add(logo);
 	    //#region Footer
 	    layout.footer.add(Surface({
 	        properties: {
@@ -96,7 +93,7 @@ define(function (require, exports, module)
 	        }
 	    });
 	    footerElements.push(supportContact);
-	    var supportContact = Surface({
+	    var featuresContact = Surface({
 	        content: '<a href="mailto:features@anime-flix.com?subject=Feature Request">features@anime-flix.com</a>',
 	        properties: {
 	            size: [undefined, footerHeight],
@@ -105,7 +102,7 @@ define(function (require, exports, module)
 	            verticalAlign: 'middle',
 	        }
 	    });
-	    footerElements.push(supportContact);
+	    footerElements.push(featuresContact);
         //#endregion
 
 	    var buttonProps={
@@ -151,12 +148,9 @@ define(function (require, exports, module)
 		layout.header.add(logoutButtonTransform).add(logoutButton);
 
 		var gridHeight = headerHeight / 2;
-		var gridTransform=new StateModifier({
-			transform:Transform.translate(0,headerHeight-gridHeight,1)
-		});
+		var gridTransform=new StateModifier();
 
 		var grid=new GridLayout({
-		    size: [undefined, gridHeight],
 			dimensions:[6,1]
 		});
 
@@ -275,7 +269,38 @@ define(function (require, exports, module)
 		{
 		    view.refreshList();
 		});
-        //#endregion
+	    //#endregion
+
+		view.resize = function ()
+		{
+		    seriesDisplay.resize();
+		    seriesDisplay.updatePosition();
+		    watchingButton.setOptions({size:[undefined, /*window.formatting.scale * */gridHeight]});
+		    completedButton.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight]});
+		    onHoldButton.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight]});
+		    droppedButton.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight]});
+		    planToWatchButton.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight]});
+		    searchButton.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight]});
+		    logoutButton.setOptions({ size: [/*window.formatting.scale * */100, /*window.formatting.scale * */gridHeight] });
+		    watchingButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    completedButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
+		    onHoldButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    droppedButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    planToWatchButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    searchButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
+		    logoutButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    byRichard.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    supportContact.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    featuresContact.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    layout.setOptions({
+		        headerSize: /*window.formatting.scale * */headerHeight,
+		        footerSize: /*window.formatting.scale * */footerHeight
+		    });
+		    logo.setSize([true, /*window.formatting.scale * */50]);
+		    //logo.setProperties({ 'height': /*window.formatting.scale * */50 +'px'});
+		    gridTransform.setTransform(Transform.translate(0, /*window.formatting.scale * */(headerHeight - gridHeight), 1));
+		    grid.setOptions({ size: [undefined, /*window.formatting.scale * */gridHeight] });
+		}
 
         //#region Background
 		var background=Surface({
@@ -363,11 +388,6 @@ define(function (require, exports, module)
 		    seriesDisplay.show();
 			//view._eventOutput.emit('showSelected',data);
 		}
-
-		Engine.on('resize', function ()
-		{
-		    seriesDisplay.updatePosition();
-		});
 
 		var watchingIconView=IconView();
 		watchingIconView.on('iconClick',showSelectedPassThrough);

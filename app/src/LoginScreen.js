@@ -70,29 +70,24 @@ define(function (require, exports, module)
 
         var logoHeight = 100;
         var logoTransform = new StateModifier({
-            transform: Transform.translate(0, -boxHeight - logoHeight),
             origin: [0.5, 0.5]
         });
         var logo = new ImageSurface({
-            size: [true, logoHeight],
             content: '/content/images/AnimeflixLogo.png'
         });
 
         var betaHeight = 60;
         var betaTransform = new StateModifier({
-            transform: Transform.translate(330, -boxHeight - logoHeight-20),
             origin: [0.5, 0.5]
         });
         var betaRotate = new StateModifier({
             transform:Transform.rotate(0,0,3.14/6)
         });
         var beta = new ImageSurface({
-            size: [true, betaHeight],
             content:'content/images/Beta.png'
         });
 
         var textboxProperties = {
-            fontSize: fontSize + 'px',
             border: '1px solid gray',
             borderRadius: boxHeight / 2 + 'px',
             textAlign: 'center',
@@ -111,11 +106,9 @@ define(function (require, exports, module)
         }
 
         var usernameBoxTransform = new Modifier({
-            transform: Transform.translate(0, -boxHeight, 1),
             origin: [0.5, 0.5]
         });
         var usernameBox = new InputSurface({
-            size: [boxWidth, boxHeight],
             type: 'text',
             placeholder: 'Username',
             properties: textboxProperties
@@ -124,11 +117,9 @@ define(function (require, exports, module)
         usernameBox.on('keypress', textBoxEnter);
 
         var passwordBoxTransform = new Modifier({
-            transform: Transform.translate(0, boxHeight, 1),
             origin: [0.5, 0.5]
         });
         var passwordBox = new InputSurface({
-            size: [boxWidth, boxHeight],
             type: 'password',
             placeholder: 'Password',
             properties: textboxProperties
@@ -139,14 +130,11 @@ define(function (require, exports, module)
         var buttonWidth = 200;
         var buttonHeight = 80;
         var buttonTransform = new Modifier({
-            transform: Transform.translate(0, buttonHeight + boxHeight, 1),
             origin: [0.5, 0.5]
         });
         var button = Surface({
-            size: [buttonWidth, buttonHeight],
             content: 'Login',
             properties: {
-                fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
                 backgroundColor: window.colorScheme.main,//'#4494FD',//'#00fff8',
@@ -156,26 +144,45 @@ define(function (require, exports, module)
 
         button.on('click', login)
 
+        view.resize = function ()
+        {
+            buttonTransform.setTransform(Transform.translate(0, window.formatting.scale*(buttonHeight + boxHeight), 1));
+            button.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
+            usernameBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * -boxHeight, 1));
+            usernameBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
+            passwordBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * boxHeight, 1));
+            passwordBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
+            logoTransform.setTransform(Transform.translate(0, window.formatting.scale * (-boxHeight - logoHeight)));
+            logo.setSize([true, window.formatting.scale * logoHeight]);
+            betaTransform.setTransform(Transform.translate(window.formatting.scale * 330, window.formatting.scale * (-boxHeight - logoHeight - 20)));
+            beta.setSize([true, window.formatting.scale * betaHeight]);
+            credentialInfoTransform2.setTransform(Transform.translate(window.formatting.scale * -20, 0, 0));
+            credentialInfoBackground.setSize([window.formatting.scale * 250 * 1.15, window.formatting.scale * 150 * 1.15]);
+            credentialInfo.setSize([window.formatting.scale * 200, true]);
+            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -350, 0, 5));
+            credentialInfo.setProperties({ fontSize: window.formatting.scale * 12 + 'px' });
+            button.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
+            usernameBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
+            passwordBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
+        }
+
         var credentialInfoTransform = new StateModifier({
-            origin: [0.5,0.5],
-            transform:Transform.translate(-350,0,5)
+            origin: [0.5,0.5]
         });
         function credentialInfoBounce()
         {
-            credentialInfoTransform.setTransform(Transform.translate(-400, 0, 5), { duration: 1000, curve: Easing.outCubic });
-            credentialInfoTransform.setTransform(Transform.translate(-350, 0, 5), { duration: 1000, curve: Easing.outBounce });
+            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -400, 0, 5), { duration: 1000, curve: Easing.outCubic });
+            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -350, 0, 5), { duration: 1000, curve: Easing.outBounce });
             //credentialInfoTransform.setTransform(Transform.translate(-350, 0, 5), { duration: 500, curve: Easing.outBounce },credentialInfoBounce);
         }
 
         var credentialInfoBackground = new ImageSurface({
-            size:[250*1.15,150*1.15],
             content:'content/images/InfoBubble2.png'
         });
         var credentialInfoTransform2 = new StateModifier({
-            transform:Transform.translate(-20,0,0)
+
         });
         var credentialInfo = Surface({
-            size: [200, true],
             content: 'Login with your MyAnimeList credentials. Anime-flix uses MyAnimeList to track your viewing progress as you watch.',
             properties: {
                 textAlign: 'center',
@@ -207,26 +214,6 @@ define(function (require, exports, module)
             }
         }
 
-        Engine.on('resize', function ()
-        {
-            var scaleFactor=1;
-            var windowSize = window.mainContext.getSize();
-            if(windowSize[0]<954)
-            {
-                scaleFactor = windowSize[0] / 954;
-            }
-            //var proportions = [scaleFactor, scaleFactor];
-            //loginTransform.proportionsFrom(proportions);
-            /*
-            logoTransform.setSize(proportions);
-            betaTransform.setSize(proportions);
-            usernameBoxTransform.setSize(proportions);
-            passwordBoxTransform.setSize(proportions);
-            buttonTransform.setSize(proportions);
-            credentialInfoTransform.setSize(proportions);
-            credentialInfoTransform2.setSize(proportions);
-            */
-        });
 
         var bouncerNode = view.add(loginTransform);
         bouncerNode.add(loginBackground);

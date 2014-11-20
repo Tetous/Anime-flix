@@ -29,12 +29,12 @@ define(function (require, exports, module)
 			//size:window.mainContext.getSize(),
 			properties: { overflow: 'hidden' }
 		});
-
+		var speedLimit = window.isMobile ? 0 : 2;
 		var scroll=new Scrollview({
 		    direction:1,
 		    friction:1,
 		    drag: 1,
-		    speedLimit: 1
+		    speedLimit: speedLimit
 		  });
 
 		var iconView=new View();

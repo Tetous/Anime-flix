@@ -28,6 +28,7 @@ define(function (require, exports, module)
     }
     window.formatting = { scale: 1 };
 
+
     function detectmob()
     {
         if (navigator.userAgent.match(/Android/i)
@@ -51,6 +52,19 @@ define(function (require, exports, module)
     {
 
     }
+    /*window.scrollTo(0, 1);
+    addEventListener("resize", function ()
+    {
+        var
+              el = document.documentElement
+            , rfs =
+                   el.requestFullScreen
+                || el.webkitRequestFullScreen
+                || el.mozRequestFullScreen
+        ;
+        rfs.call(el);
+    });
+    */
 
     //CSS
     var vidCSS = document.createElement("link");
@@ -69,7 +83,7 @@ define(function (require, exports, module)
     var url = 'http://www.anime-flix.com/requester.php';
     var request = new XMLHttpRequest();
     request.open("GET", url, false);
-    request.send();
+    //request.send();
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -132,12 +146,30 @@ define(function (require, exports, module)
             }
             //#endregion
         });
-
-        Engine.on('resize', function ()
+        function resize()
         {
+            var size = mainContext.getSize();
+            window.formatting.scale = 1;
+            if (size[0]<1000)
+            {
+                window.formatting.scale = size[0] / 1000;
+            }
+            if (size[1]<600)
+            {
+                var rat=size[1] / 600;
+                if(rat<window.formatting.scale)
+                {
+                    window.formatting.scale = rat;
+                }
+            }
 
-        });
+            loginScreen.resize();
+            showSelector.resize();
+            //videoPlayer.resize();
+        }
+        Engine.on('resize', resize);
         
         mainContext.add(loginScreenTransform).add(loginScreen);
+        resize();
     });
 });
