@@ -239,9 +239,34 @@ function processTitle($title)
             break;
     }
 }
+function processDubTitle($title)
+{
+    switch($title)
+    {
+        case 'Highschool of the Dead: Drifters of the Dead':
+            return 'Highschool of the Dead OVA';
+            break;
+        case 'Fullmetal Alchemist: Brotherhood':
+            return 'Forcing Default Case';
+            break;
+        case 'Fullmetal Alchemist':
+            return 'Forcing Default Case';
+            break;
+        default:
+            return $title;
+            break;
+    }
+}
 function getStreamUrl($paramShowUrl,$title,$episode)
 {
-$title=processTitle($title);
+if(strpos($paramShowUrl,'plus'))
+{
+    $title=processTitle($title);
+}
+else
+{
+    $title=processDubTitle($title);
+}
   $baseShowUrl=$paramShowUrl.'?page=';
     global $ch;
       $ch=curl_init();

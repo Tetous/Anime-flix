@@ -68,7 +68,7 @@ define(function (require, exports, module)
 		{
 		    titleBarRenderController.show(titleBarView, { duration: 1000, curve: Easing.outCubic });
 		    languageSurface.setContent(language);
-		    titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
+		    titleBar.setContent(playData.show.series_title + ' - Episode ' + playData.episode);
 		    //titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
 		});
 		playerSurface.on('becameInactive', function ()
@@ -563,7 +563,7 @@ define(function (require, exports, module)
                                     var body = dubRequest.responseText;
                                     if (body == 'Link not found')
                                     {
-                                        myStatus.options.selectedIndex = 1;
+                                        language.options.selectedIndex = 1;
                                         if (streamSources)
                                         {
                                             playerSurface.play(streamSources[0]);
@@ -597,7 +597,7 @@ define(function (require, exports, module)
                 }
                 else
                 {
-                    myStatus.options.selectedIndex = 1;
+                    language.options.selectedIndex = 1;
                 }
 	        }
 	        else
