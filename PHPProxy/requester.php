@@ -19,12 +19,12 @@ switch ($_GET["m"])
         echo $out;
 		break;
 	case 'ledger':
-        $out=getAnimePlusList();
+        $out=getAnimePlusList($_GET['d']);
         header('Content-Length: '.strlen($out));
         echo $out;
 		break;
    case 'movieLedger':
-        $out=getAnimePlusMovieList();
+        $out=getAnimePlusMovieList($_GET['d']);
         header('Content-Length: '.strlen($out));
         echo $out;
 		break;
@@ -344,39 +344,51 @@ $title=processTitle($title);
             curl_setopt($ch, CURLOPT_URL, $showEpisodeLinks[$showLinksCount-$episode]);
         }
           $pageBody=curl_exec($ch);
+          
+          $streamLinks='';
+          $elinksIndex=strpos($pageBody, 'elinks');
           $iframeSrcIndex=strpos($pageBody, '<iframe src="',strpos($pageBody, '<div id="streams">'))+13;
-          $iframeSrc=substr($pageBody, $iframeSrcIndex, strpos($pageBody, '"',$iframeSrcIndex)-$iframeSrcIndex);
+          while($iframeSrcIndex>14)//$elinksIndex>$iframeSrcIndex)
+          {
+              $iframeSrc=substr($pageBody, $iframeSrcIndex, strpos($pageBody, '"',$iframeSrcIndex)-$iframeSrcIndex);
 
-          curl_setopt($ch, CURLOPT_URL, $iframeSrc);
-          $playerBody=curl_exec($ch);
+              curl_setopt($ch, CURLOPT_URL, $iframeSrc);
+              $playerBody=curl_exec($ch);
 
-          $playlistIndex=strpos($playerBody, 'playlist');
-          $skipImage=strpos($playerBody, '.jpg',$playlistIndex);
-          $skipImage2=strpos($playerBody, '.png',$playlistIndex);
-          if($skipImage>0)
-          {
-            $playlistIndex=$skipImage;
+              $playlistIndex=strpos($playerBody, 'playlist');
+              $skipImage=strpos($playerBody, '.jpg',$playlistIndex);
+              $skipImage2=strpos($playerBody, '.png',$playlistIndex);
+              if($skipImage>0)
+              {
+                $playlistIndex=$skipImage;
+              }
+              else
+              {
+                if($skipImage2>0)
+                {
+                  $playlistIndex=$skipImage2;
+                }
+              }
+              $quote='\'';
+              $streamIndex=strpos($playerBody, 'url: \'http://',$playlistIndex)+6;
+              if($streamIndex==6)
+              {
+                $quote='"';
+                $streamIndex=strpos($playerBody, 'url: "http://',$playlistIndex)+6;
+              }
+              if($streamIndex!=6)
+              {
+                  $streamLink=substr($playerBody, $streamIndex,strpos($playerBody, $quote,$streamIndex)-$streamIndex);
+                  //echo $streamLink;
+                  $streamLinks=$streamLinks.$streamLink.';';
+              }
+              $iframeSrcIndex=strpos($pageBody, '<iframe src="',$iframeSrcIndex)+13;
           }
-          else
-          {
-            if($skipImage2>0)
-            {
-              $playlistIndex=$skipImage2;
-            }
-          }
-          $quote='\'';
-          $streamIndex=strpos($playerBody, 'url: \'http://',$playlistIndex)+6;
-          if($streamIndex==6)
-          {
-            $quote='"';
-            $streamIndex=strpos($playerBody, 'url: "http://',$playlistIndex)+6;
-          }
-          $streamLink=substr($playerBody, $streamIndex,strpos($playerBody, $quote,$streamIndex)-$streamIndex);
 
         // close curl resource to free up system resources 
         curl_close($ch);
 
-        return urldecode($streamLink);
+        return urldecode($streamLinks);
 }
 
 function checkLogin($username,$password)
@@ -406,12 +418,19 @@ function getMALList($user)
 	return $output;
 }
 
-function getAnimePlusList()
+function getAnimePlusList($dub)
 { 
       global $ch;
       $ch=curl_init();
         // set url 
-        curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-show-list'); 
+        if($dub=='true')
+        {
+            curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.tv/dubbed-anime'); 
+        }
+        else
+        {
+            curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-show-list'); 
+        }
 
         //return the transfer as a string 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
@@ -429,12 +448,19 @@ function getAnimePlusList()
 
         return $output;
 }
-function getAnimePlusMovieList()
+function getAnimePlusMovieList($dub)
 { 
       global $ch;
       $ch=curl_init();
         // set url 
-        curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-movies'); 
+        if($dub=='true')
+        {
+            curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.tv/movies');
+        }
+        else
+        {
+            curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-movies'); 
+        }
 
         //return the transfer as a string 
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 

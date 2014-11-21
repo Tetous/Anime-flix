@@ -7,10 +7,11 @@ define(function (require, exports, module)
 {
     var Engine = require('famous/core/Engine');
     var View = require('famous/core/View');
+    var RenderController=require('famous/views/RenderController');
     var Lightbox = require('famous/views/Lightbox');
 	var StateModifier= require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
-    var Surface = require('famous/core/Surface');
+    var Surface = require('RichFamous/Surface');
     var ImageSurface=require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
     var Timer = require('famous/utilities/Timer');
@@ -23,7 +24,13 @@ define(function (require, exports, module)
 
 	function createVideoPlayer()
     {
-		var countdown;
+	    var countdown;
+	    var contentType;
+	    var english=false;
+	    var streamSources = [];
+	    var streamSourcesIndex = 0;
+	    var dubStreamSources = [];
+	    var dubStreamSourcesIndex = 0;
 		var playData={show:undefined,episode:undefined};
 		var videoPlayerNode = new View();
 		var screenWidth = window.mainContext.getSize()[0];
@@ -59,18 +66,41 @@ define(function (require, exports, module)
         });
 		playerSurface.on('becameActive', function ()
 		{
-		    titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
+		    titleBarRenderController.show(titleBarView, { duration: 1000, curve: Easing.outCubic });
+		    languageSurface.setContent(language);
+		    titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
+		    //titleBarModifier.setOpacity(0.8, { duration: 1000, curve: Easing.outCubic });
 		});
 		playerSurface.on('becameInactive', function ()
 		{
-		    titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
+		    titleBarRenderController.hide({ duration: 1000, curve: Easing.outCubic });
+		    //titleBarModifier.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
 		});
 		playerSurface.on('playerError', function (error)
 		{
 		    switch (error.code)
 		    {
 		        case 4:
-		            playerSurface.reload();
+		            switch (contentType)
+		            {
+		                case 'anime':
+		                    if (english)
+		                    {
+		                        dubStreamSourcesIndex++;
+		                        playerSurface.play(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length]);
+		                    }
+		                    else
+		                    {
+		                        streamSourcesIndex++;
+		                        playerSurface.play(streamSources[streamSourcesIndex % streamSources.length]);
+		                    }
+		                    break;
+		                case 'movie':
+		                    playerSurface.reload();
+		                    break;
+		                default:
+		                    break;
+		            }
 		            break;
 		        default:
 		            break;
@@ -80,21 +110,28 @@ define(function (require, exports, module)
 		videoPlayerNode.add(playerSurface);
 
 		var titleBarHeight = 75;
+		var titleBarRenderController = new RenderController();
+		videoPlayerNode.add(titleBarRenderController);
+		var titleBarView = new View();
 		var titleBarModifier = new StateModifier({
-		    opacity: 0,
+            opacity: 0.8,
 		    transform: Transform.translate(0, 0, 1)
 		});
-		var titleBarModifierNode = videoPlayerNode.add(titleBarModifier);
-		var titleBar = new Surface({
+		var titleBarModifierNode = titleBarView.add(titleBarModifier);
+		var titleBar = Surface({
 		    size: [undefined, titleBarHeight],
 		    properties: {
                 color:'white',
 		        backgroundColor: '#2A2A2A',
-                textAlign:'center'
+		        textAlign: 'center',
+                verticalAlign:'middle'
 		    }
 		});
 		titleBarModifierNode.add(titleBar);
 
+		var backToBrowsingButtonTransform = new StateModifier({
+		    transform:Transform.translate(0,0,2)
+		});
 		var backToBrowsingButton=new ImageSurface({
 			size:[titleBarHeight,titleBarHeight],
 			content:'/content/images/AnimeflixBack2.png',
@@ -109,19 +146,22 @@ define(function (require, exports, module)
 		    videoPlayerNode._eventOutput.emit('backToBrowsing');
 		}
 		backToBrowsingButton.on('click',backToBrowsing);
-		titleBarModifierNode.add(backToBrowsingButton);
+		titleBarModifierNode.add(backToBrowsingButtonTransform).add(backToBrowsingButton);
 
+		var nextEpisodeButtonRenderController = new RenderController();
+		titleBarModifierNode.add(nextEpisodeButtonRenderController);
+		var nextEpisodeButtonView = new View();
 		var nextEpisodeButtonTransform = new StateModifier({
 		    align: [1, 0],
 		    origin: [1, 0],
-            transform:Transform.translate(0,8,0)
+            transform:Transform.translate(0,8,2)
 		});
 		var nextEpisodeButton = new ImageSurface({
             size:[true,59],
             content:'/content/images/AnimeflixNextEpisode.png'
 		});
 		nextEpisodeButton.on('click', nextEpisode);
-		titleBarModifierNode.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
+		nextEpisodeButtonView.add(nextEpisodeButtonTransform).add(nextEpisodeButton);
 
 		function nextEpisode()
 		{
@@ -163,6 +203,39 @@ define(function (require, exports, module)
 		    updateAnime(playData.show);
 		}
 
+		var language = document.createElement('SELECT');
+		var subOption = new Option('Sub', 1);
+		language.options.add(subOption);
+		var dubOption = new Option('Dub', 2);
+		language.options.add(dubOption);
+		language.addEventListener('change', function ()
+		{
+		    english = language.options[language.selectedIndex].value == 2;
+		    var link = streamSources[streamSourcesIndex];
+		    if (english)
+		    {
+		        link = dubStreamSources[dubStreamSourcesIndex];
+		    }
+		    playerSurface.playAtSameLocation(link);
+		});
+
+		var languageRenderController = new RenderController();
+		titleBarModifierNode.add(languageRenderController);
+		var languageView = new View();
+		var languageTransform = new StateModifier({
+		    align: [1, 0],
+		    origin: [1, 0],
+		    transform: Transform.translate(-130, 8, 2)
+		});
+		var languageSurface = Surface({
+		    size: [true, titleBarHeight],
+		    content: language,
+		    properties: {
+		        vertialAlign:'middle'
+		    }
+		});
+		languageView.add(languageTransform).add(languageSurface);
+
 		var transitionScreen = VideoTransitionScreen();
 		transitionScreen.on('backToBrowsing', backToBrowsing);
 		transitionScreen.on('finishedCountdown', function ()
@@ -181,40 +254,92 @@ define(function (require, exports, module)
 		playerSurface.on('playerLoaded',function(){
 		    playerSurface.player.on('ended', function ()
 		    {
-			    //update anime list
-				if (playData.episode > playData.show.my_watched_episodes)
-				{
-				    playData.show.my_watched_episodes = playData.episode;
-				}
+		        //update anime list
+		        switch (contentType)
+		        {
+		            case 'movie':
+		                if (english)
+		                {
+		                    dubStreamSourcesIndex++;
+		                    if (dubStreamSourcesIndex < dubStreamSources.length)
+		                    {
+		                        playerSurface.play(dubStreamSources[dubStreamSourcesIndex]);
+		                    }
+		                    else
+		                    {
+		                        if (playData.episode > playData.show.my_watched_episodes)
+		                        {
+		                            playData.show.my_watched_episodes = playData.episode;
+		                        }
+		                        playData.show.my_status = 2;
+		                        lightbox.show(seriesEndScreen);
+		                        updateAnime(playData.show);
+		                    }
+		                }
+		                else
+		                {
+		                    streamSourcesIndex++;
+		                    if (streamSourcesIndex < streamSources.length)
+		                    {
+		                        playerSurface.play(streamSources[streamSourcesIndex]);
+		                    }
+		                    else
+		                    {
+		                        if (playData.episode > playData.show.my_watched_episodes)
+		                        {
+		                            playData.show.my_watched_episodes = playData.episode;
+		                        }
+		                        playData.show.my_status = 2;
+		                        lightbox.show(seriesEndScreen);
+		                        updateAnime(playData.show);
+		                    }
+		                }
+		                break;
+		            case 'anime':
+		                if (playData.episode > playData.show.my_watched_episodes)
+		                {
+		                    playData.show.my_watched_episodes = playData.episode;
+		                }
 
-				if (playData.episode+1 > playData.show.series_episodes)
-				{
-				    playData.show.my_status = 2;
-				    lightbox.show(seriesEndScreen);
-				}
-				else
-				{
-				    lightbox.show(transitionScreen);
-				    transitionScreen.startCountdown(playData.episode,playData.show.series_animedb_id);
-				}
-				updateAnime(playData.show);
+		                if (playData.episode + 1 > playData.show.series_episodes)
+		                {
+		                    playData.show.my_status = 2;
+		                    lightbox.show(seriesEndScreen);
+		                }
+		                else
+		                {
+		                    lightbox.show(transitionScreen);
+		                    transitionScreen.startCountdown(playData.episode, playData.show.series_animedb_id);
+		                }
+		                updateAnime(playData.show);
+		                break;
+		            default:
+		                break;
+		        }
+				
 			});
 			videoPlayerNode._eventOutput.emit('playerLoaded');
 		});
 
 		var dirtyLedger = false;
+		var dirtyDubLedger = false;
 		var ledgerSwaps=[];
 		var showLedger = [];
+		var dubLedger = [];
 		if (localStorage.ledger)
 		{
 		    showLedger=JSON.parse(localStorage.ledger);
+		}
+		if (localStorage.dubLedger)
+		{
+		    dubLedger = JSON.parse(localStorage.dubLedger);
 		}
 		if (localStorage.swaps)
 		{
 		    ledgerSwaps = JSON.parse(localStorage.swaps);
 		}
 
-		function processLedger(body)
+		function processLedger(body,terminator,type)
 		{
 		    var swapsRequest = new XMLHttpRequest();
 		    swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
@@ -228,13 +353,13 @@ define(function (require, exports, module)
 
 		    var index = body.indexOf('class="series_index"');
 		    var showName = "";
-		    while (showName !== 'Dubbed Anime & Cartoon')
+		    while (showName !== terminator)
 		    {
 		        index = body.indexOf("<a href=\"", index) + 9;
 		        var showLink = body.substring(index, body.indexOf("\"", index));
 		        var index2 = body.indexOf(">", index) + 1;
 		        showName = body.substring(index2, body.indexOf("<", index2));
-		        resultLedger.push({ name: showName, link: showLink });
+		        resultLedger.push({ name: showName, link: showLink, contentType:type });
 		    }
 		    resultLedger.pop();
 
@@ -256,7 +381,7 @@ define(function (require, exports, module)
 		                    showLedger = [];
 		                    dirtyLedger = false;
 		                }
-		                var processedLedger = processLedger(request.responseText);
+		                var processedLedger = processLedger(request.responseText, 'Dubbed Anime & Cartoon', 'anime');
 		                showLedger = showLedger.concat(processedLedger);
 		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
@@ -280,8 +405,55 @@ define(function (require, exports, module)
 		                    showLedger = [];
 		                    dirtyLedger = false;
 		                }
-		                showLedger = showLedger.concat(processLedger(request.responseText));
+		                showLedger = showLedger.concat(processLedger(request.responseText, 'Dubbed Anime & Cartoon', 'movie'));
 		                localStorage.ledger = JSON.stringify(showLedger);
+		            }
+		        }
+		    };
+		    request.open("GET", url, true);
+		    request.send();
+		}
+		function getDubAnimeLedger()
+		{
+		    var url = "http://www.anime-flix.com/requester.php?m=ledger&d=true";
+		    var request = new XMLHttpRequest();
+		    request.onreadystatechange = function ()
+		    {
+		        if (request.readyState == 4)
+		        {
+		            if (request.status == 200)
+		            {
+		                if (dirtyDubLedger)
+		                {
+		                    dubLedger = [];
+		                    dirtyDubLedger = false;
+		                }
+		                var processedLedger = processLedger(request.responseText, 'Watch Anime', 'anime');
+		                dubLedger = dubLedger.concat(processedLedger);
+		                localStorage.dubLedger = JSON.stringify(dubLedger);
+		            }
+		        }
+		    };
+		    request.open("GET", url, true);
+		    request.send();
+		}
+		function getDubMovieLedger()
+		{
+		    var url = "http://www.anime-flix.com/requester.php?m=movieLedger&d=true";
+		    var request = new XMLHttpRequest();
+		    request.onreadystatechange = function ()
+		    {
+		        if (request.readyState == 4)
+		        {
+		            if (request.status == 200)
+		            {
+		                if (dirtyDubLedger)
+		                {
+		                    dubLedger = [];
+		                    dirtyDubLedger = false;
+		                }
+		                dubLedger = dubLedger.concat(processLedger(request.responseText.replace(' (Movie)', ''), 'Watch Anime', 'movie'));
+		                localStorage.dubLedger = JSON.stringify(dubLedger);
 		            }
 		        }
 		    };
@@ -293,52 +465,140 @@ define(function (require, exports, module)
 	    {
 	        //showLedger = [];
 	        dirtyLedger = true;
+	        dirtyDubLedger = true;
 	        getAnimeLedger();
 	        getMovieLedger();
+	        getDubAnimeLedger();
+	        getDubMovieLedger();
 	    }
 	    getLedger();
 
 	    videoPlayerNode.play = function (playObject, episode)
 	    {
+	        streamSources = undefined;
+	        dubStreamSources = undefined;
+
 	        playData.show = playObject;
 	        playData.episode = episode;
 
 	        lightbox.show(playerSurface);
 
 	        var ledgerItem = getLedgerItem(playObject);
+	        var dubLedgerItem = getLedgerItem(playObject, true);
+	        contentType = ledgerItem.contentType;
+	        if (contentType=='movie')
+	        {
+	            nextEpisodeButtonRenderController.hide();
+	        }
+	        else
+	        {
+	            nextEpisodeButtonRenderController.show(nextEpisodeButtonView);
+	        }
 	        if (ledgerItem)
 	        {
-	            //setting hash
-	            window.location.hash = 'video&' + playData.show.series_animedb_id+'&'+playData.episode;
+                
+	                //setting hash
+	                window.location.hash = 'video&' + playData.show.series_animedb_id+'&'+playData.episode;
 
-	            titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
+	                titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
 
-	            url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
-	            var request = new XMLHttpRequest();
-	            request.onreadystatechange = function ()
-	            {
-	                if (request.readyState == 4)
+	                url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
+	                var request = new XMLHttpRequest();
+	                request.onreadystatechange = function ()
 	                {
-	                    if (request.status == 200)
+	                    if (request.readyState == 4)
 	                    {
-	                        if (window.location.hash.indexOf('video')>-1)
+	                        if (request.status == 200)
 	                        {
-	                            var body = request.responseText;
-	                            if (body == 'Link not found')
+	                            if (window.location.hash.indexOf('video')>-1)
 	                            {
-	                                window.alert('The episode can not be found. Sorry for the inconvenience. Please contact support@anime-flix.com and we will sort it out as soon as possible.');
-	                                backToBrowsing();
+	                                var body = request.responseText;
+	                                if (body == 'Link not found')
+	                                {
+	                                    window.alert('The episode can not be found. Sorry for the inconvenience. Please contact support@anime-flix.com and we will sort it out as soon as possible.');
+	                                    backToBrowsing();
+	                                }
+	                                else
+	                                {
+	                                    streamSources = body.split(';');
+	                                    streamSources.pop();
+	                                    streamSourcesIndex = 0;
+	                                    if (!english)
+	                                    {
+	                                        playerSurface.play(streamSources[0]);
+	                                    }
+	                                }
+	                            }
+	                            if (streamSources && dubStreamSources)
+	                            {
+	                                languageRenderController.show(languageView);
 	                            }
 	                            else
 	                            {
-	                                playerSurface.play(body);
+	                                languageRenderController.hide();
 	                            }
 	                        }
 	                    }
-	                }
-	            };
-	            request.open('POST', url);
-	            request.send(ledgerItem.link);
+	                };
+	                request.open('POST', url);
+	                request.send(ledgerItem.link);
+	            
+                if (dubLedgerItem)
+                {
+                    //setting hash
+                    //window.location.hash = 'video&' + playData.show.series_animedb_id + '&' + playData.episode;
+
+                    //titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
+
+                    url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + dubLedgerItem.name + '&e=' + episode;
+                    var dubRequest = new XMLHttpRequest();
+                    dubRequest.onreadystatechange = function ()
+                    {
+                        if (dubRequest.readyState == 4)
+                        {
+                            if (dubRequest.status == 200)
+                            {
+                                if (window.location.hash.indexOf('video') > -1)
+                                {
+                                    var body = dubRequest.responseText;
+                                    if (body == 'Link not found')
+                                    {
+                                        myStatus.options.selectedIndex = 1;
+                                        if (streamSources)
+                                        {
+                                            playerSurface.play(streamSources[0]);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        dubStreamSources = body.split(';');
+                                        dubStreamSources.pop();
+                                        dubStreamSourcesIndex = 0;
+                                        if (english)
+                                        {
+                                            playerSurface.play(dubStreamSources[0]);
+
+                                        }
+                                    }
+                                }
+                                if (streamSources && dubStreamSources)
+                                {
+                                    languageRenderController.show(languageView);
+                                }
+                                else
+                                {
+                                    languageRenderController.hide();
+                                }
+                            }
+                        }
+                    };
+                    dubRequest.open('POST', url);
+                    dubRequest.send(dubLedgerItem.link);
+                }
+                else
+                {
+                    myStatus.options.selectedIndex = 1;
+                }
 	        }
 	        else
 	        {
@@ -347,8 +607,14 @@ define(function (require, exports, module)
 	        }
 	    };
 
-		function getLedgerItem(show)
-		{
+		function getLedgerItem(show,dub)
+	    {
+		    var ledgerToCheck = showLedger;
+		    if (dub)
+		    {
+		        ledgerToCheck = dubLedger;
+		    }
+
 			var value=false;
 			var done=false;
 
@@ -368,13 +634,13 @@ define(function (require, exports, module)
 			    var workingTitle=titles[j];
 			    while (workingTitle && !done)
 			    {
-			        for (var i = 0; i < showLedger.length && !done; i++)
+			        for (var i = 0; i < ledgerToCheck.length && !done; i++)
 			        {
-			            if (showLedger[i].name == workingTitle)
+			            if (ledgerToCheck[i].name.toLowerCase() == workingTitle.toLowerCase())
 			            {
-			                value = { name: titles[0], link: showLedger[i].link };
+			                value = { name: titles[0], link: ledgerToCheck[i].link, contentType:ledgerToCheck[i].contentType };
 			                if (j>0) {
-			                    showLedger.push(value);
+			                    ledgerToCheck.push(value);
 			                }
 			                done = true;
 			            };
@@ -386,13 +652,13 @@ define(function (require, exports, module)
 			{
 			    for (var i = 0; i < ledgerSwaps.length&&!done; i++)
 			    {
-			        if (ledgerSwaps[i].malName == show.series_title)
+			        if (ledgerSwaps[i].malName.toLowerCase() == show.series_title.toLowerCase())
 			        {
-			            for (var j = 0; j < showLedger.length && !done; j++)
+			            for (var j = 0; j < ledgerToCheck.length && !done; j++)
 			            {
-			                if (ledgerSwaps[i].ledgerName == showLedger[j].name)
+			                if (ledgerSwaps[i].ledgerName.toLowerCase() == ledgerToCheck[j].name.toLowerCase())
 			                {
-			                    value = { name: showLedger[j].name, link: showLedger[j].link };
+			                    value = { name: ledgerToCheck[j].name, link: ledgerToCheck[j].link, contentType: ledgerToCheck[i].contentType };
 			                    done = true;
 			                }
 			            }
