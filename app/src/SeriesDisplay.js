@@ -27,43 +27,42 @@ define(function (require, exports, module)
         var transforms = [];
         var view = new View();
 
-        var backgroundWidth=1000;
-        var backgroundHeight=600;
         var backgroundTransform = new StateModifier();
         var background = Surface({
             properties: {
-                backgroundColor: window.colorScheme.third,
-                borderRadius: '10px'
+                backgroundColor: window.colorScheme.second,
             }
         });
-        transforms.push(backgroundTransform);
-        view.add(backgroundTransform).add(background);
+        var backgroundTransformNode = view.add(backgroundTransform);
+        backgroundTransformNode.add(background);
 
         var imageTransform = new StateModifier();
-        var image = new ImageSurface();
+        var image = new ImageSurface({
+            properties: {borderRadius:'10px'}
+        });
         transforms.push(imageTransform);
-        view.add(imageTransform).add(image);
+        backgroundTransformNode.add(imageTransform).add(image);
 
         var titleTransform = new StateModifier();
         var title = Surface({
             size: [true, true]
         });
         transforms.push(titleTransform);
-        view.add(titleTransform).add(title);
+        backgroundTransformNode.add(titleTransform).add(title);
 
         var typeTransform = new StateModifier();
         var type = Surface({
             size: [true, true]
         });
         transforms.push(typeTransform);
-        view.add(typeTransform).add(type);
+        backgroundTransformNode.add(typeTransform).add(type);
 
         var airedTransform = new StateModifier();
         var aired = Surface({
             size: [true, true]
         });
         transforms.push(airedTransform);
-        view.add(airedTransform).add(aired);
+        backgroundTransformNode.add(airedTransform).add(aired);
 
         var descriptionTransform = new StateModifier();
         var descriptionContainer = new ContainerSurface({
@@ -87,7 +86,7 @@ define(function (require, exports, module)
         descriptionScroll.sequenceFrom([description]);
         descriptionContainer.add(descriptionScroll);
         transforms.push(descriptionTransform);
-        view.add(descriptionTransform).add(descriptionContainer);
+        backgroundTransformNode.add(descriptionTransform).add(descriptionContainer);
 
         var myStatusLabelTransform = new StateModifier();
         var myStatusLabel = Surface({
@@ -95,7 +94,7 @@ define(function (require, exports, module)
             content:'My Status:'
         });
         transforms.push(myStatusLabelTransform);
-        view.add(myStatusLabelTransform).add(myStatusLabel);
+        backgroundTransformNode.add(myStatusLabelTransform).add(myStatusLabel);
 
         var myStatus = document.createElement('SELECT');
         var watchingOption = new Option('Watching', 1);
@@ -114,7 +113,7 @@ define(function (require, exports, module)
             content:myStatus
         });
         transforms.push(myStatusTransform);
-        view.add(myStatusTransform).add(myStatusSurface);
+        backgroundTransformNode.add(myStatusTransform).add(myStatusSurface);
 
         var scoreLabelTransform = new StateModifier();
         var scoreLabel = Surface({
@@ -122,7 +121,7 @@ define(function (require, exports, module)
             content:'Score:'
         });
         transforms.push(scoreLabelTransform);
-        view.add(scoreLabelTransform).add(scoreLabel);
+        backgroundTransformNode.add(scoreLabelTransform).add(scoreLabel);
 
         var score = document.createElement('SELECT');
         score.options.add(new Option((10).toString()));
@@ -141,14 +140,14 @@ define(function (require, exports, module)
             content: score
         });
         transforms.push(scoreTransform);
-        view.add(scoreTransform).add(scoreSurface);
+        backgroundTransformNode.add(scoreTransform).add(scoreSurface);
 
         var statusTransform = new StateModifier();
         var status = Surface({
             size: [150, true]
         });
         transforms.push(statusTransform);
-        view.add(statusTransform).add(status);
+        backgroundTransformNode.add(statusTransform).add(status);
 
         var viewOnMALTransform = new StateModifier();
         var viewOnMALButton = Surface({
@@ -156,7 +155,8 @@ define(function (require, exports, module)
             content: 'View On MyAnimeList',
             properties: {
                 borderRadius: '5px',
-                backgroundColor: 'white',
+                color:'white',
+                backgroundColor: 'black',
                 textAlign: 'center',
                 verticalAlign:'middle'
             }
@@ -166,7 +166,7 @@ define(function (require, exports, module)
             window.open('http://myanimelist.net/anime/' + series.listData.series_animedb_id);
         });
         transforms.push(viewOnMALTransform);
-        view.add(viewOnMALTransform).add(viewOnMALButton)
+        backgroundTransformNode.add(viewOnMALTransform).add(viewOnMALButton)
 
         var episodeLabelTransform = new StateModifier();
         var episodeLabel = Surface({
@@ -174,7 +174,7 @@ define(function (require, exports, module)
             content:'Episode:'
         });
         transforms.push(episodeLabelTransform);
-        view.add(episodeLabelTransform).add(episodeLabel);
+        backgroundTransformNode.add(episodeLabelTransform).add(episodeLabel);
 
         var episodeDropdown = document.createElement('SELECT');
         var episodeDropdownTransform = new StateModifier();
@@ -183,7 +183,7 @@ define(function (require, exports, module)
             content:episodeDropdown
         });
         transforms.push(episodeDropdownTransform);
-        view.add(episodeDropdownTransform).add(episodeDropdownSurface);
+        backgroundTransformNode.add(episodeDropdownTransform).add(episodeDropdownSurface);
 
         //play button alerts
         var alertZTransform = new StateModifier({
@@ -233,7 +233,8 @@ define(function (require, exports, module)
             },
             buttonProperties: {
                 textAlign: 'center',
-                backgroundColor: window.colorScheme.second,
+                color:'white',
+                backgroundColor: window.colorScheme.main,
                 lineHeight: 50 + 'px',
                 verticalAlign: 'middle',
                 //border: '3px solid gray',
@@ -249,7 +250,8 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: window.colorScheme.second,
+                color: 'white',
+                backgroundColor: window.colorScheme.main,
                 borderRadius: 25 + 'px'
             }
         });
@@ -340,7 +342,7 @@ define(function (require, exports, module)
             }
         });
         transforms.push(playButtonTransform);
-        view.add(playButtonTransform).add(playButton);
+        backgroundTransformNode.add(playButtonTransform).add(playButton);
 
         var updateButtonTransform = new StateModifier();
         var updateButton = Surface({
@@ -349,7 +351,8 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: window.colorScheme.second,
+                color: 'white',
+                backgroundColor: window.colorScheme.main,
                 borderRadius: 25 + 'px'
             }
         });
@@ -401,7 +404,7 @@ define(function (require, exports, module)
             });
         });
         transforms.push(updateButtonTransform);
-        view.add(updateButtonTransform).add(updateButton);
+        backgroundTransformNode.add(updateButtonTransform).add(updateButton);
 
         var deleteButtonTransform = new StateModifier();
         var deleteButton = Surface({
@@ -410,7 +413,8 @@ define(function (require, exports, module)
                 //fontSize: fontSize + 'px',
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: window.colorScheme.second,
+                color: 'white',
+                backgroundColor: window.colorScheme.main,
                 borderRadius: 25 + 'px'
             }
         });
@@ -423,9 +427,11 @@ define(function (require, exports, module)
             });
         });
         transforms.push(deleteButtonTransform);
-        view.add(deleteButtonTransform).add(deleteButton);
+        backgroundTransformNode.add(deleteButtonTransform).add(deleteButton);
 
         var closeButtonTransform = new StateModifier({
+            origin: [1, 0],
+            align: [1,0]
         });
         var closeButton = Surface({
             size: [30,30],
@@ -443,7 +449,7 @@ define(function (require, exports, module)
             view.hide();
         });
         transforms.push(closeButtonTransform);
-        view.add(closeButtonTransform).add(closeButton);
+        backgroundTransformNode.add(closeButtonTransform).add(closeButton);
        
         view.setSeries = function (ser) {
             series = ser;
@@ -485,11 +491,11 @@ define(function (require, exports, module)
 
         view.resize = function ()
         {
-            background.setSize([window.formatting.scale * backgroundWidth, window.formatting.scale * backgroundHeight]);
+            var windowSize = window.mainContext.getSize();
             playButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
             updateButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
             deleteButton.setSize([window.formatting.scale * 100, window.formatting.scale * 50]);
-            descriptionContainer.setSize([window.formatting.scale * backgroundWidth - 250, window.formatting.scale * 250]);
+            descriptionContainer.setSize([ windowSize[0] - 250, window.formatting.scale * 250]);
             image.setSize([window.formatting.scale * 150, window.formatting.scale * 233]);
             if (opened)
             {
@@ -504,9 +510,10 @@ define(function (require, exports, module)
                 transforms[i].halt();
             }
             var windowSize=window.mainContext.getSize();
-            var backgroundPos = [(windowSize[0] - window.formatting.scale * backgroundWidth) / 2, (windowSize[1] - window.formatting.scale * backgroundHeight) / 2];
-            var inTransition={ duration: 1000, curve: Easing.outCubic };
-            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0), inTransition);
+            var backgroundPos = [0, 0];
+            var inTransition = { duration: 1000, curve: Easing.outCubic };
+            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0));
+            backgroundTransform.setOpacity(1, inTransition);
             imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), inTransition);
             titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1),inTransition);
             typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), inTransition);
@@ -523,7 +530,6 @@ define(function (require, exports, module)
             playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
             updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 160, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
             deleteButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 320, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
-            closeButtonTransform.setTransform(Transform.translate(backgroundPos[0] + window.formatting.scale * backgroundWidth - 30, backgroundPos[1], 2), inTransition);
             opened = true;
         }
 
@@ -558,15 +564,16 @@ define(function (require, exports, module)
         }
 
         view.hide = function () {
-            initialPositions(1000);
+            //initialPositions(1000);
+            var backgroundPos = window.mainContext.getSize();
+            var inTransition = { duration: 1000, curve: Easing.outCubic };
+            backgroundTransform.setOpacity(0, inTransition);
+            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0));
             opened = false;
         }
-        function initialPositions(duration) {
-            for (var i = 0; i < transforms.length; i++)
-            {
-                var pos = getRandomPos();
-                transforms[i].setTransform(Transform.translate(pos[0], pos[1], 1), { duration: duration, curve: Easing.outCubic });
-            }
+        function initialPositions(duration)
+        {
+            view.hide();
         }
 
         view.updatePosition = function ()

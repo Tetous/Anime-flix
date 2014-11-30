@@ -79,7 +79,7 @@ define(function (require, exports, module)
         var logo = new ImageSurface({
             content: '/content/images/AnimeflixLogo.png'
         });
-
+        /*
         var betaHeight = 60;
         var betaTransform = new StateModifier({
             origin: [0.5, 0.5]
@@ -90,7 +90,7 @@ define(function (require, exports, module)
         var beta = new ImageSurface({
             content:'content/images/Beta.png'
         });
-
+        */
         var textboxProperties = {
             border: '1px solid gray',
             borderRadius: boxHeight / 2 + 'px',
@@ -158,8 +158,10 @@ define(function (require, exports, module)
             passwordBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
             logoTransform.setTransform(Transform.translate(0, window.formatting.scale * (-boxHeight - logoHeight)));
             logo.setSize([true, window.formatting.scale * logoHeight]);
+            /*
             betaTransform.setTransform(Transform.translate(window.formatting.scale * 330, window.formatting.scale * (-boxHeight - logoHeight - 20)));
             beta.setSize([true, window.formatting.scale * betaHeight]);
+            */
             credentialInfoTransform.setTransform(Transform.translate(0, window.formatting.scale * 3 * buttonHeight, 1));
             credentialInfo.setProperties({ fontSize: window.formatting.scale * 16 + 'px' });
             button.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
@@ -210,7 +212,7 @@ define(function (require, exports, module)
 
 
         loginElementsNode.add(logoTransform).add(logo);
-        loginElementsNode.add(betaTransform).add(betaRotate).add(beta);
+        //loginElementsNode.add(betaTransform).add(betaRotate).add(beta);
         loginElementsNode.add(usernameBoxTransform).add(usernameBox);
         loginElementsNode.add(passwordBoxTransform).add(passwordBox);
         loginElementsNode.add(buttonTransform).add(button);
