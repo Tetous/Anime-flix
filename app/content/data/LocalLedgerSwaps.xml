@@ -20,4 +20,8 @@
     <ledgerName>Steins Gate</ledgerName>
     <malName>Steins;Gate</malName>
   </swap>
+<swap>
+    <ledgerName>Toradora</ledgerName>
+    <malName>Toradora!</malName>
+  </swap>
 </Root>

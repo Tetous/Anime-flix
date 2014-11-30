@@ -110,8 +110,9 @@ define(function (require, exports, module)
 	        textAlign:'center',
 	        verticalAlign:'middle',
 	        color: 'white',
-	        borderTopRightRadius: '5px',
-	        borderTopLeftRadius: '5px'
+            borderRadius:'10px'
+	        //borderTopRightRadius: '5px',
+	        //borderTopLeftRadius: '5px'
 	    };
 
 	    var buttonColorEvents = new EventHandler();

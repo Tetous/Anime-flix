@@ -8,9 +8,8 @@ define(function (require, exports, module)
     var Engine = require('famous/core/Engine');
     var View = require('famous/core/View');
     var Transform = require('famous/core/Transform');
-    var Modifier = require('famous/core/Modifier');
     var StateModifier = require('famous/modifiers/StateModifier');
-    var Transitionable = require('famous/transitions/Transitionable');
+    var RenderController = require('famous/views/RenderController');
     var Easing = require('famous/transitions/Easing');
     var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
@@ -18,51 +17,56 @@ define(function (require, exports, module)
 
     function createLoginScreen(size)
     {
+        var overView = new View();
         var view = new View();
+        
+        var loginRenderController = new RenderController();
+        overView.add(loginRenderController);
+        loginRenderController.show(view);
 
-        var loginTransitionable = new Transitionable([0.5, -1.5]);
-        var loginTransform = new Modifier({
+        var loginBackgroundTransform = new StateModifier({
             origin: [0.5, 0.5],
-            align: function () { return loginTransitionable.get(); }
+            align:[0.5,0.5]
         });
-
+        var loginBackgroundNode = view.add(loginBackgroundTransform);
         
         //loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
 
-        var loginBackground = new ImageSurface({
-            content: "/content/images/AnimeflixLogin2.png"
+        var loginBackground = Surface({
+            properties: {backgroundColor:'black'}
         });
+        loginBackgroundNode.add(loginBackground);
+        function fakeOut()
+        {
+            loginTransform.setOpacity(0, { duration: 1000, curve: Easing.outCubic });
+            loginTransform.setOpacity(1, { duration: 1000, curve: Easing.inCubic });
+        }
         loginBackground.on("deploy", function ()
         {
             //#region Session Relogin
 
             if (sessionStorage.username != undefined)
             {
-                view.username = sessionStorage.username;
-                view.password = sessionStorage.password;
+                overView.username = sessionStorage.username;
+                overView.password = sessionStorage.password;
 
-                var url = 'http://www.anime-flix.com/requester.php?m=login';
-                var request = new XMLHttpRequest();
-                request.open("POST", url, false);
-                request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                request.send('u=' + view.username + '&p=' + view.password);
-
-                var bodyText = request.responseText;
-                if (bodyText == 'Invalid credentials' || request.status != 200)
+                if (overView.login(overView.username, overView.password))
                 {
-                    loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
-                }
-                else
-                {
-                    view._eventOutput.emit('loggedIn');
+                    loginRenderController.hide({ duration: 0 });
                 }
             }
             else
             {
-                loginTransitionable.set([0.5, 0.5], { duration: 2000, curve: Easing.outBounce }, credentialInfoBounce);
+                fakeOut();
             }
             //#endregion
         });
+        var loginTransform = new StateModifier({
+            opacity: 0,
+            origin: [0.5, 0.5],
+            align: [0.5, 0.5]
+        });
+        var loginElementsNode=loginBackgroundNode.add(loginTransform);
 
         var fontSize = 25;
         var boxWidth = 400;
@@ -105,7 +109,7 @@ define(function (require, exports, module)
             };
         }
 
-        var usernameBoxTransform = new Modifier({
+        var usernameBoxTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
         var usernameBox = new InputSurface({
@@ -116,7 +120,7 @@ define(function (require, exports, module)
         );
         usernameBox.on('keypress', textBoxEnter);
 
-        var passwordBoxTransform = new Modifier({
+        var passwordBoxTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
         var passwordBox = new InputSurface({
@@ -129,7 +133,7 @@ define(function (require, exports, module)
 
         var buttonWidth = 200;
         var buttonHeight = 80;
-        var buttonTransform = new Modifier({
+        var buttonTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
         var button = Surface({
@@ -137,14 +141,14 @@ define(function (require, exports, module)
             properties: {
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: window.colorScheme.main,//'#4494FD',//'#00fff8',
+                backgroundColor: window.colorScheme.second,//'#4494FD',//'#00fff8',
                 borderRadius: boxHeight / 2 + 'px'
             }
         });
 
         button.on('click', login)
 
-        view.resize = function ()
+        overView.resize = function ()
         {
             buttonTransform.setTransform(Transform.translate(0, window.formatting.scale*(buttonHeight + boxHeight), 1));
             button.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
@@ -156,33 +160,18 @@ define(function (require, exports, module)
             logo.setSize([true, window.formatting.scale * logoHeight]);
             betaTransform.setTransform(Transform.translate(window.formatting.scale * 330, window.formatting.scale * (-boxHeight - logoHeight - 20)));
             beta.setSize([true, window.formatting.scale * betaHeight]);
-            credentialInfoTransform2.setTransform(Transform.translate(window.formatting.scale * -20, 0, 0));
-            credentialInfoBackground.setSize([window.formatting.scale * 250 * 1.15, window.formatting.scale * 150 * 1.15]);
-            credentialInfo.setSize([window.formatting.scale * 200, true]);
-            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -350, 0, 5));
-            credentialInfo.setProperties({ fontSize: window.formatting.scale * 12 + 'px' });
+            credentialInfoTransform.setTransform(Transform.translate(0, window.formatting.scale * 3 * buttonHeight, 1));
+            credentialInfo.setProperties({ fontSize: window.formatting.scale * 16 + 'px' });
             button.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             usernameBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             passwordBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
         }
 
         var credentialInfoTransform = new StateModifier({
-            origin: [0.5,0.5]
-        });
-        function credentialInfoBounce()
-        {
-            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -400, 0, 5), { duration: 1000, curve: Easing.outCubic });
-            credentialInfoTransform.setTransform(Transform.translate(window.formatting.scale * -350, 0, 5), { duration: 1000, curve: Easing.outBounce });
-            //credentialInfoTransform.setTransform(Transform.translate(-350, 0, 5), { duration: 500, curve: Easing.outBounce },credentialInfoBounce);
-        }
-
-        var credentialInfoBackground = new ImageSurface({
-            content:'content/images/InfoBubble2.png'
-        });
-        var credentialInfoTransform2 = new StateModifier({
-
+            origin: [0.5, 0.5],
         });
         var credentialInfo = Surface({
+            size:[true,true],
             content: 'Login with your MyAnimeList credentials. Anime-flix uses MyAnimeList to track your viewing progress as you watch.',
             properties: {
                 textAlign: 'center',
@@ -193,39 +182,40 @@ define(function (require, exports, module)
 
         function login()
         {
-            view.username = usernameBox.getValue();
-            view.password = passwordBox.getValue();
+            overView.username = usernameBox.getValue();
+            overView.password = passwordBox.getValue();
+            return overView.login(overView.username, overView.password);
+        }
+        overView.login = function (username, password)
+        {
             var url = 'http://www.anime-flix.com/requester.php?m=login';
             var request = new XMLHttpRequest();
             request.open("POST", url, false);
-            request.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
-            request.send('u=' + view.username + '&p=' + view.password);
+            request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.send('u=' + username + '&p=' + password);
 
             var bodyText = request.responseText;
             if (bodyText == 'Invalid credentials' || request.status != 200)
             {
-                loginTransitionable.set([0.5, 0.4], { duration: 500, curve: Easing.outCubic });
-                loginTransitionable.set([0.5, 0.5], { duration: 500, curve: Easing.outBounce });
+                fakeOut();
+                return false;
             }
             else
             {
-                view._eventOutput.emit('loggedIn');
-                loginTransitionable.set([0.5, -1.5], { duration: 3000, curve: Easing.outQuint });
+                overView._eventOutput.emit('loggedIn');
+                loginRenderController.hide({ duration: 2000 });
+                return true;
             }
         }
 
 
-        var bouncerNode = view.add(loginTransform);
-        bouncerNode.add(loginBackground);
-        bouncerNode.add(logoTransform).add(logo);
-        bouncerNode.add(betaTransform).add(betaRotate).add(beta);
-        bouncerNode.add(usernameBoxTransform).add(usernameBox);
-        bouncerNode.add(passwordBoxTransform).add(passwordBox);
-        bouncerNode.add(buttonTransform).add(button);
-        var credentialInfoNode = bouncerNode.add(credentialInfoTransform);
-        credentialInfoNode.add(credentialInfoBackground);
-        credentialInfoNode.add(credentialInfoTransform2).add(credentialInfo);
-        return view;
+        loginElementsNode.add(logoTransform).add(logo);
+        loginElementsNode.add(betaTransform).add(betaRotate).add(beta);
+        loginElementsNode.add(usernameBoxTransform).add(usernameBox);
+        loginElementsNode.add(passwordBoxTransform).add(passwordBox);
+        loginElementsNode.add(buttonTransform).add(button);
+        loginElementsNode.add(credentialInfoTransform).add(credentialInfo);
+        return overView;
     }
     module.exports = createLoginScreen;
 });

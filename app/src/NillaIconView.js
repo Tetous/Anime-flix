@@ -66,7 +66,7 @@ define(function (require, exports, module)
 		    for (var i = 0; i < iconsToReUse; i++)
 		    {
 		        surfaces[i].setSeries(shows[i]);
-		        iconRenderControllers[i].show(surfaces[i]);
+		        iconRenderControllers[i].show(surfaces[i], {duration:2000});
 		    }
 		    for (var i = 0; i < iconsToCreate; i++)
 		    {
@@ -82,7 +82,7 @@ define(function (require, exports, module)
 		        surfaces.push(icon);
 
 		        iconView.add(iconTransform).add(iconRenderController);
-		        iconRenderController.show(icon);
+		        iconRenderController.show(icon, {duration:2000});
 		    }
             /*
 			for (var i = 0; i < shows.length; i++) {

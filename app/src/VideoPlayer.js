@@ -297,6 +297,7 @@ define(function (require, exports, module)
 		                }
 		                break;
 		            case 'anime':
+		                clear();
 		                if (playData.episode > playData.show.my_watched_episodes)
 		                {
 		                    playData.show.my_watched_episodes = playData.episode;
@@ -344,6 +345,7 @@ define(function (require, exports, module)
 		{
 		    var swapsRequest = new XMLHttpRequest();
 		    swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
+		    swapsRequest.setRequestHeader('Content-Type', "text/xml");
 		    swapsRequest.send();
 		    var parser = new DOMParser();
 		    var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
@@ -518,7 +520,8 @@ define(function (require, exports, module)
 	                                if (body == 'Link not found')
 	                                {
 	                                    window.alert('The episode can not be found. Sorry for the inconvenience. Please contact support@anime-flix.com and we will sort it out as soon as possible.');
-	                                    backToBrowsing();
+	                                    //backToBrowsing();
+	                                    videoPlayerNode._eventOutput.emit('failedToFind');
 	                                }
 	                                else
 	                                {
@@ -607,7 +610,8 @@ define(function (require, exports, module)
 	        else
 	        {
 	            window.alert('The show could not be found. Sorry');
-	            backToBrowsing();
+	            //backToBrowsing();
+	            videoPlayerNode._eventOutput.emit('failedToFind');
 	        }
 	    };
 
@@ -662,7 +666,7 @@ define(function (require, exports, module)
 			            {
 			                if (ledgerSwaps[i].ledgerName.toLowerCase() == ledgerToCheck[j].name.toLowerCase())
 			                {
-			                    value = { name: ledgerToCheck[j].name, link: ledgerToCheck[j].link, contentType: ledgerToCheck[i].contentType };
+			                    value = { name: ledgerToCheck[j].name, link: ledgerToCheck[j].link, contentType: ledgerToCheck[j].contentType };
 			                    done = true;
 			                }
 			            }

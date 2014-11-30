@@ -17,7 +17,10 @@ define(function(require, exports, module) {
 		var view = new View();
 		view.data=data;
 		var image=new ImageSurface({
-				size:[iconWidth,iconHeight]
+		    size: [iconWidth, iconHeight],
+		    properties: {
+                borderRadius:'10px'
+		    }
 			});
         
 		var titleTransform=new StateModifier({
@@ -26,7 +29,8 @@ define(function(require, exports, module) {
 		var title=new Surface({
 			size:[iconWidth,true],
 			properties:{
-				textAlign:'center'
+			    textAlign: 'center',
+                color:'white'
 			}
 		});
 		image.on('click',function(){

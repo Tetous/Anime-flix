@@ -21,10 +21,10 @@ define(function (require, exports, module)
     window.showSelectorZ = 50;
     window.videoPlayerZ = 0;
     window.colorScheme = {
-        main: '#FF9200',//'#0066CC',
-        second: '#BF8230',
+        main: 'black',//'#0066CC',
+        second: 'white',
         third: '#A65F00',
-        background:'white'
+        background:'black'
     }
     window.formatting = { scale: 1 };
 
@@ -98,8 +98,15 @@ define(function (require, exports, module)
         videoPlayer.on('backToBrowsing', function ()
         {
             showSelector.refreshList();
-            window.location.hash = 'sdisplay&'+showSelector.getShowingSection();
-            showSelectorTransform.setAlign([0, 0], { duration: 2000, curve: Easing.outCubic });
+            window.location.hash = 'sdisplay&' + showSelector.getShowingSection();
+            showSelectorTransform.setAlign([0, 0], { duration: 0 });
+            showSelectorTransform.setOpacity(1, { duration: 2000 });
+        });
+        videoPlayer.on('failedToFind', function ()
+        {
+            showSelectorTransform.halt();
+            showSelectorTransform.setAlign([0, 0], { duration: 0 });
+            showSelectorTransform.setOpacity(1, { duration: 0 });
         });
         mainContext.add(videoPlayerTransform).add(videoPlayer);
 
@@ -109,7 +116,8 @@ define(function (require, exports, module)
         var showSelector = ShowSelector();
         function showSelected(data)
         {
-            showSelectorTransform.setAlign([0, -1], { duration: 2000, curve: Easing.outCubic });
+            showSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic });
+            showSelectorTransform.setAlign([0, -1], { duration: 0 });
             videoPlayer.play(data.show, data.episode);
         }
         showSelector.on('showSelected', showSelected);
