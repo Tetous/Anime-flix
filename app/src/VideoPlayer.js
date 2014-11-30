@@ -26,7 +26,6 @@ define(function (require, exports, module)
     {
 	    var countdown;
 	    var contentType;
-	    var english=false;
 	    var streamSources = [];
 	    var streamSourcesIndex = 0;
 	    var dubStreamSources = [];
@@ -84,15 +83,15 @@ define(function (require, exports, module)
 		            switch (contentType)
 		            {
 		                case 'anime':
-		                    if (english)
+		                    if (localStorage.english=='true')
 		                    {
 		                        dubStreamSourcesIndex++;
-		                        playerSurface.play(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length]);
+		                        playerSurface.playAtSameLocation(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length]);
 		                    }
 		                    else
 		                    {
 		                        streamSourcesIndex++;
-		                        playerSurface.play(streamSources[streamSourcesIndex % streamSources.length]);
+		                        playerSurface.playAtSameLocation(streamSources[streamSourcesIndex % streamSources.length]);
 		                    }
 		                    break;
 		                case 'movie':
@@ -208,11 +207,13 @@ define(function (require, exports, module)
 		language.options.add(subOption);
 		var dubOption = new Option('Dub', 2);
 		language.options.add(dubOption);
+		language.options.selectedIndex = localStorage.english=='true'?1:0;
 		language.addEventListener('change', function ()
 		{
-		    english = language.options[language.selectedIndex].value == 2;
+		    localStorage.english = language.options[language.selectedIndex].value == 2;
+
 		    var link = streamSources[streamSourcesIndex];
-		    if (english)
+		    if (localStorage.english=='true')
 		    {
 		        link = dubStreamSources[dubStreamSourcesIndex];
 		    }
@@ -258,7 +259,7 @@ define(function (require, exports, module)
 		        switch (contentType)
 		        {
 		            case 'movie':
-		                if (english)
+		                if (localStorage.english=='true')
 		                {
 		                    dubStreamSourcesIndex++;
 		                    if (dubStreamSourcesIndex < dubStreamSources.length)
@@ -452,7 +453,8 @@ define(function (require, exports, module)
 		                    dubLedger = [];
 		                    dirtyDubLedger = false;
 		                }
-		                dubLedger = dubLedger.concat(processLedger(request.responseText.replace(' (Movie)', ''), 'Watch Anime', 'movie'));
+		                var moddedBody=request.responseText.replace(/ \(Movie\)/g, '');
+		                dubLedger = dubLedger.concat(processLedger(moddedBody, 'Watch Anime', 'movie'));
 		                localStorage.dubLedger = JSON.stringify(dubLedger);
 		            }
 		        }
@@ -523,7 +525,7 @@ define(function (require, exports, module)
 	                                    streamSources = body.split(';');
 	                                    streamSources.pop();
 	                                    streamSourcesIndex = 0;
-	                                    if (!english)
+	                                    if (localStorage.english=='false')
 	                                    {
 	                                        playerSurface.play(streamSources[0]);
 	                                    }
@@ -563,7 +565,8 @@ define(function (require, exports, module)
                                     var body = dubRequest.responseText;
                                     if (body == 'Link not found')
                                     {
-                                        language.options.selectedIndex = 1;
+                                        localStorage.english = false;
+                                        language.options.selectedIndex = 0;
                                         if (streamSources)
                                         {
                                             playerSurface.play(streamSources[0]);
@@ -574,7 +577,7 @@ define(function (require, exports, module)
                                         dubStreamSources = body.split(';');
                                         dubStreamSources.pop();
                                         dubStreamSourcesIndex = 0;
-                                        if (english)
+                                        if (localStorage.english=='true')
                                         {
                                             playerSurface.play(dubStreamSources[0]);
 
@@ -597,7 +600,8 @@ define(function (require, exports, module)
                 }
                 else
                 {
-                    language.options.selectedIndex = 1;
+                    localStorage.english = false;
+                    language.options.selectedIndex = 0;
                 }
 	        }
 	        else
@@ -638,10 +642,10 @@ define(function (require, exports, module)
 			        {
 			            if (ledgerToCheck[i].name.toLowerCase() == workingTitle.toLowerCase())
 			            {
-			                value = { name: titles[0], link: ledgerToCheck[i].link, contentType:ledgerToCheck[i].contentType };
-			                if (j>0) {
-			                    ledgerToCheck.push(value);
-			                }
+			                value = { name: titles[j], link: ledgerToCheck[i].link, contentType:ledgerToCheck[i].contentType };
+			                //if (j>0&&!dub) {
+			                //    ledgerToCheck.push(value);
+			                //}
 			                done = true;
 			            };
 			        };

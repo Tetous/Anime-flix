@@ -244,13 +244,7 @@ function processDubTitle($title)
     switch($title)
     {
         case 'Highschool of the Dead: Drifters of the Dead':
-            return 'Highschool of the Dead OVA';
-            break;
-        case 'Fullmetal Alchemist: Brotherhood':
-            return 'Forcing Default Case';
-            break;
-        case 'Fullmetal Alchemist':
-            return 'Forcing Default Case';
+            return 'Highschool of the Dead - Drifters of the Dead';
             break;
         default:
             return $title;
@@ -350,10 +344,15 @@ else
         
         if($showLinksCount==0)
         {
+        if(strpos($paramShowUrl,'toon')/*&&!strpos($paramShowUrl,'movie')*/)
+        {
+            return 'Link not found';
+        }
             if(count($episodeLinks)<$episode)
             {
                 return 'Link not found';
             }
+            
             curl_setopt($ch, CURLOPT_URL, $episodeLinks[$episodeLinksCount-$episode]);
         }
         else
@@ -361,6 +360,10 @@ else
             if(count($showEpisodeLinks)<$episode)
             {
                 if(count($episodeLinks)<$episode)
+                {
+                    return 'Link not found';
+                }
+                if(strpos($paramShowUrl,'toon')/*&&!strpos($paramShowUrl,'movie')*/)
                 {
                     return 'Link not found';
                 }
