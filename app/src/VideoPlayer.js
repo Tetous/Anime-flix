@@ -358,7 +358,7 @@ define(function (require, exports, module)
 		    var showName = "";
 		    while (showName !== terminator)
 		    {
-		        index = body.indexOf("<a href=\"", index) + 9;
+		        index = body.indexOf("href=\"", index) + 6;
 		        var showLink = body.substring(index, body.indexOf("\"", index));
 		        var index2 = body.indexOf(">", index) + 1;
 		        showName = body.substring(index2, body.indexOf("<", index2));
@@ -384,7 +384,7 @@ define(function (require, exports, module)
 		                    showLedger = [];
 		                    dirtyLedger = false;
 		                }
-		                var processedLedger = processLedger(request.responseText, 'Dubbed Anime & Cartoon', 'anime');
+		                var processedLedger = processLedger(request.responseText, 'Dubbed Anime', 'anime');
 		                showLedger = showLedger.concat(processedLedger);
 		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
@@ -408,7 +408,7 @@ define(function (require, exports, module)
 		                    showLedger = [];
 		                    dirtyLedger = false;
 		                }
-		                showLedger = showLedger.concat(processLedger(request.responseText, 'Dubbed Anime & Cartoon', 'movie'));
+		                showLedger = showLedger.concat(processLedger(request.responseText, 'Dubbed Anime', 'movie'));
 		                localStorage.ledger = JSON.stringify(showLedger);
 		            }
 		        }
