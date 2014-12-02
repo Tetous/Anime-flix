@@ -105,8 +105,8 @@ define(function (require, exports, module)
         videoPlayer.on('failedToFind', function ()
         {
             showSelectorTransform.halt();
-            showSelectorTransform.setAlign([0, 0], { duration: 0 });
-            showSelectorTransform.setOpacity(1, { duration: 0 });
+            showSelectorTransform.setAlign([0, 0]);
+            showSelectorTransform.setOpacity(1);
         });
         mainContext.add(videoPlayerTransform).add(videoPlayer);
 
@@ -116,8 +116,10 @@ define(function (require, exports, module)
         var showSelector = ShowSelector();
         function showSelected(data)
         {
-            showSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic });
-            showSelectorTransform.setAlign([0, -1], { duration: 0 });
+            showSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic }, function ()
+            {
+                showSelectorTransform.setAlign([0, -1]);
+            });
             videoPlayer.play(data.show, data.episode);
         }
         showSelector.on('showSelected', showSelected);

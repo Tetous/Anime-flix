@@ -3,10 +3,12 @@
   "description": "An anime streaming site linked into MAL..",
   "version": "0.1.0",
   "homepage": "https://github.com//animeflix",
-  "authors": [{
-    "name": "Richard",
-    "url": "http://github.com//"
-  }],
+  "authors": [
+    {
+      "name": "Richard",
+      "url": "http://github.com//"
+    }
+  ],
   "main": "app/index.html",
   "moduleType": [
     "amd"

@@ -567,8 +567,10 @@ define(function (require, exports, module)
             //initialPositions(1000);
             var backgroundPos = window.mainContext.getSize();
             var inTransition = { duration: 1000, curve: Easing.outCubic };
-            backgroundTransform.setOpacity(0, inTransition);
-            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0));
+            backgroundTransform.setOpacity(0, inTransition, function ()
+            {
+                backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0));
+            });
             opened = false;
         }
         function initialPositions(duration)

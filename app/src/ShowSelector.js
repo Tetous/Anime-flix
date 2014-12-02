@@ -43,7 +43,7 @@ define(function (require, exports, module)
 	    var view=new View();
 
 	    var headerHeight = 100;
-	    var footerHeight = 50;
+	    var footerHeight = 25;
 	    var layout=new HeaderFooterLayout();
 	    view.add(layout);
 
@@ -80,7 +80,7 @@ define(function (require, exports, module)
                 size:[undefined,footerHeight],
                 color: 'white',
                 textAlign:'center',
-	            verticalAlign: 'middle',
+                verticalAlign: 'middle'
 	        }
 	    });
 	    footerElements.push(byRichard);
@@ -104,18 +104,68 @@ define(function (require, exports, module)
 	        }
 	    });
 	    footerElements.push(featuresContact);
+        //#region IP Adress
+        /*
+	    var ipAddress = Surface({
+	        properties: {
+	            size: [undefined, footerHeight],
+	            color: 'white',
+	            textAlign: 'center',
+	            verticalAlign: 'middle',
+	        }
+	    });
+	    footerElements.push(ipAddress);
+
+	        var RTCPeerConnection = window.webkitRTCPeerConnection || window.mozRTCPeerConnection;
+
+	        var configuration = { "iceServers": [] };
+	        var pc;
+	        var localIP;
+
+	        if (RTCPeerConnection)
+	        {
+
+	            pc = new RTCPeerConnection(configuration);
+	            pc.createDataChannel('', { reliable: false });
+	            pc.onicecandidate = function (evt)
+	            {
+	                if (evt.candidate)
+	                {
+	                    if (!localIP)
+	                    {
+	                        localIP = getIpFromString(evt.candidate.candidate);
+	                        ipAddress.setContent('IP Address: ' + localIP);
+	                    }
+	                }
+	            };
+
+	            pc.createOffer(function (offerDesc)
+	            {;
+	                pc.setLocalDescription(offerDesc);
+	            }, function (e) { console.warn("offer failed", e); });
+
+	            function getIpFromString(a)
+	            {
+	                var r = a.match(/\b(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\b/);
+	                return r[0];
+	            }
+
+	        } else
+	        {
+	            //browser doesn't support webrtc   
+	        }
+            */
+        //#endregion
         //#endregion
 
 	    var buttonProps={
 	        textAlign:'center',
 	        verticalAlign:'middle',
-	        color: 'white',
-            borderRadius:'10px'
-	        //borderTopRightRadius: '5px',
-	        //borderTopLeftRadius: '5px'
+	        color: 'white'
 	    };
 
 	    var buttonColorEvents = new EventHandler();
+        /*
 	    buttonColorEvents.on('mouseover', function (button)
 	    {
 	        button.currentTarget.style.color = 'black';
@@ -126,7 +176,7 @@ define(function (require, exports, module)
 	        button.currentTarget.style.color = 'white';
 	        button.currentTarget.style.backgroundColor = headerFooterColor;
 	    });
-
+        */
 	    var logoutButtonTransform = new StateModifier({
 	        origin: [1,0],
 	        align:[1,0],
@@ -136,9 +186,6 @@ define(function (require, exports, module)
 	        size:[100,40],
 	        content: 'Logout',
 	        properties:buttonProps
-	    });
-	    logoutButton.setProperties({
-            borderRadius:'5px'
 	    });
 	    logoutButton.on('click', function ()
 	    {
@@ -291,9 +338,10 @@ define(function (require, exports, module)
 		    planToWatchButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
 		    searchButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
 		    logoutButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
-		    byRichard.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
-		    supportContact.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
-		    featuresContact.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    byRichard.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
+		    supportContact.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
+		    featuresContact.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
+		    //ipAddress.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
 		    layout.setOptions({
 		        headerSize: window.formatting.scale * headerHeight,
 		        footerSize: window.formatting.scale * footerHeight
@@ -324,8 +372,8 @@ define(function (require, exports, module)
 			outOpacity: 1,
 			inTransform: Transform.translate(screenWidth,0, 1),
 			outTransform: Transform.translate(-1*screenWidth, 0, 1),
-			inTransition: { duration: 500, curve: Easing.outBack },
-			outTransition: { duration: 500, curve: Easing.easeOut }
+			inTransition: { duration: 1000, curve: Easing.outBack },
+			outTransition: { duration: 1000, curve: Easing.easeOut }
 		});
         //#endregion
 

@@ -141,7 +141,8 @@ define(function (require, exports, module)
             properties: {
                 textAlign: 'center',
                 verticalAlign: 'middle',
-                backgroundColor: window.colorScheme.second,//'#4494FD',//'#00fff8',
+                color:'white',
+                //backgroundColor: window.colorScheme.second,//'#4494FD',//'#00fff8',
                 borderRadius: boxHeight / 2 + 'px'
             }
         });

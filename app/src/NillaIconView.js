@@ -106,7 +106,8 @@ define(function (require, exports, module)
 		{
 		    var windowSize = window.mainContext.getSize();
 
-		    var minIconBufferX = 50;
+		    var minIconBufferX = 25;
+		    var bufferY = 75;
 		    var iconWidth = 150;
 		    var iconHeight = iconWidth * 1.555;
 		    var imagesPerRow = Math.floor((windowSize[0] - minIconBufferX) / (iconWidth + minIconBufferX));
@@ -121,12 +122,12 @@ define(function (require, exports, module)
 		        iconBufferX = minIconBufferX + (iconWidth + minIconBufferX) / (numberOfRenderingIcons+1);
 		    }
 
-		    iconView.setOptions({ size: [undefined, 100 + Math.floor(numberOfRenderingIcons / imagesPerRow + 0.95) * (iconHeight + 100)] });
+		    iconView.setOptions({ size: [undefined, 100 + Math.floor(numberOfRenderingIcons / imagesPerRow + 0.95) * (iconHeight + 75)] });
 
 		    for (var i = 0; i < numberOfRenderingIcons; i++)
 		    {
 		        iconStateMods[i].halt();
-		        iconStateMods[i].setTransform(Transform.translate(i % imagesPerRow * (iconWidth + iconBufferX) + iconBufferX, 100 + Math.floor(i / imagesPerRow) * (iconHeight + 100), window.showSelectorZ + 10), { duration: duration, curve: Easing.outCubic });
+		        iconStateMods[i].setTransform(Transform.translate(i % imagesPerRow * (iconWidth + iconBufferX) + iconBufferX, bufferY + Math.floor(i / imagesPerRow) * (iconHeight + bufferY), window.showSelectorZ + 10), { duration: duration, curve: Easing.outCubic });
 		    }
 		}
 
