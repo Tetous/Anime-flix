@@ -54,9 +54,10 @@ define(function (require, exports, module)
 	            backgroundColor: headerFooterColor
 	        }
 	    }));
+	    var date = new Date();
 	    var logoSizer = new StateModifier();
 	    var logo = new ImageSurface({
-	        content: 'content/images/AnimeflixLogo.png'
+	        content: 'content/images/AnimeflixLogo.png?'+date.getTime()
 	    });
 	    layout.header.add(logoSizer).add(logo);
 	    //#region Footer

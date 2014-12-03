@@ -239,6 +239,10 @@ define(function (require, exports, module)
 
 		var transitionScreen = VideoTransitionScreen();
 		transitionScreen.on('backToBrowsing', backToBrowsing);
+		transitionScreen.on('abortedCountdown', function ()
+		{
+		    lightbox.show(playerSurface);
+		});
 		transitionScreen.on('finishedCountdown', function ()
 		{
 		    lightbox.show(playerSurface, function ()

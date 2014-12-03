@@ -40,7 +40,7 @@ define(function (require, exports, module)
         });
         backToBrowsingButton.on('click', function ()
         {
-            countDown = -1;
+            countdown = -1;
             view._eventOutput.emit('backToBrowsing');
         });
         view.add(backToBrowsingButtonTransform).add(backToBrowsingButton);
@@ -91,6 +91,7 @@ define(function (require, exports, module)
         {
             if (countdown==-1)
             {
+                view._eventOutput.emit('abortedCountdown');
                 return;
             }
             if (countdown == 0)

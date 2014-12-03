@@ -76,8 +76,9 @@ define(function (require, exports, module)
         var logoTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
+        var date = new Date();
         var logo = new ImageSurface({
-            content: '/content/images/AnimeflixLogo.png'
+            content: '/content/images/AnimeflixLogo.png?'+date.getTime()
         });
         /*
         var betaHeight = 60;
