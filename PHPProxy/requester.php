@@ -38,6 +38,11 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
+    case 'epCount':
+        $out=getEpisodeCount(file_get_contents('php://input'),$_GET['t']);
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
     case 'search':
         $out=getSearch($_GET['s'],htmlspecialchars($_POST["u"]),htmlspecialchars($_POST["p"]));
         header('Content-Length: '.strlen($out));
@@ -233,6 +238,9 @@ function processTitle($title)
             break;
         case 'Fullmetal Alchemist':
             return 'Forcing Default Case';
+            break;
+        case 'Fairy Tail (2014)':
+            return 'Fairy Tail 2014';
             break;
         default:
             return $title;
@@ -566,8 +574,101 @@ function setCookies($ch, $string)
     return $length;
 }
 
+function getEpisodeCount($paramShowUrl,$title)
+{
+if(strpos($paramShowUrl,'plus'))
+{
+    $title=processTitle($title);
+}
+else
+{
+    $title=processDubTitle($title);
+}
+  $baseShowUrl=$paramShowUrl.'?page=';
+    global $ch;
+      $ch=curl_init();
+        // set url 
+        curl_setopt($ch, CURLOPT_URL, $paramShowUrl); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
+        curl_setopt ($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
+        curl_exec($ch); 
 
-	//echo getMALList('RichKop');
+        $pageIndex=0;
+        $showUrl='';
+        
+        $episodeLinks=array();
+        $showEpisodeLinks=array();
+        $loopCount=0;
+          $showLinksCount=0;
+        do
+        {
+          $pageIndex++;
+          $showUrl=$baseShowUrl.$pageIndex;
 
+          curl_setopt($ch, CURLOPT_URL, $showUrl); 
+          $output = curl_exec($ch);
+
+          $vidDivIndex=strpos($output, '<div id="videos">');
+          $searchIndex=strpos($output,'<a href="',$vidDivIndex)+9;
+          $endVidIndex=strpos($output, '</div>',$vidDivIndex);
+
+          
+          while ($searchIndex<$endVidIndex) {
+            $endLinkIndex=strpos($output, '"',$searchIndex);
+            $link=substr($output, $searchIndex,$endLinkIndex-$searchIndex);
+
+            $episodeLinks[$loopCount]=$link;
+            if(strpos($link,'.',22)===false)
+            {
+                $baseShowCheck=$link.'">'.$title;
+                //echo($baseShowCheck);
+                $showChecks=array(
+                    0=>$baseShowCheck.' Episode',
+                    1=>$baseShowCheck.' 1',
+                    2=>$baseShowCheck.' 2',
+                    3=>$baseShowCheck.' 3',
+                    4=>$baseShowCheck.' 4',
+                    5=>$baseShowCheck.' 5',
+                    6=>$baseShowCheck.' 6',
+                    7=>$baseShowCheck.' 7',
+                    8=>$baseShowCheck.' 8',
+                    9=>$baseShowCheck.' 9',
+                    //10=>$baseShowCheck.' 0',
+                    11=>$baseShowCheck.' episode',
+                    12=>$baseShowCheck.' </a>',
+                    13=>$baseShowCheck.' OVA',
+                    14=>$baseShowCheck.' Movie',
+                    15=>$baseShowCheck.' movie',
+                    10=>$baseShowCheck.' ova'
+                );
+            
+                $showChecksCount=count($showChecks);
+                $done=false;
+                for ($i = 0; $i <= $showChecksCount&&!$done; $i++) {
+                    if(strpos($output,$showChecks[$i])!==false)
+                    {
+                        $done=true;
+                        $showEpisodeLinks[$showLinksCount]=$link;
+                        $showLinksCount++;
+                        //echo('got show\n');
+                    }
+                }
+            }
+
+            $searchIndex=strpos($output,'<a href="',$searchIndex)+9;
+            $loopCount++;
+          }
+        }while (strpos($output, 'Next</a>'));
+
+        $result="";
+        $episodeLinksCount=count($episodeLinks);
+        $showEpisodeLinksCount=count($showEpisodeLinks);
+
+        // close curl resource to free up system resources 
+        curl_close($ch);
+
+        return $showEpisodeLinksCount.':'.$episodeLinksCount;
+}
 ?>

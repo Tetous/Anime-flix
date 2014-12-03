@@ -451,20 +451,21 @@ define(function (require, exports, module)
         transforms.push(closeButtonTransform);
         backgroundTransformNode.add(closeButtonTransform).add(closeButton);
        
-        view.setSeries = function (ser) {
+        view.setSeries = function (ser)
+        {
             series = ser;
             image.setContent(ser.listData.series_image);
             title.setContent(ser.listData.series_title);
             type.setContent(ser.searchData.type);
             aired.setContent(ser.searchData.start_date + " to " + ser.searchData.end_date);
             var myStatusIndex = ser.listData.my_status;
-            if (myStatusIndex>5||myStatusIndex<1)
+            if (myStatusIndex > 5 || myStatusIndex < 1)
             {
                 myStatusIndex = 5;
             }
-            myStatus.options.selectedIndex = myStatusIndex-1;
+            myStatus.options.selectedIndex = myStatusIndex - 1;
             score.options.selectedIndex = 10 - ser.listData.my_score;
-            status.setContent('Status: '+ser.searchData.status);
+            status.setContent('Status: ' + ser.searchData.status);
             description.setContent(ser.searchData.synopsis);
             /*
             Engine.nextTick(function ()
@@ -476,14 +477,40 @@ define(function (require, exports, module)
                 
             });
             */
-            while (episodeDropdown.options.length > 0) {
+            
+            if (ser.listData.series_status == 1)
+            {
+                var ledgerItem = window.ledger.getLedgerItem(ser.listData);
+                getEpisodeCountAsync(ser.listData.series_title, ledgerItem.link, function (episodeCounts)
+                {
+                    while (episodeDropdown.options.length > 0)
+                    {
+                        episodeDropdown.options.remove(0);
+                    }
+                    ser.listData.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
+                    for (var i = 1; i <= ser.listData.series_episodes; i++)
+                    {
+                        episodeDropdown.options.add(new Option(i.toString()));
+                    }
+                    var indexToSelect = ser.listData.my_watched_episodes;
+                    if (indexToSelect == episodeDropdown.options.length)
+                    {
+                        indexToSelect--;
+                    }
+                    episodeDropdown.options.selectedIndex = indexToSelect;
+                });
+            }
+            while (episodeDropdown.options.length > 0)
+            {
                 episodeDropdown.options.remove(0);
             }
-            for (var i = 1; i <= ser.listData.series_episodes; i++) {
+            for (var i = 1; i <= ser.listData.series_episodes; i++)
+            {
                 episodeDropdown.options.add(new Option(i.toString()));
             }
-            var indexToSelect=ser.listData.my_watched_episodes;
-            if (indexToSelect==episodeDropdown.options.length) {
+            var indexToSelect = ser.listData.my_watched_episodes;
+            if (indexToSelect == episodeDropdown.options.length)
+            {
                 indexToSelect--;
             }
             episodeDropdown.options.selectedIndex = indexToSelect;

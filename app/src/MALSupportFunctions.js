@@ -178,3 +178,23 @@ function searchMALAsync(search, callback)
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }
+function getEpisodeCountAsync(title,link, callback)
+{
+    var url = 'http://www.anime-flix.com/requester.php?m=epCount&t=' + title;
+    var request = new XMLHttpRequest();
+    request.onreadystatechange = function ()
+    {
+        if (request.readyState == 4)
+        {
+            if (request.status == 200)
+            {
+                var strings = request.responseText.split(':');
+                var arr = [parseInt(strings[0]), parseInt(strings[1])];
+                callback(arr);
+            }
+        }
+    }
+    request.open('POST', url);
+    request.send(link);
+    
+}

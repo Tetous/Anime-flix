@@ -43,6 +43,16 @@ define(function (require, exports, module)
         });
         view.add(backToBrowsingButtonTransform).add(backToBrowsingButton);
 
+        view.setContent = function (content)
+        {
+            if(content==undefined)
+            {
+                content = 'You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)';
+            }
+            backgroundSurface.setContent(content);
+        }
+
+
         return view;
     }
     module.exports=createSeriesEndScreen;

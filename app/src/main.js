@@ -4,16 +4,13 @@ define(function (require, exports, module)
     'use strict';
     // import dependencies
     var Engine = require('famous/core/Engine');
-    var RenderNode = require('famous/core/RenderNode');
-    var Modifier = require('famous/core/Modifier');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
-    var Surface = require('famous/core/Surface');
     var Easing = require('famous/transitions/Easing');
-    var Transitionable = require('famous/transitions/Transitionable');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');
     var VideoPlayer = require('VideoPlayer');
+    window.ledger = require('Ledger');
 
     require('MALSupportFunctions');
 
@@ -24,8 +21,8 @@ define(function (require, exports, module)
         main: 'black',//'#0066CC',
         second: 'white',
         third: '#A65F00',
-        background:'black'
-    }
+        background: 'black'
+    };
     window.formatting = { scale: 1 };
 
 
@@ -67,10 +64,10 @@ define(function (require, exports, module)
     */
 
     //CSS
-    var vidCSS = document.createElement("link");
-    vidCSS.rel = "stylesheet";
-    vidCSS.href = "css/video-js.min.css";
-    vidCSS.type = "text/css";
+    var vidCSS = document.createElement('link');
+    vidCSS.rel = 'stylesheet';
+    vidCSS.href = 'css/video-js.min.css';
+    vidCSS.type = 'text/css';
     document.head.appendChild(vidCSS);
 
     //Read UserAgent
@@ -82,12 +79,12 @@ define(function (require, exports, module)
     //get CORS access
     var url = 'http://www.anime-flix.com/requester.php';
     var request = new XMLHttpRequest();
-    request.open("GET", url, false);
+    request.open('GET', url, false);
     //request.send();
 
     // create the main context
     var mainContext = Engine.createContext();
-    window.mainContext = mainContext
+    window.mainContext = mainContext;
 
     Engine.nextTick(function ()
     {
@@ -125,7 +122,7 @@ define(function (require, exports, module)
         showSelector.on('showSelected', showSelected);
         mainContext.add(showSelectorTransform).add(showSelector);
 
-        var loginScreenTransform = new Modifier({ transform: Transform.translate(0, 0, window.loginZ) });
+        var loginScreenTransform = new StateModifier({ transform: Transform.translate(0, 0, window.loginZ) });
         var loginScreen = LoginScreen(mainContext.getSize());
         loginScreen.on('loggedIn', function ()
         {
