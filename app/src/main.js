@@ -16,7 +16,7 @@ define(function (require, exports, module)
 
     window.loginZ = 100;
     window.showSelectorZ = 50;
-    window.videoPlayerZ = 1;
+    window.videoPlayerZ = 0;
     window.colorScheme = {
         main: 'black',//'#0066CC',
         second: 'white',
