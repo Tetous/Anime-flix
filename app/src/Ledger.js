@@ -27,29 +27,30 @@ define(function (require, exports, module)
 
     function processLedger(body, terminator, type)
     {
-        var swapsRequest = new XMLHttpRequest();
-        swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
-        swapsRequest.setRequestHeader('Content-Type', "text/xml");
-        swapsRequest.send();
-        var parser = new DOMParser();
-        var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
-        ledgerSwaps = XML2jsobj(domObj).Root.swap;
-        localStorage.swaps = JSON.stringify(ledgerSwaps);
-
         var resultLedger = [];
-
-        var index = body.indexOf('class="series_index"');
-        var showName = "";
-        while (showName !== terminator)
+        if (!body.contains('unavailable'))
         {
-            index = body.indexOf("href=\"", index) + 6;
-            var showLink = body.substring(index, body.indexOf("\"", index));
-            var index2 = body.indexOf(">", index) + 1;
-            showName = body.substring(index2, body.indexOf("<", index2));
-            resultLedger.push({ name: showName, link: showLink, contentType: type });
-        }
-        resultLedger.pop();
+            var swapsRequest = new XMLHttpRequest();
+            swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
+            swapsRequest.setRequestHeader('Content-Type', "text/xml");
+            swapsRequest.send();
+            var parser = new DOMParser();
+            var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
+            ledgerSwaps = XML2jsobj(domObj).Root.swap;
+            localStorage.swaps = JSON.stringify(ledgerSwaps);
 
+            var index = body.indexOf('class="series_index"');
+            var showName = "";
+            while (showName !== terminator)
+            {
+                index = body.indexOf("href=\"", index) + 6;
+                var showLink = body.substring(index, body.indexOf("\"", index));
+                var index2 = body.indexOf(">", index) + 1;
+                showName = body.substring(index2, body.indexOf("<", index2));
+                resultLedger.push({ name: showName, link: showLink, contentType: type });
+            }
+            resultLedger.pop();
+        }
         return resultLedger;
     }
 

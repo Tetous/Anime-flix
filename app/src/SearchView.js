@@ -74,12 +74,13 @@ define(function (require, exports, module)
         var scrollTransform = new StateModifier({
             transform: Transform.translate(0, 30, 1 + window.showSelectorZ + 1)
         });
+        var speedLimit = window.isMobile ? 0 : 2;
         var scroll = new Scrollview({
             //size:[undefined,undefined],
             direction: 1,
             friction: 1,
             drag: 1,
-            speedLimit: 1
+            speedLimit: speedLimit
         });
         scroll.sequenceFrom(searchItemDisplaysToShow);
         container.pipe(scroll);
