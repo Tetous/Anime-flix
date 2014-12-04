@@ -19,7 +19,10 @@ define(function (require, exports, module)
         var view = new View();
         view.button1Clicked = false;
         view.button2Clicked = true;
-        var alertTransform = new StateModifier();
+        var alertTransform = new StateModifier({
+            origin: [0, 0],
+            align:[0,0]
+        });
         var alertTransformNode = view.add(alertTransform);
 
         var background = Surface(options);
@@ -61,14 +64,18 @@ define(function (require, exports, module)
         {
             view.button1Clicked = false;
             view.button2Clicked = false;
-            var windowSize=window.mainContext.getSize();
+            var windowSize = window.mainContext.getSize();
+            alertTransform.setOpacity(1);
             alertTransform.setTransform(Transform.translate(windowSize[0] / 2 - options.size[0] / 2, windowSize[1] / 2 - options.size[1] / 2, 0), options.showTransitionable, function () { view._eventOutput.emit('shown') });
         }
 
         function hide()
         {
             var windowSize = window.mainContext.getSize();
-            alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0), options.hideTransitionable, function () { view._eventOutput.emit('hidden') });
+            alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0), options.hideTransitionable, function () { view._eventOutput.emit('hidden') }, function ()
+            {
+                alertTransform.setOpacity(0);
+            });
         }
         alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0));
 

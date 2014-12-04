@@ -28,7 +28,7 @@ define(function (require, exports, module)
     function processLedger(body, terminator, type)
     {
         var resultLedger = [];
-        if (!body.contains('unavailable'))
+        if (!body.indexOf('unavailable')>-1)
         {
             var swapsRequest = new XMLHttpRequest();
             swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
