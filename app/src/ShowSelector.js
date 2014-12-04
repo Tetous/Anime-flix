@@ -70,7 +70,7 @@ define(function (require, exports, module)
 	    var footerElements = [];
 	    var footerGrid = new GridLayout({
 	        size: [undefined, footerHeight],
-            dimensions:[3,1]
+            dimensions:[4,1]
 	    });
 	    footerGrid.sequenceFrom(footerElements);
 	    layout.footer.add(footerGrid);
@@ -105,6 +105,17 @@ define(function (require, exports, module)
 	        }
 	    });
 	    footerElements.push(featuresContact);
+
+	    var FAQButton = Surface({
+	        content: 'FAQ',
+	        properties: {
+	            size: [undefined, footerHeight],
+	            color: 'white',
+	            textAlign: 'center',
+	            verticalAlign: 'middle',
+	        }
+	    });
+	    footerElements.push(FAQButton);
         //#region IP Adress
         /*
 	    var ipAddress = Surface({
@@ -196,6 +207,23 @@ define(function (require, exports, module)
 	    });
 		logoutButton.pipe(buttonColorEvents);
 		layout.header.add(logoutButtonTransform).add(logoutButton);
+
+		var mangaButtonTransform = new StateModifier({
+		    origin: [1, 0],
+		    align: [1, 0],
+		    transform: Transform.translate(-110, -5, 1)
+		});
+		var mangaButton = Surface({
+		    size: [100, 40],
+		    content: 'Manga',
+		    properties: buttonProps
+		});
+		mangaButton.on('click', function ()
+		{
+		    view._eventOutput.emit('manga');
+		});
+		mangaButton.pipe(buttonColorEvents);
+		layout.header.add(mangaButtonTransform).add(mangaButton);
 
 		var gridHeight = headerHeight / 2;
 		var gridTransform=new StateModifier();
@@ -332,6 +360,7 @@ define(function (require, exports, module)
 		    planToWatchButton.setOptions({ size: [undefined, window.formatting.scale * gridHeight]});
 		    searchButton.setOptions({ size: [undefined, window.formatting.scale * gridHeight]});
 		    logoutButton.setOptions({ size: [window.formatting.scale * 100, window.formatting.scale * gridHeight] });
+		    mangaButton.setOptions({ size: [window.formatting.scale * 100, window.formatting.scale * gridHeight] });
 		    watchingButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
 		    completedButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
 		    onHoldButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
@@ -339,9 +368,11 @@ define(function (require, exports, module)
 		    planToWatchButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
 		    searchButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
 		    logoutButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
+		    mangaButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
 		    byRichard.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
 		    supportContact.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
 		    featuresContact.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
+		    FAQButton.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
 		    //ipAddress.setProperties({ fontSize: window.formatting.scale * 14 + 'px' });
 		    layout.setOptions({
 		        headerSize: window.formatting.scale * headerHeight,

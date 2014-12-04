@@ -21,7 +21,8 @@ define(function (require, exports, module)
         view.button2Clicked = true;
         var alertTransform = new StateModifier({
             origin: [0, 0],
-            align:[0,0]
+            align: [0, 0],
+            opacity:0
         });
         var alertTransformNode = view.add(alertTransform);
 

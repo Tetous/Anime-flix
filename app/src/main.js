@@ -7,6 +7,7 @@ define(function (require, exports, module)
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
     var Easing = require('famous/transitions/Easing');
+    var Surface = require('RichFamous/Surface');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');
     var VideoPlayer = require('VideoPlayer');
@@ -85,42 +86,32 @@ define(function (require, exports, module)
     // create the main context
     var mainContext = Engine.createContext();
     window.mainContext = mainContext;
+    mainContext.setPerspective(0);
 
     Engine.nextTick(function ()
     {
-        var videoPlayerTransform = new StateModifier({
-            transform: Transform.translate(0, 0, window.videoPlayerZ)
+        var flips=0;
+        var centerSpinTransform = new StateModifier({
+            align: [0.5, 0.5],
+            origin: [0.5, 0.5]
         });
-        var videoPlayer = VideoPlayer();
-        videoPlayer.on('backToBrowsing', function ()
+        var centerSpinRotation = new StateModifier();
+        function spin()
         {
-            showSelector.refreshList();
-            window.location.hash = 'sdisplay&' + showSelector.getShowingSection();
-            showSelectorTransform.setAlign([0, 0], { duration: 0 });
-            showSelectorTransform.setOpacity(1, { duration: 2000 });
-        });
-        videoPlayer.on('failedToFind', function ()
-        {
-            showSelectorTransform.halt();
-            showSelectorTransform.setAlign([0, 0]);
-            showSelectorTransform.setOpacity(1);
-        });
-        mainContext.add(videoPlayerTransform).add(videoPlayer);
-
-        var showSelectorTransform = new StateModifier({
-            transform: Transform.translate(0, 0, window.showSelectorZ)
-        });
-        var showSelector = ShowSelector();
-        function showSelected(data)
-        {
-            showSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic }, function ()
+            mainContext.setPerspective(1500);
+            centerSpinTransform.setTransform(Transform.translate(0, 0, -400), { duration: 1000, curve: Easing.outCubic }, function ()
             {
-                showSelectorTransform.setAlign([0, -1]);
+                flips++;
+                centerSpinRotation.setTransform(Transform.rotateY(Math.PI * flips), { duration: 1500, curve: Easing.inOutCubic }, function ()
+                {
+                    centerSpinTransform.setTransform(Transform.translate(0, 0, 0), { duration: 1000, curve: Easing.outCubic }, function ()
+                    {
+                        mainContext.setPerspective(0);
+                    });
+                });
             });
-            videoPlayer.play(data.show, data.episode);
         }
-        showSelector.on('showSelected', showSelected);
-        mainContext.add(showSelectorTransform).add(showSelector);
+        var spinnerNode = mainContext.add(centerSpinTransform).add(centerSpinRotation);
 
         var loginScreenTransform = new StateModifier({ transform: Transform.translate(0, 0, window.loginZ) });
         var loginScreen = LoginScreen(mainContext.getSize());
@@ -138,7 +129,7 @@ define(function (require, exports, module)
                     var showData = showSelector.selectShowById(parseInt(params[1]));
                     if (episode > showData.my_watched_episodes)
                     {
-                        showData.my_watched_episodes = episode-1;
+                        showData.my_watched_episodes = episode - 1;
                     }
                     updateAnime(showData);
                     showSelected({ show: showData, episode: episode });
@@ -153,18 +144,78 @@ define(function (require, exports, module)
             }
             //#endregion
         });
+
+        mainContext.add(loginScreenTransform).add(loginScreen);
+
+        //#region Anime
+        var videoPlayerTransform = new StateModifier({
+            transform: Transform.translate(0, 0, window.videoPlayerZ)
+        });
+        var videoPlayer = VideoPlayer();
+        videoPlayer.on('backToBrowsing', function ()
+        {
+            showSelector.refreshList();
+            window.location.hash = 'sdisplay&' + showSelector.getShowingSection();
+            showSelectorTransform.setAlign([0, 0], { duration: 0 });
+            showSelectorTransform.setOpacity(1, { duration: 2000 });
+        });
+        videoPlayer.on('failedToFind', function ()
+        {
+            showSelectorTransform.halt();
+            showSelectorTransform.setAlign([0, 0]);
+            showSelectorTransform.setOpacity(1);
+        });
+        spinnerNode.add(videoPlayerTransform).add(videoPlayer);
+
+        var showSelectorTransform = new StateModifier({
+            transform: Transform.translate(0, 0, window.showSelectorZ)
+        });
+        var showSelector = ShowSelector();
+        function showSelected(data)
+        {
+            showSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic }, function ()
+            {
+                showSelectorTransform.setAlign([0, -1]);
+            });
+            videoPlayer.play(data.show, data.episode);
+        }
+        showSelector.on('showSelected', showSelected);
+        showSelector.on('manga', function () { spin()});
+        spinnerNode.add(showSelectorTransform).add(showSelector);
+        //#endregion
+        //#region Manga
+        var mangaRotation = new StateModifier({
+            transform:Transform.rotateY(Math.PI)
+        });
+        var mangaTestSurface = Surface({
+            content: 'Manga Coming Soon!',
+            properties: {
+                color:'white',
+                backgroundColor: 'black',
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                fontSize:'30px'
+            }
+        });
+        mangaTestSurface.on('click', function ()
+        {
+            spin();
+        });
+        spinnerNode.add(mangaRotation).add(mangaTestSurface);
+        //#endregion
+
         function resize()
         {
             var size = mainContext.getSize();
             window.formatting.scale = 1;
-            if (size[0]<1000)
+            if (size[0] < 1000)
             {
                 window.formatting.scale = size[0] / 1000;
             }
-            if (size[1]<600)
+            if (size[1] < 600)
             {
-                var rat=size[1] / 600;
-                if(rat<window.formatting.scale)
+                var rat = size[1] / 600;
+                if (rat < window.formatting.scale)
                 {
                     window.formatting.scale = rat;
                 }
@@ -175,8 +226,6 @@ define(function (require, exports, module)
             //videoPlayer.resize();
         }
         Engine.on('resize', resize);
-        
-        mainContext.add(loginScreenTransform).add(loginScreen);
         resize();
     });
 });
