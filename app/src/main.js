@@ -8,6 +8,7 @@ define(function (require, exports, module)
     var Transform = require('famous/core/Transform');
     var Easing = require('famous/transitions/Easing');
     var Surface = require('RichFamous/Surface');
+    var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');
     var VideoPlayer = require('VideoPlayer');
@@ -111,7 +112,10 @@ define(function (require, exports, module)
                 });
             });
         }
-        var spinnerNode = mainContext.add(centerSpinTransform).add(centerSpinRotation);
+
+        var siteContainer = new ContainerSurface();
+        mainContext.add(centerSpinTransform).add(centerSpinRotation).add(siteContainer);
+        var spinnerNode = siteContainer;
 
         var loginScreenTransform = new StateModifier({ transform: Transform.translate(0, 0, window.loginZ) });
         var loginScreen = LoginScreen(mainContext.getSize());
@@ -201,7 +205,7 @@ define(function (require, exports, module)
         {
             spin();
         });
-        spinnerNode.add(mangaRotation).add(mangaTestSurface);
+        //spinnerNode.add(mangaRotation).add(mangaTestSurface);
         //#endregion
 
         function resize()

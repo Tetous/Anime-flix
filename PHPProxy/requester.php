@@ -38,6 +38,16 @@ switch ($_GET["m"])
         header('Content-Length: '.strlen($out));
         echo $out;
         break;
+    case 'page':
+        $out=getPageUrl(file_get_contents('php://input'));
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
+    case 'pagePages':
+        $out=getPagePageUrls(file_get_contents('php://input'),$_GET['e']);
+        header('Content-Length: '.strlen($out));
+        echo $out;
+        break;
     case 'epCount':
         $out=getEpisodeCount(file_get_contents('php://input'),$_GET['t']);
         header('Content-Length: '.strlen($out));

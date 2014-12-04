@@ -211,11 +211,11 @@ define(function (require, exports, module)
 		var mangaButtonTransform = new StateModifier({
 		    origin: [1, 0],
 		    align: [1, 0],
-		    transform: Transform.translate(-110, -5, 1)
+		    transform: Transform.translate(-180, -5, 1)
 		});
 		var mangaButton = Surface({
-		    size: [100, 40],
-		    content: 'Manga',
+		    size: [200, 40],
+		    content: 'Manga<br>(Coming Soon)',
 		    properties: buttonProps
 		});
 		mangaButton.on('click', function ()
@@ -360,7 +360,7 @@ define(function (require, exports, module)
 		    planToWatchButton.setOptions({ size: [undefined, window.formatting.scale * gridHeight]});
 		    searchButton.setOptions({ size: [undefined, window.formatting.scale * gridHeight]});
 		    logoutButton.setOptions({ size: [window.formatting.scale * 100, window.formatting.scale * gridHeight] });
-		    mangaButton.setOptions({ size: [window.formatting.scale * 100, window.formatting.scale * gridHeight] });
+		    mangaButton.setOptions({ size: [window.formatting.scale * 200, window.formatting.scale * gridHeight] });
 		    watchingButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });
 		    completedButton.setProperties({fontSize: window.formatting.scale * 20 + 'px' });
 		    onHoldButton.setProperties({ fontSize: window.formatting.scale * 20 + 'px' });

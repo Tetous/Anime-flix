@@ -11,8 +11,8 @@ define(function (require, exports, module)
     var Transform = require('famous/core/Transform');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Surface = require('RichFamous/Surface');
+    var ContainerSurface = require('famous/surfaces/ContainerSurface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
-    var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var Scrollview = require('famous/views/Scrollview');
     var Timer = require('famous/utilities/Timer');
     var AlertView = require('AlertView');
@@ -33,36 +33,36 @@ define(function (require, exports, module)
                 backgroundColor: window.colorScheme.second,
             }
         });
-        var backgroundTransformNode = view.add(backgroundTransform);
-        backgroundTransformNode.add(background);
+        var transformNode = view.add(backgroundTransform);
+        transformNode.add(background);
 
         var imageTransform = new StateModifier();
         var image = new ImageSurface({
             properties: {borderRadius:'10px'}
         });
         transforms.push(imageTransform);
-        backgroundTransformNode.add(imageTransform).add(image);
+        transformNode.add(imageTransform).add(image);
 
         var titleTransform = new StateModifier();
         var title = Surface({
             size: [true, true]
         });
         transforms.push(titleTransform);
-        backgroundTransformNode.add(titleTransform).add(title);
+        transformNode.add(titleTransform).add(title);
 
         var typeTransform = new StateModifier();
         var type = Surface({
             size: [true, true]
         });
         transforms.push(typeTransform);
-        backgroundTransformNode.add(typeTransform).add(type);
+        transformNode.add(typeTransform).add(type);
 
         var airedTransform = new StateModifier();
         var aired = Surface({
             size: [true, true]
         });
         transforms.push(airedTransform);
-        backgroundTransformNode.add(airedTransform).add(aired);
+        transformNode.add(airedTransform).add(aired);
 
         var descriptionTransform = new StateModifier();
         var descriptionContainer = new ContainerSurface({
@@ -86,7 +86,7 @@ define(function (require, exports, module)
         descriptionScroll.sequenceFrom([description]);
         descriptionContainer.add(descriptionScroll);
         transforms.push(descriptionTransform);
-        backgroundTransformNode.add(descriptionTransform).add(descriptionContainer);
+        transformNode.add(descriptionTransform).add(descriptionContainer);
 
         var myStatusLabelTransform = new StateModifier();
         var myStatusLabel = Surface({
@@ -94,7 +94,7 @@ define(function (require, exports, module)
             content:'My Status:'
         });
         transforms.push(myStatusLabelTransform);
-        backgroundTransformNode.add(myStatusLabelTransform).add(myStatusLabel);
+        transformNode.add(myStatusLabelTransform).add(myStatusLabel);
 
         var myStatus = document.createElement('SELECT');
         var watchingOption = new Option('Watching', 1);
@@ -113,7 +113,7 @@ define(function (require, exports, module)
             content:myStatus
         });
         transforms.push(myStatusTransform);
-        backgroundTransformNode.add(myStatusTransform).add(myStatusSurface);
+        transformNode.add(myStatusTransform).add(myStatusSurface);
 
         var scoreLabelTransform = new StateModifier();
         var scoreLabel = Surface({
@@ -121,7 +121,7 @@ define(function (require, exports, module)
             content:'Score:'
         });
         transforms.push(scoreLabelTransform);
-        backgroundTransformNode.add(scoreLabelTransform).add(scoreLabel);
+        transformNode.add(scoreLabelTransform).add(scoreLabel);
 
         var score = document.createElement('SELECT');
         score.options.add(new Option((10).toString()));
@@ -140,14 +140,14 @@ define(function (require, exports, module)
             content: score
         });
         transforms.push(scoreTransform);
-        backgroundTransformNode.add(scoreTransform).add(scoreSurface);
+        transformNode.add(scoreTransform).add(scoreSurface);
 
         var statusTransform = new StateModifier();
         var status = Surface({
             size: [150, true]
         });
         transforms.push(statusTransform);
-        backgroundTransformNode.add(statusTransform).add(status);
+        transformNode.add(statusTransform).add(status);
 
         var viewOnMALTransform = new StateModifier();
         var viewOnMALButton = Surface({
@@ -166,7 +166,7 @@ define(function (require, exports, module)
             window.open('http://myanimelist.net/anime/' + series.listData.series_animedb_id);
         });
         transforms.push(viewOnMALTransform);
-        backgroundTransformNode.add(viewOnMALTransform).add(viewOnMALButton)
+        transformNode.add(viewOnMALTransform).add(viewOnMALButton)
 
         var episodeLabelTransform = new StateModifier();
         var episodeLabel = Surface({
@@ -174,7 +174,7 @@ define(function (require, exports, module)
             content:'Episode:'
         });
         transforms.push(episodeLabelTransform);
-        backgroundTransformNode.add(episodeLabelTransform).add(episodeLabel);
+        transformNode.add(episodeLabelTransform).add(episodeLabel);
 
         var episodeDropdown = document.createElement('SELECT');
         var episodeDropdownTransform = new StateModifier();
@@ -183,7 +183,7 @@ define(function (require, exports, module)
             content:episodeDropdown
         });
         transforms.push(episodeDropdownTransform);
-        backgroundTransformNode.add(episodeDropdownTransform).add(episodeDropdownSurface);
+        transformNode.add(episodeDropdownTransform).add(episodeDropdownSurface);
 
         //play button alerts
         var alertZTransform = new StateModifier({
@@ -342,7 +342,7 @@ define(function (require, exports, module)
             }
         });
         transforms.push(playButtonTransform);
-        backgroundTransformNode.add(playButtonTransform).add(playButton);
+        transformNode.add(playButtonTransform).add(playButton);
 
         var updateButtonTransform = new StateModifier();
         var updateButton = Surface({
@@ -404,7 +404,7 @@ define(function (require, exports, module)
             });
         });
         transforms.push(updateButtonTransform);
-        backgroundTransformNode.add(updateButtonTransform).add(updateButton);
+        transformNode.add(updateButtonTransform).add(updateButton);
 
         var deleteButtonTransform = new StateModifier();
         var deleteButton = Surface({
@@ -427,7 +427,7 @@ define(function (require, exports, module)
             });
         });
         transforms.push(deleteButtonTransform);
-        backgroundTransformNode.add(deleteButtonTransform).add(deleteButton);
+        transformNode.add(deleteButtonTransform).add(deleteButton);
 
         var closeButtonTransform = new StateModifier({
             origin: [1, 0],
@@ -449,7 +449,7 @@ define(function (require, exports, module)
             view.hide();
         });
         transforms.push(closeButtonTransform);
-        backgroundTransformNode.add(closeButtonTransform).add(closeButton);
+        transformNode.add(closeButtonTransform).add(closeButton);
        
         view.setSeries = function (ser)
         {
@@ -536,27 +536,25 @@ define(function (require, exports, module)
             {
                 transforms[i].halt();
             }
-            var windowSize=window.mainContext.getSize();
-            var backgroundPos = [0, 0];
             var inTransition = { duration: 1000, curve: Easing.outCubic };
-            backgroundTransform.setTransform(Transform.translate(backgroundPos[0], backgroundPos[1], 0));
             backgroundTransform.setOpacity(1, inTransition);
-            imageTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + 10, 1), inTransition);
-            titleTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 10, 1),inTransition);
-            typeTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 35, 1), inTransition);
-            airedTransform.setTransform(Transform.translate(backgroundPos[0] + 260, backgroundPos[1] + 35, 1), inTransition);
-            myStatusLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260, 1), inTransition);
-            myStatusTransform.setTransform(Transform.translate(backgroundPos[0] + 90, backgroundPos[1] + window.formatting.scale * 260, 1), inTransition);
-            scoreLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260+30, 1), inTransition);
-            scoreTransform.setTransform(Transform.translate(backgroundPos[0] + 70, backgroundPos[1] + window.formatting.scale * 260+30, 1), inTransition);
-            statusTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260 + 60, 1), inTransition);
-            viewOnMALTransform.setTransform(Transform.translate(backgroundPos[0] + 10, backgroundPos[1] + window.formatting.scale * 260 + 110, 1), inTransition);
-            descriptionTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + 75, 1), inTransition);
-            episodeLabelTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + window.formatting.scale * 275 + 75, 1), inTransition);
-            episodeDropdownTransform.setTransform(Transform.translate(backgroundPos[0] + 280, backgroundPos[1] + window.formatting.scale * 275+75, 1), inTransition);
-            playButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
-            updateButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 160, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
-            deleteButtonTransform.setTransform(Transform.translate(backgroundPos[0] + 210+window.formatting.scale * 320, backgroundPos[1] + window.formatting.scale * 315+75, 1), inTransition);
+            backgroundTransform.setTransform(Transform.translate(0,0,0));
+            imageTransform.setTransform(Transform.translate(10, 10, 1), inTransition);
+            titleTransform.setTransform(Transform.translate(210, 10, 1),inTransition);
+            typeTransform.setTransform(Transform.translate(210, 35, 1), inTransition);
+            airedTransform.setTransform(Transform.translate(260, 35, 1), inTransition);
+            myStatusLabelTransform.setTransform(Transform.translate(10,  window.formatting.scale * 260, 1), inTransition);
+            myStatusTransform.setTransform(Transform.translate(90, + window.formatting.scale * 260, 1), inTransition);
+            scoreLabelTransform.setTransform(Transform.translate(10, window.formatting.scale * 260+30, 1), inTransition);
+            scoreTransform.setTransform(Transform.translate(70, window.formatting.scale * 260+30, 1), inTransition);
+            statusTransform.setTransform(Transform.translate(10, window.formatting.scale * 260 + 60, 1), inTransition);
+            viewOnMALTransform.setTransform(Transform.translate(10, window.formatting.scale * 260 + 110, 1), inTransition);
+            descriptionTransform.setTransform(Transform.translate(210, 75, 1), inTransition);
+            episodeLabelTransform.setTransform(Transform.translate(210, window.formatting.scale * 275 + 75, 1), inTransition);
+            episodeDropdownTransform.setTransform(Transform.translate(280, window.formatting.scale * 275+75, 1), inTransition);
+            playButtonTransform.setTransform(Transform.translate(210, window.formatting.scale * 315+75, 1), inTransition);
+            updateButtonTransform.setTransform(Transform.translate(210+window.formatting.scale * 160, window.formatting.scale * 315+75, 1), inTransition);
+            deleteButtonTransform.setTransform(Transform.translate(210+window.formatting.scale * 320, window.formatting.scale * 315+75, 1), inTransition);
             opened = true;
         }
 

@@ -31,7 +31,7 @@ define(function (require, exports, module)
 	    var dubStreamSources = [];
 	    var dubStreamSourcesIndex = 0;
 		var playData={show:undefined,episode:undefined};
-		var videoPlayerNode = new View();
+		var view = new View();
 		var screenWidth = window.mainContext.getSize()[0];
 		var lightboxTransform = new StateModifier({
 		    transform:Transform.translate(0,0,1)
@@ -52,7 +52,7 @@ define(function (require, exports, module)
 		        outTransform: Transform.translate(-1 * screenWidth, 0, 1)
 		    });
 		});
-		videoPlayerNode.add(lightboxTransform).add(lightbox);
+		view.add(lightboxTransform).add(lightbox);
 
 		var playerSurface=VideoJsSurface({},
         { 
@@ -106,17 +106,17 @@ define(function (require, exports, module)
 
 		    }
 		});
-		videoPlayerNode.add(playerSurface);
+		view.add(playerSurface);
 
 		var titleBarHeight = 75;
 		var titleBarRenderController = new RenderController();
-		videoPlayerNode.add(titleBarRenderController);
+		view.add(titleBarRenderController);
 		var titleBarView = new View();
 		var titleBarModifier = new StateModifier({
             opacity: 0.8,
 		    transform: Transform.translate(0, 0, 1)
 		});
-		var titleBarModifierNode = titleBarView.add(titleBarModifier);
+		var titleBarModifierNode = view.add(titleBarModifier);
 		var titleBar = Surface({
 		    size: [undefined, titleBarHeight],
 		    properties: {
@@ -142,7 +142,7 @@ define(function (require, exports, module)
 		        clear();
 		        playerSurface.player.exitFullscreen();
 		    }
-		    videoPlayerNode._eventOutput.emit('backToBrowsing');
+		    view._eventOutput.emit('backToBrowsing');
 		}
 		backToBrowsingButton.on('click',backToBrowsing);
 		titleBarModifierNode.add(backToBrowsingButtonTransform).add(backToBrowsingButton);
@@ -197,7 +197,7 @@ define(function (require, exports, module)
 		    else
 		    {
 		        playData.episode++;
-		        videoPlayerNode.play(playData.show, playData.episode);
+		        view.play(playData.show, playData.episode);
 		    }
 		    updateAnime(playData.show);
 		}
@@ -248,7 +248,7 @@ define(function (require, exports, module)
 		    lightbox.show(playerSurface, function ()
 		    {
 		        playData.episode++;
-		        videoPlayerNode.play(playData.show, playData.episode);
+		        view.play(playData.show, playData.episode);
 		        updateAnime(playData.show);
 		    });
 		});
@@ -336,12 +336,12 @@ define(function (require, exports, module)
 		        }
 				
 			});
-			videoPlayerNode._eventOutput.emit('playerLoaded');
+			view._eventOutput.emit('playerLoaded');
 		});
 
 	    window.ledger.getLedger();
 
-	    videoPlayerNode.play = function (playObject, episode)
+	    view.play = function (playObject, episode)
 	    {
 	        streamSources = undefined;
 	        dubStreamSources = undefined;
@@ -385,7 +385,7 @@ define(function (require, exports, module)
 	                                {
 	                                    window.alert('The episode can not be found. Sorry for the inconvenience. Please contact support@anime-flix.com and we will sort it out as soon as possible.');
 	                                    //backToBrowsing();
-	                                    videoPlayerNode._eventOutput.emit('failedToFind');
+	                                    view._eventOutput.emit('failedToFind');
 	                                }
 	                                else
 	                                {
@@ -475,7 +475,7 @@ define(function (require, exports, module)
 	        {
 	            window.alert('The show could not be found. Sorry');
 	            //backToBrowsing();
-	            videoPlayerNode._eventOutput.emit('failedToFind');
+	            view._eventOutput.emit('failedToFind');
 	        }
 	    };
 
@@ -489,7 +489,7 @@ define(function (require, exports, module)
 		};
 
 		lightbox.show(playerSurface);
-		return videoPlayerNode;
+		return view;
 	}
 	module.exports=createVideoPlayer;
 
