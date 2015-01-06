@@ -116,7 +116,7 @@ define(function (require, exports, module)
             opacity: 0.8,
 		    transform: Transform.translate(0, 0, 1)
 		});
-		var titleBarModifierNode = view.add(titleBarModifier);
+		var titleBarModifierNode = titleBarView.add(titleBarModifier);
 		var titleBar = Surface({
 		    size: [undefined, titleBarHeight],
 		    properties: {

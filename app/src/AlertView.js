@@ -73,9 +73,10 @@ define(function (require, exports, module)
         function hide()
         {
             var windowSize = window.mainContext.getSize();
-            alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0), options.hideTransitionable, function () { view._eventOutput.emit('hidden') }, function ()
+            alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0), options.hideTransitionable, function ()
             {
                 alertTransform.setOpacity(0);
+                view._eventOutput.emit('hidden')
             });
         }
         alertTransform.setTransform(Transform.translate(-options.size[0], -options.size[1], 0));

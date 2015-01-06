@@ -7,16 +7,19 @@ define(function (require, exports, module)
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
     var Easing = require('famous/transitions/Easing');
+    var RenderController = require('famous/views/RenderController');
     var Surface = require('RichFamous/Surface');
     var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');
     var VideoPlayer = require('VideoPlayer');
+    var FAQ = require('FAQ');
     window.ledger = require('Ledger');
 
     require('MALSupportFunctions');
 
     window.loginZ = 100;
+    window.faqZ = 125;
     window.showSelectorZ = 50;
     window.videoPlayerZ = 0;
     window.colorScheme = {
@@ -78,11 +81,12 @@ define(function (require, exports, module)
     //Read Hash
     var hash = window.location.hash;
 
-    //get CORS access
+    /*get CORS access
     var url = 'http://www.anime-flix.com/requester.php';
     var request = new XMLHttpRequest();
     request.open('GET', url, false);
-    //request.send();
+    request.send();
+    */
 
     // create the main context
     var mainContext = Engine.createContext();
@@ -113,9 +117,9 @@ define(function (require, exports, module)
             });
         }
 
-        var siteContainer = new ContainerSurface();
-        mainContext.add(centerSpinTransform).add(centerSpinRotation).add(siteContainer);
-        var spinnerNode = siteContainer;
+        var animeContainer = new ContainerSurface();
+        var spinnerNode = mainContext.add(centerSpinTransform).add(centerSpinRotation);
+        spinnerNode.add(animeContainer);
 
         var loginScreenTransform = new StateModifier({ transform: Transform.translate(0, 0, window.loginZ) });
         var loginScreen = LoginScreen(mainContext.getSize());
@@ -148,8 +152,33 @@ define(function (require, exports, module)
             }
             //#endregion
         });
+        loginScreen.on('showFAQ', showFAQ);
 
         mainContext.add(loginScreenTransform).add(loginScreen);
+
+        var faqTransform = new StateModifier({
+            transform:Transform.translate(0,0,window.faqZ)
+        });
+        var faqRenderController = new RenderController();
+        mainContext.add(faqTransform).add(faqRenderController);
+        var faqView = FAQ();
+        faqView.on('hideFAQ', function ()
+        {
+            faqRenderController.hide();
+            location.hash = location.hash.replace('&FAQ', '');
+            location.hash = location.hash.replace('FAQ', '');
+        });
+        function showFAQ()
+        {
+            faqRenderController.show(faqView);
+            location.hash = location.hash.replace('&FAQ', '');
+            location.hash = location.hash.replace('FAQ', '');
+            location.hash += '&FAQ';
+        }
+        if (location.hash.indexOf('FAQ')>-1)
+        {
+            showFAQ();
+        }
 
         //#region Anime
         var videoPlayerTransform = new StateModifier({
@@ -169,7 +198,7 @@ define(function (require, exports, module)
             showSelectorTransform.setAlign([0, 0]);
             showSelectorTransform.setOpacity(1);
         });
-        spinnerNode.add(videoPlayerTransform).add(videoPlayer);
+        animeContainer.add(videoPlayerTransform).add(videoPlayer);
 
         var showSelectorTransform = new StateModifier({
             transform: Transform.translate(0, 0, window.showSelectorZ)
@@ -184,13 +213,15 @@ define(function (require, exports, module)
             videoPlayer.play(data.show, data.episode);
         }
         showSelector.on('showSelected', showSelected);
-        showSelector.on('manga', function () { spin()});
-        spinnerNode.add(showSelectorTransform).add(showSelector);
+        showSelector.on('manga', function () { spin() });
+        showSelector.on('showFAQ', showFAQ);
+        animeContainer.add(showSelectorTransform).add(showSelector);
         //#endregion
         //#region Manga
         var mangaRotation = new StateModifier({
             transform:Transform.rotateY(Math.PI)
         });
+        var mangaContainer = new ContainerSurface();
         var mangaTestSurface = Surface({
             content: 'Manga Coming Soon!',
             properties: {
@@ -205,7 +236,8 @@ define(function (require, exports, module)
         {
             spin();
         });
-        //spinnerNode.add(mangaRotation).add(mangaTestSurface);
+        mangaContainer.add(mangaTestSurface);
+        spinnerNode.add(mangaRotation).add(mangaContainer);
         //#endregion
 
         function resize()
@@ -224,7 +256,7 @@ define(function (require, exports, module)
                     window.formatting.scale = rat;
                 }
             }
-
+            faqView.resize();
             loginScreen.resize();
             showSelector.resize();
             //videoPlayer.resize();

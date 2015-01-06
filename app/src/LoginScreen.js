@@ -133,7 +133,7 @@ define(function (require, exports, module)
         passwordBox.on('keypress', textBoxEnter);
 
         var buttonWidth = 200;
-        var buttonHeight = 80;
+        var buttonHeight = 60;
         var buttonTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
@@ -148,12 +148,30 @@ define(function (require, exports, module)
             }
         });
 
-        button.on('click', login)
+        button.on('click', login);
+
+        var faqButtonTransform = new StateModifier({
+            origin: [0.5, 0.5]
+        });
+        var faqButton = Surface({
+            content: 'FAQ',
+            properties: {
+                textAlign: 'center',
+                verticalAlign: 'middle',
+                color: 'white',
+                //backgroundColor: window.colorScheme.second,//'#4494FD',//'#00fff8',
+                borderRadius: boxHeight / 2 + 'px'
+            }
+        });
+
+        faqButton.on('click', function () { overView._eventOutput.emit('showFAQ');});
 
         overView.resize = function ()
         {
             buttonTransform.setTransform(Transform.translate(0, window.formatting.scale*(buttonHeight + boxHeight), 1));
             button.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
+            faqButtonTransform.setTransform(Transform.translate(0, window.formatting.scale * (buttonHeight*2 + boxHeight), 1));
+            faqButton.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
             usernameBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * -boxHeight, 1));
             usernameBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
             passwordBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * boxHeight, 1));
@@ -164,9 +182,10 @@ define(function (require, exports, module)
             betaTransform.setTransform(Transform.translate(window.formatting.scale * 330, window.formatting.scale * (-boxHeight - logoHeight - 20)));
             beta.setSize([true, window.formatting.scale * betaHeight]);
             */
-            credentialInfoTransform.setTransform(Transform.translate(0, window.formatting.scale * 3 * buttonHeight, 1));
+            credentialInfoTransform.setTransform(Transform.translate(0, window.formatting.scale * 3 * buttonHeight+boxHeight, 1));
             credentialInfo.setProperties({ fontSize: window.formatting.scale * 16 + 'px' });
             button.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
+            faqButton.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             usernameBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             passwordBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
         }
@@ -218,6 +237,7 @@ define(function (require, exports, module)
         loginElementsNode.add(usernameBoxTransform).add(usernameBox);
         loginElementsNode.add(passwordBoxTransform).add(passwordBox);
         loginElementsNode.add(buttonTransform).add(button);
+        loginElementsNode.add(faqButtonTransform).add(faqButton);
         loginElementsNode.add(credentialInfoTransform).add(credentialInfo);
         return overView;
     }

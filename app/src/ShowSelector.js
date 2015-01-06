@@ -12,11 +12,10 @@ define(function (require, exports, module)
     var EventHandler = require('famous/core/EventHandler');
 	var Easing = require('famous/transitions/Easing');
 	var Transform = require('famous/core/Transform');
-	var StateModifier= require('famous/modifiers/StateModifier');
+	var StateModifier = require('famous/modifiers/StateModifier');
 	var Surface=require('RichFamous/Surface');
 	var ContainerSurface=require('famous/surfaces/ContainerSurface');
 	var ImageSurface = require('famous/surfaces/ImageSurface');
-	var Scrollview=require('famous/views/Scrollview');
 	var HeaderFooterLayout = require("famous/views/HeaderFooterLayout");
 	var GridLayout = require("famous/views/GridLayout");
 	var Lightbox=require('famous/views/Lightbox');
@@ -115,6 +114,10 @@ define(function (require, exports, module)
 	            verticalAlign: 'middle',
 	        }
 	    });
+	    FAQButton.on('click', function ()
+	    {
+	        view._eventOutput.emit('showFAQ');
+	    });
 	    footerElements.push(FAQButton);
         //#region IP Adress
         /*
@@ -203,7 +206,8 @@ define(function (require, exports, module)
 	    {
 	        sessionStorage.username = undefined;
 	        sessionStorage.password = undefined;
-	        window.location.href = 'http://anime-flix.com';
+	        locatio.hash = '';
+	        location.reload();
 	    });
 		logoutButton.pipe(buttonColorEvents);
 		layout.header.add(logoutButtonTransform).add(logoutButton);

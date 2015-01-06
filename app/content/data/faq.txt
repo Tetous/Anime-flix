@@ -1,0 +1,6 @@
+[
+{"q":"What is Anime-flix?","a":"Anime-flix is an anime streaming site that automatically tracks your progress on <a href='http://myanimelist.net/' target='_blank'>MyAnimeList</a>."},
+{"q":"Is Anime-flix affiliated with MyAnimeList?","a":"No, Anime-flix has no affiliation with MyAnimeList. We simply use MyAnimeList to track progress and provide information about anime (ie. descriptions, start/end dates, cover pictures, etc.)"},
+{"q":"Does Anime-flix store any content retrieved from MyAnimeList?","a":"No, all content from MyAnimeList is retrieved on an instance by instance basis. Some of which is forgotten after use, but all of it is forgotten after the session is closed. All credit for MyAnimeList content goes to MyAnimeList and those whom the give credit to."},
+{"q":"Does Anime-flix store MyAnimeList login information?","a":"No, your login information is remembered by your browser only for the duration of the session, it is the forgotten."}
+]

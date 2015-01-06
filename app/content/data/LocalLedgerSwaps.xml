@@ -24,4 +24,12 @@
     <ledgerName>Toradora</ledgerName>
     <malName>Toradora!</malName>
   </swap>
+<swap>
+    <ledgerName>Angel Beats</ledgerName>
+    <malName>Angel Beats!</malName>
+  </swap>
+<swap>
+    <ledgerName>Fate Stay Night</ledgerName>
+    <malName>Fate/stay night</malName>
+  </swap>
 </Root>
