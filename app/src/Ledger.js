@@ -212,11 +212,6 @@ define(function (require, exports, module)
                 titles.unshift(show.series_title);
             }
 
-            for (var i = 0; i < titles.length; i++)
-            {
-                titles[i] = titles[i].replace('!', '');
-            }
-
             for (var j = 0; j < titles.length && !done; j++)
             {
                 var workingTitle = titles[j];
@@ -242,14 +237,21 @@ define(function (require, exports, module)
 
     function trimTitle(s)
     {
-        var index = s.lastIndexOf(' ');
         var trimmedString = false;
-        if (index > -1)
+        if (s.charAt(s.length - 1) == '!')
         {
-            trimmedString = s.substring(0, index);
-            if (trimmedString.charAt(trimmedString.length - 1) == ':')
+            trimmedString = s.substring(0, s.length - 1);
+        }
+        else
+        {
+            var index = s.lastIndexOf(' ');
+            if (index > -1)
             {
-                trimmedString = trimmedString.substring(0, trimmedString.length - 1);
+                trimmedString = s.substring(0, index);
+                if (trimmedString.charAt(trimmedString.length - 1) == ':')
+                {
+                    trimmedString = trimmedString.substring(0, trimmedString.length - 1);
+                }
             }
         }
         return trimmedString;
