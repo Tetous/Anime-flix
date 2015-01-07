@@ -676,6 +676,25 @@ else
         $episodeLinksCount=count($episodeLinks);
         $showEpisodeLinksCount=count($showEpisodeLinks);
 
+        $episodeCheck=$showEpisodeLinkCount;
+        if($showEpisodeLinkCount==0)
+        {
+            $episodeCheck=$episodeLinkCount;
+        }
+        
+        curl_setopt($ch, CURLOPT_URL, 'http://anime-flix.com/requester.php?m=stream&t='.$title.'&e='.$episodeCheck);
+        
+        curl_setopt($ch, CURLOPT_POST, 1 );
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $baseShowUrl ); 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/plain')); 
+        $output = curl_exec($ch);
+        
+        if($output=='')
+        {
+            $showEpisodeLinksCount-=1;
+            $episodeLinksCount-=1;
+        }
+        
         // close curl resource to free up system resources 
         curl_close($ch);
 

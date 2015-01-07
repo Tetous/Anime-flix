@@ -295,7 +295,7 @@ define(function (require, exports, module)
         playButton.on('click', function ()
         {
             //Run checks and update show data
-            if (episodeDropdown.options[episodeDropdown.options.selectedIndex] != undefined)
+            if (episodeDropdown.options[episodeDropdown.options.selectedIndex] && episodeDropdown.options[episodeDropdown.options.selectedIndex].text!='0')
             {
                 if (series.listData.my_status == 2)
                 {
@@ -488,32 +488,46 @@ define(function (require, exports, module)
                         episodeDropdown.options.remove(0);
                     }
                     ser.listData.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
-                    for (var i = 1; i <= ser.listData.series_episodes; i++)
+                    if (ser.listData.series_episodes == 0)
                     {
-                        episodeDropdown.options.add(new Option(i.toString()));
+                        episodeDropdown.options.add(new Option('0'));
                     }
-                    var indexToSelect = ser.listData.my_watched_episodes;
-                    if (indexToSelect == episodeDropdown.options.length)
+                    else
                     {
-                        indexToSelect--;
+                        for (var i = 1; i <= ser.listData.series_episodes; i++)
+                        {
+                            episodeDropdown.options.add(new Option(i.toString()));
+                        }
+                        var indexToSelect = ser.listData.my_watched_episodes;
+                        if (indexToSelect == episodeDropdown.options.length)
+                        {
+                            indexToSelect--;
+                        }
+                        episodeDropdown.options.selectedIndex = indexToSelect;
                     }
-                    episodeDropdown.options.selectedIndex = indexToSelect;
                 });
             }
             while (episodeDropdown.options.length > 0)
             {
                 episodeDropdown.options.remove(0);
             }
-            for (var i = 1; i <= ser.listData.series_episodes; i++)
+            if (ser.listData.series_episodes == 0)
             {
-                episodeDropdown.options.add(new Option(i.toString()));
+                episodeDropdown.options.add(new Option('0'));
             }
-            var indexToSelect = ser.listData.my_watched_episodes;
-            if (indexToSelect == episodeDropdown.options.length)
+            else
             {
-                indexToSelect--;
+                for (var i = 1; i <= ser.listData.series_episodes; i++)
+                {
+                    episodeDropdown.options.add(new Option(i.toString()));
+                }
+                var indexToSelect = ser.listData.my_watched_episodes;
+                if (indexToSelect == episodeDropdown.options.length)
+                {
+                    indexToSelect--;
+                }
+                episodeDropdown.options.selectedIndex = indexToSelect;
             }
-            episodeDropdown.options.selectedIndex = indexToSelect;
         }
 
         view.resize = function ()
