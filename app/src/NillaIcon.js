@@ -66,7 +66,7 @@ define(function(require, exports, module) {
 		    title.setContent(series.series_title);
 		    image.setContent(series.series_image);
 		    bannerRenderController.hide();
-		    if (data.series_status == 1)
+		    if (view.data.series_status == 1)
 		    {
 		        var ledgerItem = window.ledger.getLedgerItem(view.data);
 		        getEpisodeCountAsync(view.data.series_title, ledgerItem.link, function (episodeCounts)
