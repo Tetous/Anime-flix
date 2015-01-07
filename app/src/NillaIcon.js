@@ -27,7 +27,7 @@ define(function(require, exports, module) {
 	    var bannerRenderController = new RenderController();
 	    var banner = new ImageSurface({
 	        size: [iconWidth, iconHeight],
-	        content: 'content/images/newEpisodesbanner.png'
+	        content: 'content/images/NewEpisodesBanner.png'
 	    });
 	    banner.pipe(iconEventHandler);
 	    view.add(bannerTransform).add(bannerRenderController);
