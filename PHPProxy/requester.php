@@ -347,7 +347,6 @@ else
                         $done=true;
                         $showEpisodeLinks[$showLinksCount]=$link;
                         $showLinksCount++;
-                        //echo('got show\n');
                     }
                 }
             }
@@ -394,7 +393,7 @@ else
           $streamLinks='';
           $elinksIndex=strpos($pageBody, 'elinks');
           $iframeSrcIndex=strpos($pageBody, '<iframe src="',strpos($pageBody, '<div id="streams">'))+13;
-          while($iframeSrcIndex>14)//$elinksIndex>$iframeSrcIndex)
+          while($iframeSrcIndex>14)
           {
               $iframeSrc=substr($pageBody, $iframeSrcIndex, strpos($pageBody, '"',$iframeSrcIndex)-$iframeSrcIndex);
 
@@ -425,7 +424,6 @@ else
               if($streamIndex!=6)
               {
                   $streamLink=substr($playerBody, $streamIndex,strpos($playerBody, $quote,$streamIndex)-$streamIndex);
-                  //echo $streamLink;
                   $streamLinks=$streamLinks.$streamLink.';';
               }
               $iframeSrcIndex=strpos($pageBody, '<iframe src="',$iframeSrcIndex)+13;
@@ -556,7 +554,6 @@ function setCookies($ch, $string)
        # this is okay because we need to 
        # update the global $ch with 
        # new cookies
-    //echo $string;
     $length = strlen($string);
     if(!strncmp($string, "Location:", 9))
     {
@@ -579,8 +576,6 @@ function setCookies($ch, $string)
       }
       curl_setopt($ch, CURLOPT_COOKIE, $cookie);
     }
-	//print_r($cookiearr);
-	//echo "<br/>";
     return $length;
 }
 
@@ -662,7 +657,6 @@ else
                         $done=true;
                         $showEpisodeLinks[$showLinksCount]=$link;
                         $showLinksCount++;
-                        //echo('got show\n');
                     }
                 }
             }
@@ -676,16 +670,15 @@ else
         $episodeLinksCount=count($episodeLinks);
         $showEpisodeLinksCount=count($showEpisodeLinks);
 
-        $episodeCheck=$showEpisodeLinkCount;
-        if($showEpisodeLinkCount==0)
+        $episodeCheck=$showEpisodeLinksCount;
+        if($showEpisodeLinksCount==0)
         {
-            $episodeCheck=$episodeLinkCount;
+            $episodeCheck=$episodeLinksCount;
         }
-        
-        curl_setopt($ch, CURLOPT_URL, 'http://anime-flix.com/requester.php?m=stream&t='.$title.'&e='.$episodeCheck);
+        curl_setopt($ch, CURLOPT_URL, str_replace(' ','%20','http://anime-flix.com/requester.php?m=stream&t='.$title.'&e='.$episodeCheck));
         
         curl_setopt($ch, CURLOPT_POST, 1 );
-        curl_setopt($ch, CURLOPT_POSTFIELDS, $baseShowUrl ); 
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $paramShowUrl ); 
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: text/plain')); 
         $output = curl_exec($ch);
         
