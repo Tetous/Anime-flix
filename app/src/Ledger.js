@@ -170,53 +170,71 @@ define(function (require, exports, module)
 
         var value = false;
         var done = false;
-
-        var titles;
-        if ((typeof show.series_synonyms) == 'string')
+        /*
+        for (var i = 0; i < ledgerSwaps.length && !done; i++)
         {
-            titles = show.series_synonyms.split('; ');
-        }
-        else
-        {
-            titles = new Array();
-        }
-        titles.unshift(show.series_title);
-
-        for (var j = 0; j < titles.length && !done; j++)
-        {
-            var workingTitle = titles[j];
-            while (workingTitle && !done)
+            if (ledgerSwaps[i].malName.toLowerCase() == show.series_title.toLowerCase())
             {
-                for (var i = 0; i < ledgerToCheck.length && !done; i++)
+                for (var j = 0; j < ledgerToCheck.length && !done; j++)
                 {
-                    if (ledgerToCheck[i].name.toLowerCase() == workingTitle.toLowerCase())
+                    if (ledgerSwaps[i].ledgerName.toLowerCase() == ledgerToCheck[j].name.toLowerCase())
                     {
-                        value = { name: titles[j], link: ledgerToCheck[i].link, contentType: ledgerToCheck[i].contentType };
-                        //if (j>0&&!dub) {
-                        //    ledgerToCheck.push(value);
-                        //}
+                        value = { name: ledgerToCheck[j].name, link: ledgerToCheck[j].link, contentType: ledgerToCheck[j].contentType };
                         done = true;
-                    };
-                };
-                workingTitle = trimTitle(workingTitle);
-            };
-        };
-        if (!value)
-        {
-            for (var i = 0; i < ledgerSwaps.length && !done; i++)
-            {
-                if (ledgerSwaps[i].malName.toLowerCase() == show.series_title.toLowerCase())
-                {
-                    for (var j = 0; j < ledgerToCheck.length && !done; j++)
-                    {
-                        if (ledgerSwaps[i].ledgerName.toLowerCase() == ledgerToCheck[j].name.toLowerCase())
-                        {
-                            value = { name: ledgerToCheck[j].name, link: ledgerToCheck[j].link, contentType: ledgerToCheck[j].contentType };
-                            done = true;
-                        }
                     }
                 }
             }
+        }
+        */
+        if (!value)
+        {
+            var titles;
+            if ((typeof show.series_synonyms) == 'string')
+            {
+                titles = show.series_synonyms.split('; ');
+            }
+            else
+            {
+                titles = new Array();
+            }
+            var swapped = false;
+            for (var i = 0; i < ledgerSwaps.length && !swapped; i++)
+            {
+                if (ledgerSwaps[i].malName.toLowerCase() == show.series_title.toLowerCase())
+                {
+                    titles.unshift(ledgerSwaps[i].ledgerName);
+                    swapped = true;
+                }
+            }
+            if (!swapped)
+            {
+                titles.unshift(show.series_title);
+            }
+
+            for (var i = 0; i < titles.length; i++)
+            {
+                titles[i] = titles[i].replace('!', '');
+            }
+
+            for (var j = 0; j < titles.length && !done; j++)
+            {
+                var workingTitle = titles[j];
+                while (workingTitle && !done)
+                {
+                    for (var i = 0; i < ledgerToCheck.length && !done; i++)
+                    {
+                        if (ledgerToCheck[i].name.toLowerCase() == workingTitle.toLowerCase())
+                        {
+                            value = { name: titles[j], link: ledgerToCheck[i].link, contentType: ledgerToCheck[i].contentType };
+                            //if (j>0&&!dub) {
+                            //    ledgerToCheck.push(value);
+                            //}
+                            done = true;
+                        };
+                    };
+                    workingTitle = trimTitle(workingTitle);
+                };
+            };
         }
         return value;
     }
