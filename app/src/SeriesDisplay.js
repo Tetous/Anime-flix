@@ -481,7 +481,7 @@ define(function (require, exports, module)
             if (ser.listData.series_status == 1)
             {
                 var ledgerItem = window.ledger.getLedgerItem(ser.listData);
-                getEpisodeCountAsync(ser.listData.series_title, ledgerItem.link, function (episodeCounts)
+                getEpisodeCountAsync(ledgerItem.name, ledgerItem.link, function (episodeCounts)
                 {
                     while (episodeDropdown.options.length > 0)
                     {

@@ -69,16 +69,12 @@ define(function(require, exports, module) {
 		    if (view.data.series_status == 1)
 		    {
 		        var ledgerItem = window.ledger.getLedgerItem(view.data);
-		        getEpisodeCountAsync(view.data.series_title, ledgerItem.link, function (episodeCounts)
+		        getEpisodeCountAsync(ledgerItem.name, ledgerItem.link, function (episodeCounts)
 		        {
 		            view.data.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
-
-		            if (view.data.my_status == 1)
+		            if (view.data.series_episodes > view.data.my_watched_episodes)
 		            {
-		                if (view.data.series_episodes > view.data.my_watched_episodes)
-		                {
-		                    bannerRenderController.show(banner);
-		                }
+		                bannerRenderController.show(banner);
 		            }
 		        });
 		    }

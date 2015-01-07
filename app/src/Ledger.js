@@ -33,6 +33,7 @@ define(function (require, exports, module)
             var swapsRequest = new XMLHttpRequest();
             swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
             swapsRequest.setRequestHeader('Content-Type', "text/xml");
+            swapsRequest.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
             swapsRequest.send();
             var parser = new DOMParser();
             var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
@@ -186,8 +187,8 @@ define(function (require, exports, module)
             }
         }
         */
-        if (!value)
-        {
+        //if (!value)
+        //{
             var titles;
             if ((typeof show.series_synonyms) == 'string')
             {
@@ -235,7 +236,7 @@ define(function (require, exports, module)
                     workingTitle = trimTitle(workingTitle);
                 };
             };
-        }
+        //}
         return value;
     }
 
