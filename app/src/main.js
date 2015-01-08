@@ -16,7 +16,7 @@ define(function (require, exports, module)
     var FAQ = require('FAQ');
     window.ledger = require('Ledger');
 
-    require('MALSupportFunctions');
+    require('Anime-flixWebFunctions');
 
     window.loginZ = 100;
     window.faqZ = 125;

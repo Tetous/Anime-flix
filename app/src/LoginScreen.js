@@ -73,6 +73,7 @@ define(function (require, exports, module)
         var boxHeight = 40;
 
         var logoHeight = 100;
+        var logoWidth = 640;
         var logoTransform = new StateModifier({
             origin: [0.5, 0.5]
         });
@@ -177,7 +178,8 @@ define(function (require, exports, module)
             passwordBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * boxHeight, 1));
             passwordBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
             logoTransform.setTransform(Transform.translate(0, window.formatting.scale * (-boxHeight - logoHeight)));
-            logo.setSize([true, window.formatting.scale * logoHeight]);
+            //logo.setSize([true, window.formatting.scale * logoHeight]);
+            logo.setSize([window.formatting.scale * logoWidth, window.formatting.scale * logoHeight]);
             /*
             betaTransform.setTransform(Transform.translate(window.formatting.scale * 330, window.formatting.scale * (-boxHeight - logoHeight - 20)));
             beta.setSize([true, window.formatting.scale * betaHeight]);
@@ -213,22 +215,30 @@ define(function (require, exports, module)
         {
             var url = 'http://www.anime-flix.com/requester.php?m=login';
             var request = new XMLHttpRequest();
-            request.open("POST", url, false);
+            request.open("POST", url);
             request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            request.onreadystatechange = function ()
+            {
+                if (request.readyState == 4)
+                {
+                    if (request.status == 200)
+                    {
+                        var bodyText = request.responseText;
+                        if (bodyText == 'Invalid credentials' || request.status != 200)
+                        {
+                            fakeOut();
+                            //return false;
+                        }
+                        else
+                        {
+                            overView._eventOutput.emit('loggedIn');
+                            loginRenderController.hide({ duration: 2000 });
+                            //return true;
+                        }
+                    }
+                }
+            };
             request.send('u=' + username + '&p=' + password);
-
-            var bodyText = request.responseText;
-            if (bodyText == 'Invalid credentials' || request.status != 200)
-            {
-                fakeOut();
-                return false;
-            }
-            else
-            {
-                overView._eventOutput.emit('loggedIn');
-                loginRenderController.hide({ duration: 2000 });
-                return true;
-            }
         }
 
 

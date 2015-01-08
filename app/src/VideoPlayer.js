@@ -20,7 +20,7 @@ define(function (require, exports, module)
     var SeriesEndScreen = require('SeriesEndScreen');
 
     require('xml2jsobj/xml2jsobj');
-    require('MALSupportFunctions');
+    require('Anime-flixWebFunctions');
 
 	function createVideoPlayer()
     {

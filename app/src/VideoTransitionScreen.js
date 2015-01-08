@@ -12,7 +12,7 @@ define(function (require, exports, module)
     var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
-    require('MALSupportFunctions');
+    require('Anime-flixWebFunctions');
 
     function createVideoTransitionScreen()
     {

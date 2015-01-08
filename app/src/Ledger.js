@@ -6,12 +6,15 @@
 
 define(function (require, exports, module)
 {
+    require('xml2jsobj/xml2jsobj');
 
     var dirtyLedger = false;
     var dirtyDubLedger = false;
     var ledgerSwaps = [];
     var showLedger = [];
     var dubLedger = [];
+    var mangaLedger = [];
+
     if (localStorage.ledger)
     {
         showLedger = JSON.parse(localStorage.ledger);
@@ -25,21 +28,30 @@ define(function (require, exports, module)
         ledgerSwaps = JSON.parse(localStorage.swaps);
     }
 
+    var swapsRequest = new XMLHttpRequest();
+    swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml');
+    swapsRequest.setRequestHeader('Content-Type', "text/xml");
+    swapsRequest.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
+    swapsRequest.onreadystatechange = function ()
+    {
+        if (swapsRequest.readyState == 4)
+        {
+            if (swapsRequest.status == 200)
+            {
+                var parser = new DOMParser();
+                var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
+                ledgerSwaps = XML2jsobj(domObj).Root.swap;
+                localStorage.swaps = JSON.stringify(ledgerSwaps);
+            }
+        }
+    };
+    swapsRequest.send();
+
     function processLedger(body, terminator, type)
     {
         var resultLedger = [];
         if (!body.indexOf('unavailable')>-1)
         {
-            var swapsRequest = new XMLHttpRequest();
-            swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml', false);
-            swapsRequest.setRequestHeader('Content-Type', "text/xml");
-            swapsRequest.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
-            swapsRequest.send();
-            var parser = new DOMParser();
-            var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
-            ledgerSwaps = XML2jsobj(domObj).Root.swap;
-            localStorage.swaps = JSON.stringify(ledgerSwaps);
-
             var index = body.indexOf('class="series_index"');
             var showName = "";
             while (showName !== terminator)

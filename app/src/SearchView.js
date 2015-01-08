@@ -17,7 +17,7 @@ define(function (require, exports, module)
     var SearchItemDisplay = require('SearchItemDisplay');
 
     require('xml2jsobj/xml2jsobj');
-    require('MALSupportFunctions');
+    require('Anime-flixWebFunctions');
 
     function createSearchView()
     {

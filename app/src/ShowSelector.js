@@ -25,7 +25,7 @@ define(function (require, exports, module)
 	var SearchView = require('SearchView');
 
 	require('xml2jsobj/xml2jsobj');
-	require('MALSupportFunctions');
+	require('Anime-flixWebFunctions');
     //#endregion
 
 	function createShowSelector(animeList)
@@ -206,7 +206,7 @@ define(function (require, exports, module)
 	    {
 	        sessionStorage.username = undefined;
 	        sessionStorage.password = undefined;
-	        locatio.hash = '';
+	        location.hash = '';
 	        location.reload();
 	    });
 		logoutButton.pipe(buttonColorEvents);
@@ -412,24 +412,25 @@ define(function (require, exports, module)
 			outTransition: { duration: 1000, curve: Easing.easeOut }
 		});
         //#endregion
-
-		function searchShowWithID(title,id)
+		function searchShowWithID(title, id, callback)
 		{
-		    var obj=searchMAL(title);
-		    if (obj.entry.length==undefined)
+		    searchMALAsync(title, function (obj)
 		    {
-		        return obj.entry;
-		    }
-		    else
-		    {
-		        for (var i = 0; i < obj.entry.length; i++)
+		        if (obj.entry.length == undefined)
 		        {
-		            if (obj.entry[i].id == id)
+		            callback(obj.entry);
+		        }
+		        else
+		        {
+		            for (var i = 0; i < obj.entry.length; i++)
 		            {
-		                return obj.entry[i];
+		                if (obj.entry[i].id == id)
+		                {
+		                    callback(obj.entry[i]);
+		                }
 		            }
 		        }
-		    }
+		    });
 		}
 
 		function createBlankListData()
@@ -468,11 +469,15 @@ define(function (require, exports, module)
 		    return baseData;
 		}
 
-		function showSelectedPassThrough(data) {
-		    var series = { listData: data, searchData: searchShowWithID(data.series_title, data.series_animedb_id) };
-		    seriesDisplay.setSeries(series);
-		    seriesDisplay.show();
-			//view._eventOutput.emit('showSelected',data);
+		function showSelectedPassThrough(data)
+		{
+		    searchShowWithID(data.series_title, data.series_animedb_id, function (obj)
+		    {
+		        var series = { listData: data, searchData: obj };
+		        seriesDisplay.setSeries(series);
+		        seriesDisplay.show();
+		    });
+		    //view._eventOutput.emit('showSelected',data);
 		}
 
 		var watchingIconView=IconView();

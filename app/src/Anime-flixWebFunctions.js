@@ -145,7 +145,7 @@ function createSeriesXML(listData)
 	           '<tags></tags>'+
            '</entry>';
 }
-
+/*
 function searchMAL(search)
 {
     var request = new XMLHttpRequest();
@@ -157,6 +157,7 @@ function searchMAL(search)
     var domObj = parser.parseFromString(decodedRes, "text/xml");
     return XML2jsobj(domObj).anime;
 }
+*/
 function searchMALAsync(search, callback)
 {
     var request = new XMLHttpRequest();

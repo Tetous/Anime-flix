@@ -17,7 +17,7 @@ define(function (require, exports, module)
     var Timer = require('famous/utilities/Timer');
     var AlertView = require('AlertView');
 
-    require('MALSupportFunctions');
+    require('Anime-flixWebFunctions');
 
     function createSeriesDisplay()
     {
