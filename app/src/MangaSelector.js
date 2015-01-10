@@ -344,6 +344,9 @@ define(function (require, exports, module)
         seriesDisplay.on('showSelected', function (data) {
             view._eventOutput.emit('showSelected', data);
         });
+        seriesDisplay.on('mangaSelected', function (data) {
+            view._eventOutput.emit('mangaSelected', data);
+        });
         seriesDisplay.on('refreshList', function ()
         {
             view.refreshList();
@@ -434,7 +437,7 @@ define(function (require, exports, module)
         //#endregion
         function searchShowWithID(title, id, callback)
         {
-            searchMALAsync(title, function (obj)
+            searchMALAsync(title,'manga', function (obj)
             {
                 if(obj.entry.length == undefined)
                 {
@@ -491,7 +494,7 @@ define(function (require, exports, module)
 
         function showSelectedPassThrough(data)
         {
-            searchShowWithID(data.series_title, data.series_animedb_id, function (obj)
+            searchShowWithID(data.series_title, data.series_mangadb_id, function (obj)
             {
                 var series = {listData: data, searchData: obj};
                 seriesDisplay.setSeries(series);

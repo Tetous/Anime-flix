@@ -133,6 +133,9 @@ define(function (require, exports, module)
             showSelector.refreshList();
             mangaSelector.refreshList();
             //#region Process Hash
+            
+            showSelector.showSection('1');
+            mangaSelector.showSection('1');
             var params = hash.split('&');
             switch (params[0])
             {
@@ -151,7 +154,6 @@ define(function (require, exports, module)
                     showSelector.showSection(params[1]);
                     break;
                 default:
-                    showSelector.showSection('1');
                     break;
             }
             //#endregion
@@ -186,7 +188,8 @@ define(function (require, exports, module)
         
         var selectorEventHandler=new EventHandler();
         selectorEventHandler.on('showSelected', showSelected);
-        selectorEventHandler.on('spin', function () { spin() });
+        selectorEventHandler.on('mangaSelected', mangaSelected);
+        selectorEventHandler.on('spin', function () { spin(); });
         selectorEventHandler.on('showFAQ', showFAQ);
 
         //#region Anime
@@ -240,6 +243,14 @@ define(function (require, exports, module)
         });
         var mangaSelector=MangaSelector();
         mangaSelector.pipe(selectorEventHandler);
+        function mangaSelected(data)
+        {
+            mangaSelectorTransform.setOpacity(0, { duration: 2000, curve: Easing.outCubic }, function ()
+            {
+                mangaSelectorTransform.setAlign([0, -1]);
+            });
+            mangaPlayer.read(data.manga, data.chapter);
+        }
         mangaContainer.add(mangaSelectorTransform).add(mangaSelector);
         spinnerNode.add(mangaRotation).add(mangaContainer);
         //#endregion

@@ -434,7 +434,7 @@ define(function (require, exports, module)
         //#endregion
         function searchShowWithID(title, id, callback)
         {
-            searchMALAsync(title, function (obj)
+            searchMALAsync(title,'anime', function (obj)
             {
                 if(obj.entry.length == undefined)
                 {

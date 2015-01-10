@@ -60,7 +60,7 @@ switch ($_GET["m"])
         echo $out;
         break;
     case 'search':
-        $out = getSearch($_GET['s'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = getSearch($_GET['s'],$_GET['t'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         header('Content-type: text/xml');
         echo str_replace('utf-8', 'UTF-8', $out);
@@ -223,7 +223,7 @@ function changeListItem($body, $id, $username, $password)
   }
  */
 
-function getSearch($searchItem, $username, $password)
+function getSearch($searchItem,$type, $username, $password)
 {
     global $ch;
 
@@ -231,7 +231,7 @@ function getSearch($searchItem, $username, $password)
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/anime/search.xml?q=' . $replacedItem);
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'/search.xml?q=' . $replacedItem);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     $output = curl_exec($ch);
     // close curl resource to free up system resources 

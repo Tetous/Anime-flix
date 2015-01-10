@@ -196,7 +196,7 @@ define(function (require, exports, module)
                         mangaLedger.pop();
                     }
 
-                    localStorage.mangaLedger = JSON.stringify(dubLedger);
+                    localStorage.mangaLedger = JSON.stringify(mangaLedger);
                 }
             }
         };
@@ -315,6 +315,8 @@ define(function (require, exports, module)
             titles.unshift(manga.series_title);
         //}
 
+        var done=false;
+        var value=false;
         for (var j = 0; j < titles.length && !done; j++)
         {
             var workingTitle = titles[j];
@@ -355,5 +357,5 @@ define(function (require, exports, module)
         }
         return trimmedString;
     }
-    module.exports = {getLedger:getLedger,getLedgerItem:getLedgerItem}
+    module.exports = {getLedger:getLedger,getLedgerItem:getLedgerItem, getMangaLedgerItem:getMangaLedgerItem};
 });

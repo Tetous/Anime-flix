@@ -180,7 +180,7 @@ function createSeriesXML(listData)
  return XML2jsobj(domObj).anime;
  }
  */
-function searchMALAsync(search, callback)
+function searchMALAsync(search,type, callback)
 {
     var request = new XMLHttpRequest();
     request.onreadystatechange = function ()
@@ -191,19 +191,19 @@ function searchMALAsync(search, callback)
             {
                 parser = new DOMParser();
                 var domObj = parser.parseFromString(request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\''), "text/xml");
-                obj = XML2jsobj(domObj).anime;
+                obj = XML2jsobj(domObj)[type];
                 //obj = XML2jsobj(request.responseXML.documentElement);
                 callback(obj);
             }
         }
     };
-    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search, true);
+    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search+'&t='+type, true);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }
-function getEpisodeCountAsync(title, link, callback)
+function getEpisodeCountAsync(ledgerItem, callback)
 {
-    var url = 'http://www.anime-flix.com/requester.php?m=epCount&t=' + title;
+    var url = 'http://www.anime-flix.com/requester.php?m=epCount&t=' + ledgerItem.name;
     var request = new XMLHttpRequest();
     request.onreadystatechange = function ()
     {
@@ -218,7 +218,7 @@ function getEpisodeCountAsync(title, link, callback)
         }
     }
     request.open('POST', url);
-    request.send(link);
+    request.send(ledgerItem.link);
 }
 
 function getChapterCountAsync(ledgerItem, callback)
@@ -250,11 +250,11 @@ function getPages(ledgerItem, chapter, callback)
             if(request.status == 200)
             {
                 var strings = request.responseText.split(',');
-                string.pop();
+                strings.pop();
                 callback(strings);
             }
         }
     }
     request.open('POST', url);
-    request.send(link);
+    request.send(ledgerItem.link);
 }

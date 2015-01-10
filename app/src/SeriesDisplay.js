@@ -22,6 +22,8 @@ define(function (require, exports, module)
     function createSeriesDisplay()
     {
         var opened=false;
+        
+        var contentType;
 
         var series;
         var transforms = [];
@@ -257,6 +259,7 @@ define(function (require, exports, module)
         });
         function asyncAlertChecker()
         {
+            var isManga=contentType=='manga';
             var alertsFinished = (changeStatusAlert.button1Clicked||changeStatusAlert.button2Clicked)&&(skipBackAlert.button1Clicked||skipBackAlert.button2Clicked);
 
             if (alertsFinished)
@@ -266,7 +269,8 @@ define(function (require, exports, module)
                 {
                     series.listData.my_status = 1;
                     var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
-                    series.listData.my_watched_episodes = selectedEpisode - 1;
+                    var chapOrEp=isManga?'my_read_chapters':'my_watched_episodes';
+                    series.listData[chapOrEp] = selectedEpisode - 1;
                 }
                 else
                 {
@@ -280,11 +284,20 @@ define(function (require, exports, module)
                 changeStatusAlert.button2Clicked = true;
                 skipBackAlert.button1Clicked = false;
                 skipBackAlert.button2Clicked = true;
-
-                updateAnime(series.listData);
+                
+                if(!isManga) {
+                    updateAnime(series.listData);
+                }
 
                 //Play
-                view._eventOutput.emit('showSelected', { show: series.listData, episode: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
+                if(isManga)
+                {
+                    view._eventOutput.emit('mangaSelected', { manga: series.listData, chapter: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
+                }
+                else
+                {
+                    view._eventOutput.emit('showSelected', { show: series.listData, episode: parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text) });
+                }
                 view.hide();
             }
             else
@@ -323,14 +336,17 @@ define(function (require, exports, module)
                     series.listData.my_status = 1;
 
                     var selectedEpisode = parseInt(episodeDropdown.options[episodeDropdown.options.selectedIndex].text);
-                    if (selectedEpisode <= series.listData.my_watched_episodes)
+                    if(contentType=='anime')
                     {
-                        //Ask if the user wants to jump back
-                        skipBackAlert.show();
-                    }
-                    else
-                    {
-                        series.listData.my_watched_episodes = selectedEpisode - 1;
+                        if (selectedEpisode <= series.listData.my_watched_episodes)
+                        {
+                            //Ask if the user wants to jump back
+                            skipBackAlert.show();
+                        }
+                        else
+                        {
+                            series.listData.my_watched_episodes = selectedEpisode - 1;
+                        }
                     }
                 }
 
@@ -338,7 +354,14 @@ define(function (require, exports, module)
             }
             else
             {
-                alert('This show has no episodes to play.');
+                if(contentType=='manga')
+                {
+                    alert('There are no chapters available for this manga.');
+                }
+                else
+                {
+                    alert('This show has no episodes to play.');
+                }
             }
         });
         transforms.push(playButtonTransform);
@@ -454,6 +477,11 @@ define(function (require, exports, module)
         view.setSeries = function (ser)
         {
             series = ser;
+            contentType=series.listData.series_mangadb_id?'manga':'anime';
+            var playText=contentType=='manga'?'Read':'Play';
+            playButton.setContent(playText);
+            var episodeText=contentType=='manga'?'Chapters:':'Episodes:';
+            episodeLabel.setContent(episodeText);
             image.setContent(ser.listData.series_image);
             title.setContent(ser.listData.series_title);
             type.setContent(ser.searchData.type);
@@ -480,48 +508,83 @@ define(function (require, exports, module)
             
             if (ser.listData.series_status == 1)
             {
-                var ledgerItem = window.ledger.getLedgerItem(ser.listData);
-                getEpisodeCountAsync(ledgerItem.name, ledgerItem.link, function (episodeCounts)
+                var isAnime=contentType=='anime';
+                if(isAnime) 
                 {
-                    while (episodeDropdown.options.length > 0)
+                    var ledgerItem = window.ledger.getLedgerItem(ser.listData);
+                    getEpisodeCountAsync(ledgerItem, function (episodeCounts)
                     {
-                        episodeDropdown.options.remove(0);
-                    }
-                    ser.listData.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
-                    if (ser.listData.series_episodes == 0)
-                    {
-                        episodeDropdown.options.add(new Option('0'));
-                    }
-                    else
-                    {
-                        for (var i = 1; i <= ser.listData.series_episodes; i++)
+                        while (episodeDropdown.options.length > 0)
                         {
-                            episodeDropdown.options.add(new Option(i.toString()));
+                            episodeDropdown.options.remove(0);
                         }
-                        var indexToSelect = ser.listData.my_watched_episodes;
-                        if (indexToSelect == episodeDropdown.options.length)
+                        ser.listData.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
+                        if (ser.listData.series_episodes == 0)
                         {
-                            indexToSelect--;
+                            episodeDropdown.options.add(new Option('0'));
                         }
-                        episodeDropdown.options.selectedIndex = indexToSelect;
-                    }
-                });
+                        else
+                        {
+                            for (var i = 1; i <= ser.listData.series_episodes; i++)
+                            {
+                                episodeDropdown.options.add(new Option(i.toString()));
+                            }
+                            var indexToSelect = ser.listData.my_watched_episodes;
+                            if (indexToSelect == episodeDropdown.options.length)
+                            {
+                                indexToSelect--;
+                            }
+                            episodeDropdown.options.selectedIndex = indexToSelect;
+                        }
+                    });
+                }
+                else 
+                {
+                    var ledgerItem = window.ledger.getMangaLedgerItem(ser.listData);
+                    getChapterCountAsync(ledgerItem, function (chapterCount)
+                    {
+                        while (episodeDropdown.options.length > 0)
+                        {
+                            episodeDropdown.options.remove(0);
+                        }
+                        ser.listData.series_chapters = chapterCount;
+                        if (ser.listData.series_chapters == 0)
+                        {
+                            episodeDropdown.options.add(new Option('0'));
+                        }
+                        else
+                        {
+                            for (var i = 1; i <= ser.listData.series_chapters; i++)
+                            {
+                                episodeDropdown.options.add(new Option(i.toString()));
+                            }
+                            var indexToSelect = ser.listData.my_read_chapters;
+                            if (indexToSelect == episodeDropdown.options.length)
+                            {
+                                indexToSelect--;
+                            }
+                            episodeDropdown.options.selectedIndex = indexToSelect;
+                        }
+                    });
+                }
+
             }
             while (episodeDropdown.options.length > 0)
             {
                 episodeDropdown.options.remove(0);
             }
-            if (ser.listData.series_episodes == 0)
+            if (ser.listData.series_episodes === 0||ser.listData.series_chapters===0)
             {
                 episodeDropdown.options.add(new Option('0'));
             }
             else
             {
-                for (var i = 1; i <= ser.listData.series_episodes; i++)
+                var loopTimes=isAnime?ser.listData.series_episodes:ser.listData.series_chapters;
+                for (var i = 1; i <= loopTimes; i++)
                 {
                     episodeDropdown.options.add(new Option(i.toString()));
                 }
-                var indexToSelect = ser.listData.my_watched_episodes;
+                var indexToSelect = isAnime?ser.listData.my_watched_episodes:ser.listData.my_read_chapters;
                 if (indexToSelect == episodeDropdown.options.length)
                 {
                     indexToSelect--;
@@ -556,7 +619,7 @@ define(function (require, exports, module)
             imageTransform.setTransform(Transform.translate(10, 10, 1), inTransition);
             titleTransform.setTransform(Transform.translate(210, 10, 1),inTransition);
             typeTransform.setTransform(Transform.translate(210, 35, 1), inTransition);
-            airedTransform.setTransform(Transform.translate(260, 35, 1), inTransition);
+            airedTransform.setTransform(Transform.translate(300, 35, 1), inTransition);
             myStatusLabelTransform.setTransform(Transform.translate(10,  window.formatting.scale * 260, 1), inTransition);
             myStatusTransform.setTransform(Transform.translate(90, + window.formatting.scale * 260, 1), inTransition);
             scoreLabelTransform.setTransform(Transform.translate(10, window.formatting.scale * 260+30, 1), inTransition);

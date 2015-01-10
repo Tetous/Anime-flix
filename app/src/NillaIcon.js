@@ -75,22 +75,20 @@ define(function (require, exports, module) {
             {
                 if(isManga)
                 {
-                    var ledgerItem = window.ledger.getLedgerItem(view.data);
-                    /*
-                    getChapterCountAsync(ledgerItem, function (chapterCounts)
+                    var ledgerItem = window.ledger.getMangaLedgerItem(view.data);
+                    getChapterCountAsync(ledgerItem, function (chapterCount)
                     {
-                        view.data.series_episodes = chapterCounts[0] ? chapterCounts[0] : chapterCounts[1];
-                        if(view.data.series_episodes > view.data.my_watched_episodes)
+                        view.data.series_chapters = chapterCount;
+                        if(view.data.series_chapters > view.data.my_read_chapters)
                         {
                             bannerRenderController.show(banner);
                         }
                     });
-                    */
                 }
                 else
                 {
                     var ledgerItem = window.ledger.getLedgerItem(view.data);
-                    getEpisodeCountAsync(ledgerItem.name, ledgerItem.link, function (episodeCounts)
+                    getEpisodeCountAsync(ledgerItem, function (episodeCounts)
                     {
                         view.data.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
                         if(view.data.series_episodes > view.data.my_watched_episodes)
