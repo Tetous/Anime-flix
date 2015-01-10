@@ -4,6 +4,7 @@ define(function (require, exports, module)
     'use strict';
     // import dependencies
     var Engine = require('famous/core/Engine');
+    var EventHandler=require('famous/core/EventHandler');
     var StateModifier = require('famous/modifiers/StateModifier');
     var Transform = require('famous/core/Transform');
     var Easing = require('famous/transitions/Easing');
@@ -12,7 +13,9 @@ define(function (require, exports, module)
     var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');
+    var MangaSelector=require('MangaSelector');
     var VideoPlayer = require('VideoPlayer');
+    var MangaPlayer = require('MangaPlayer');
     var FAQ = require('FAQ');
     window.ledger = require('Ledger');
 
@@ -128,6 +131,7 @@ define(function (require, exports, module)
             sessionStorage.username = loginScreen.username;
             sessionStorage.password = loginScreen.password;
             showSelector.refreshList();
+            mangaSelector.refreshList();
             //#region Process Hash
             var params = hash.split('&');
             switch (params[0])
@@ -179,6 +183,11 @@ define(function (require, exports, module)
         {
             showFAQ();
         }
+        
+        var selectorEventHandler=new EventHandler();
+        selectorEventHandler.on('showSelected', showSelected);
+        selectorEventHandler.on('spin', function () { spin() });
+        selectorEventHandler.on('showFAQ', showFAQ);
 
         //#region Anime
         var videoPlayerTransform = new StateModifier({
@@ -212,9 +221,7 @@ define(function (require, exports, module)
             });
             videoPlayer.play(data.show, data.episode);
         }
-        showSelector.on('showSelected', showSelected);
-        showSelector.on('manga', function () { spin() });
-        showSelector.on('showFAQ', showFAQ);
+        showSelector.pipe(selectorEventHandler);
         animeContainer.add(showSelectorTransform).add(showSelector);
         //#endregion
         //#region Manga
@@ -222,21 +229,18 @@ define(function (require, exports, module)
             transform:Transform.rotateY(Math.PI)
         });
         var mangaContainer = new ContainerSurface();
-        var mangaTestSurface = Surface({
-            content: 'Manga Coming Soon!',
-            properties: {
-                color:'white',
-                backgroundColor: 'black',
-                textAlign: 'center',
-                verticalAlign: 'middle',
-                fontSize:'30px'
-            }
+        var mangaPlayerTransform=new StateModifier({
+            transform:Transform.translate(0,0,1+window.videoPlayerZ)
         });
-        mangaTestSurface.on('click', function ()
-        {
-            spin();
+        var mangaPlayer=MangaPlayer();
+        mangaContainer.add(mangaPlayerTransform).add(mangaPlayer);
+        
+        var mangaSelectorTransform=new StateModifier({
+            transform:Transform.translate(0,0,window.showSelectorZ)
         });
-        mangaContainer.add(mangaTestSurface);
+        var mangaSelector=MangaSelector();
+        mangaSelector.pipe(selectorEventHandler);
+        mangaContainer.add(mangaSelectorTransform).add(mangaSelector);
         spinnerNode.add(mangaRotation).add(mangaContainer);
         //#endregion
 
@@ -259,6 +263,7 @@ define(function (require, exports, module)
             faqView.resize();
             loginScreen.resize();
             showSelector.resize();
+            mangaSelector.resize();
             //videoPlayer.resize();
         }
         Engine.on('resize', resize);

@@ -6,6 +6,7 @@
 
 define(function (require, exports, module)
 {
+    var _ = require('underscore');
     require('xml2jsobj/xml2jsobj');
 
     var dirtyLedger = false;
@@ -22,6 +23,10 @@ define(function (require, exports, module)
     if (localStorage.dubLedger)
     {
         dubLedger = JSON.parse(localStorage.dubLedger);
+    }
+    if(localStorage.mangaLedger)
+    {
+        mangaLedger = JSON.parse(localStorage.mangaLedger);
     }
     if (localStorage.swaps)
     {
@@ -162,6 +167,42 @@ define(function (require, exports, module)
         request.open("GET", url, true);
         request.send();
     }
+    function getMangaLedger()
+    {
+        var url = "http://www.anime-flix.com/requester.php?m=mangaLedger";
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function ()
+        {
+            if (request.readyState == 4)
+            {
+                if (request.status == 200)
+                {
+                    var body = _.unescape(request.responseText.replace(/<span><\/span>/g, ''));
+                    mangaLedger = [];
+                    //process mangaLedger
+                    if (!body.indexOf('unavailable') > -1)
+                    {
+                        var index = body.indexOf('<div id="A" name="A">');
+                        var showName = "";
+                        var footerIndex = body.indexOf('class="footer"', index);
+                        while (footerIndex>index)
+                        {
+                            index = body.indexOf("href=\"", index) + 6;
+                            var showLink = body.substring(index, body.indexOf("\"", index));
+                            var index2 = body.indexOf(">", index) + 1;
+                            showName = body.substring(index2, body.indexOf("<", index2));
+                            mangaLedger.push({ name: showName, link: showLink });
+                        }
+                        mangaLedger.pop();
+                    }
+
+                    localStorage.mangaLedger = JSON.stringify(dubLedger);
+                }
+            }
+        };
+        request.open("GET", url, true);
+        request.send();
+    }
 
     function getLedger()
     {
@@ -172,6 +213,7 @@ define(function (require, exports, module)
         getMovieLedger();
         getDubAnimeLedger();
         getDubMovieLedger();
+        getMangaLedger();
     }
     function getLedgerItem(show, dub)
     {
@@ -244,6 +286,51 @@ define(function (require, exports, module)
                 };
             };
         //}
+        return value;
+    }
+    function getMangaLedgerItem(manga)
+    {
+        var titles;
+        if ((typeof manga.series_synonyms) == 'string')
+        {
+            titles = manga.series_synonyms.split('; ');
+        }
+        else
+        {
+            titles = new Array();
+        }
+        /*
+        var swapped = false;
+        for (var i = 0; i < ledgerSwaps.length && !swapped; i++)
+        {
+            if (ledgerSwaps[i].malName.toLowerCase() == manga.series_title.toLowerCase())
+            {
+                titles.unshift(ledgerSwaps[i].ledgerName);
+                swapped = true;
+            }
+        }
+        if (!swapped)
+        {
+        */
+            titles.unshift(manga.series_title);
+        //}
+
+        for (var j = 0; j < titles.length && !done; j++)
+        {
+            var workingTitle = titles[j];
+            while (workingTitle && !done)
+            {
+                for (var i = 0; i < mangaLedger.length && !done; i++)
+                {
+                    if (mangaLedger[i].name.toLowerCase() == workingTitle.toLowerCase())
+                    {
+                        value = { name: titles[j], link: mangaLedger[i].link };
+                        done = true;
+                    };
+                };
+                workingTitle = trimTitle(workingTitle);
+            };
+        };
         return value;
     }
 

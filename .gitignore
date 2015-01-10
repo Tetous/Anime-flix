@@ -15,3 +15,6 @@ dist
 .tmp
 app/lib
 .yo-rc.json
+/nbproject/private/
+/app/nbproject/private/
+/PHPProxy/meta/nbproject/private/

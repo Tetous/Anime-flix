@@ -32,4 +32,8 @@
     <ledgerName>Fate Stay Night</ledgerName>
     <malName>Fate/stay night</malName>
   </swap>
+  <swap>
+    <ledgerName>To Aru Majutsu no Index</ledgerName>
+    <malName>Toaru Majutsu no Index</malName>
+  </swap>
 </Root>

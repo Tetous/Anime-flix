@@ -7,7 +7,8 @@ require.config({
         famous: '../lib/famous/src',
         requirejs: '../lib/requirejs/require',
         almond: '../lib/almond/almond',
-        RichFamous: '../lib/RichFamous'
+        RichFamous: '../lib/RichFamous',
+        underscore: '../lib/underscore/underscore'
     },
     packages: [
 
