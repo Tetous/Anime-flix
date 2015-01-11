@@ -216,7 +216,7 @@ define(function (require, exports, module)
         });
         var spinButton = Surface({
             size: [200, 40],
-            content: 'Manga<br>(Coming Soon)',
+            content: 'Manga',
             properties: buttonProps
         });
         spinButton.on('click', function ()

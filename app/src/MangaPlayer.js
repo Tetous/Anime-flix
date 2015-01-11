@@ -218,7 +218,7 @@ define(function (require, exports, module)
             }
             */
         });
-        leftPage.innerDiv.setAttribute('style', 'width: 100%;height: 100%;text-align:center;');
+        leftPage.innerDiv.setAttribute('style', 'width: 100%;height: 100%;text-align:center;color:white;font-size:30px;');
         leftPageView.add(leftPageTransform).add(leftPage);
         pages.push(leftPageView);
         var rightPage = new ImageSurface({
