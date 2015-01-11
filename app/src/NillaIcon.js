@@ -29,7 +29,7 @@ define(function (require, exports, module) {
         var bannerRenderController = new RenderController();
         var banner = new ImageSurface({
             size: [iconWidth, iconHeight],
-            content: 'content/images/NewEpisodesBanner.png',
+            content: isManga?'content/images/NewChaptersBanner.png':'content/images/NewEpisodesBanner.png',
             properties: {
                 borderRadius: '10px'
             }
@@ -68,6 +68,7 @@ define(function (require, exports, module) {
         {
             view.data = series;
             view.data.originalEpisodeCount = view.data.series_episodes;
+            view.data.originalChapterCount = view.data.series_chapters;
             title.setContent(series.series_title);
             image.setContent(series.series_image);
             bannerRenderController.hide();

@@ -236,6 +236,13 @@ define(function (require, exports, module)
             transform:Transform.translate(0,0,1+window.videoPlayerZ)
         });
         var mangaPlayer=MangaPlayer();
+        mangaPlayer.on('backToBrowsing', function ()
+        {
+            mangaSelector.refreshList();
+            //window.location.hash = 'sdisplay&' + showSelector.getShowingSection();
+            mangaSelectorTransform.setAlign([0, 0], { duration: 0 });
+            mangaSelectorTransform.setOpacity(1, { duration: 2000 });
+        });
         mangaContainer.add(mangaPlayerTransform).add(mangaPlayer);
         
         var mangaSelectorTransform=new StateModifier({

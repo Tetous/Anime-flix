@@ -62,6 +62,48 @@ function updateAnime(listData, callBack)
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createAddBody(listData)));
     }
 }
+function updateManga(listData, callBack)
+{
+    var request = new XMLHttpRequest();
+    if(listData.localConstruction == undefined)
+    {
+        request.open('post', 'http://anime-flix.com/requester.php?m=updatem&i=' + listData.my_id);
+        request.onreadystatechange = function ()
+        {
+            if(request.readyState == 4)
+            {
+                if(request.status == 200)
+                {
+                    if(callBack)
+                    {
+                        callBack(request.response);
+                    }
+                }
+            }
+        };
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createMangaUpdateBody(listData)));
+    }
+    else
+    {
+        request.open('post', 'http://anime-flix.com/requester.php?m=addm&i=' + listData.series_mangadb_id);
+        request.onreadystatechange = function ()
+        {
+            if(request.readyState == 4)
+            {
+                if(request.status == 200)
+                {
+                    if(callBack)
+                    {
+                        callBack(request.response);
+                    }
+                }
+            }
+        };
+        request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createMangaAddBody(listData)));
+    }
+}
 function deleteAnime(id, callBack)
 {
     var request = new XMLHttpRequest();
@@ -92,6 +134,38 @@ function getDiscussionURL(episode, showId)
     return request.response;
 }
 
+
+function createMangaUpdateBody(listData)
+{
+    var ret = 'entry_id=' +listData.my_id +
+            '&manga_id=' + listData.series_mangadb_id +
+            '&anime_db_series_id=' + listData.series_animedb_id +
+            '&astatus=' + listData.series_status +
+            '&close_on_update=&status=' + listData.my_status + //listData.last_status needs to be added by series display. Using destructive hack right now
+            '&chap_read=' + listData.my_read_chapters + //listData.last_completed_eps needs to be added by series display. Using destructive hack right now
+            '&score=' + listData.my_score +
+            '&submitIt=2';
+    //these are unimportant and are not used my me (other and start and end date), these need to be set up to just pass original list data values through
+    //'&tags=&fansub_group=0&priority=0&storage=0&storageVal=0.00&list_downloaded_eps=0&list_times_watched=0&list_rewatch_value=0&list_comments=&discuss=1';
+    if(listData.my_start_date != '0000-00-00')
+    {
+        var dateParts = listData.my_start_date.split('-');
+        ret += '&startMonth=' + dateParts[1] + '&startDay=' + dateParts[2] + '&startYear=' + dateParts[0];
+    }
+    else {
+        ret += '&unknownStart=1';
+    }
+    if(listData.my_finish_date != '0000-00-00')
+    {
+        var dateParts = listData.my_finish_date.split('-');
+        ret += '&endMonth=' + dateParts[1] + '&endDay=' + dateParts[2] + '&endYear=' + dateParts[0];
+    }
+    else
+    {
+        ret += '&unknownEnd=1';
+    }
+    return ret;
+}
 
 function createUpdateBody(listData)
 {
@@ -126,6 +200,18 @@ function createUpdateBody(listData)
         ret += '&unknownEnd=1';
     }
     return ret;
+}
+
+function createMangaAddBody(listData)
+{
+    return 'entry_id=0 ' + // listData.series_animedb_id +
+            '&manga_id=' + listData.series_mangadb_id+// listData.series_animedb_id +
+            '&series_title=' + listData.series_animedb_id +
+            '&close_on_update=&status=' + listData.my_status +
+            //'&vol_read=0'+
+            '&chap_read=' + listData.my_read_chapters +
+            '&score=' + listData.my_score +
+            '&startMonth=00&startDay=00&startYear=0000&submitIt=1';
 }
 
 function createAddBody(listData)

@@ -510,7 +510,7 @@ define(function (require, exports, module)
         droppedIconView.on('iconClick', showSelectedPassThrough);
         var planToWatchIconView = IconView();
         planToWatchIconView.on('iconClick', showSelectedPassThrough);
-        var searchView = SearchView();
+        var searchView = SearchView('anime');
         searchView.on('searchSeriesSelected', function (data)
         {
             var listData;

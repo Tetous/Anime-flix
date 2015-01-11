@@ -12,6 +12,7 @@ define(function (require, exports, module)
     var dirtyLedger = false;
     var dirtyDubLedger = false;
     var ledgerSwaps = [];
+    var mangaSwaps=[];
     var showLedger = [];
     var dubLedger = [];
     var mangaLedger = [];
@@ -32,6 +33,10 @@ define(function (require, exports, module)
     {
         ledgerSwaps = JSON.parse(localStorage.swaps);
     }
+    if (localStorage.mangaSwaps)
+    {
+        mangaSwaps = JSON.parse(localStorage.mangaSwaps);
+    }
 
     var swapsRequest = new XMLHttpRequest();
     swapsRequest.open('GET', '/content/data/LocalLedgerSwaps.xml');
@@ -46,11 +51,36 @@ define(function (require, exports, module)
                 var parser = new DOMParser();
                 var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
                 ledgerSwaps = XML2jsobj(domObj).Root.swap;
+                if(ledgerSwaps.length==undefined) {
+                    ledgerSwaps=[ledgerSwaps];
+                }
                 localStorage.swaps = JSON.stringify(ledgerSwaps);
             }
         }
     };
     swapsRequest.send();
+    
+    var mangaSwapsRequest = new XMLHttpRequest();
+    mangaSwapsRequest.open('GET', '/content/data/LocalMangaSwaps.xml');
+    mangaSwapsRequest.setRequestHeader('Content-Type', "text/xml");
+    mangaSwapsRequest.setRequestHeader("If-Modified-Since", "Sat, 1 Jan 2005 00:00:00 GMT");
+    mangaSwapsRequest.onreadystatechange = function ()
+    {
+        if (mangaSwapsRequest.readyState == 4)
+        {
+            if (mangaSwapsRequest.status == 200)
+            {
+                var parser = new DOMParser();
+                var domObj = parser.parseFromString(mangaSwapsRequest.response, "text/xml");
+                mangaSwaps = XML2jsobj(domObj).Root.swap;
+                if(mangaSwaps.length==undefined) {
+                    mangaSwaps=[mangaSwaps];
+                }
+                localStorage.mangaSwaps = JSON.stringify(mangaSwaps);
+            }
+        }
+    };
+    mangaSwapsRequest.send();
 
     function processLedger(body, terminator, type)
     {
@@ -299,21 +329,19 @@ define(function (require, exports, module)
         {
             titles = new Array();
         }
-        /*
         var swapped = false;
-        for (var i = 0; i < ledgerSwaps.length && !swapped; i++)
-        {
-            if (ledgerSwaps[i].malName.toLowerCase() == manga.series_title.toLowerCase())
+            for (var i = 0; i < mangaSwaps.length && !swapped; i++)
             {
-                titles.unshift(ledgerSwaps[i].ledgerName);
-                swapped = true;
+                if (mangaSwaps[i].malName.toLowerCase() == manga.series_title.toLowerCase())
+                {
+                    titles.unshift(mangaSwaps[i].ledgerName);
+                    swapped = true;
+                }
             }
-        }
-        if (!swapped)
-        {
-        */
-            titles.unshift(manga.series_title);
-        //}
+            if (!swapped)
+            {
+                titles.unshift(manga.series_title);
+            }
 
         var done=false;
         var value=false;

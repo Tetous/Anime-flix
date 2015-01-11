@@ -460,33 +460,34 @@ define(function (require, exports, module)
         {
             var date = new Date();
             return {
-                series_animedb_id: 0,
+                series_mangadb_id: 0,
                 series_title: "",
                 series_type: 1,
-                series_episodes: 0,
+                series_chapters: 0,
                 series_status: 0,
                 series_start: '0000-00-00',
                 series_end: '0000-00-00',
                 my_id: 0,
-                my_watched_episodes: 0,
+                my_read_chapters: 0,
                 my_start_date: date.getFullYear() + '-' + (date.getMonth() + 1) + '-' + date.getDate(),
                 my_finish_date: '000-00-00',
                 my_score: 0,
                 my_status: 6,
                 my_rereading: 0,
-                my_rereading_ep: 0,
+                my_rereadingg_ep: 0,
                 my_last_updated: 0
             };
         }
         function createListDataFromSearchData(data)
         {
             var baseData = createBlankListData();
-            baseData.series_animedb_id = data.id;
+            baseData.series_mangadb_id = data.id;
             baseData.series_title = data.title;
             baseData.series_image = data.image;
+            baseData.series_status=data.status=='Publishing'?1:0;
             baseData.series_start = data.start_date;
             baseData.series_end = data.end_date;
-            baseData.series_episodes = data.episodes;
+            baseData.series_chapters = data.chapters;
             baseData.series_synonyms = data.synonyms + '; ' + data.english;
             baseData.localConstruction = true;
             return baseData;
@@ -513,16 +514,16 @@ define(function (require, exports, module)
         droppedIconView.on('iconClick', showSelectedPassThrough);
         var planToReadIconView = IconView();
         planToReadIconView.on('iconClick', showSelectedPassThrough);
-        var searchView = SearchView();
+        var searchView = SearchView('manga');
         searchView.on('searchSeriesSelected', function (data)
         {
             var listData;
             var bail = false;
-            for(var i = 0; i < malList.anime.length && !bail; i++)
+            for(var i = 0; i < malList.manga.length && !bail; i++)
             {
-                if(data.id == malList.anime[i].series_animedb_id)
+                if(data.id == malList.manga[i].series_mangadb_id)
                 {
-                    listData = malList.anime[i];
+                    listData = malList.manga[i];
                     bail = true;
                 }
             }
