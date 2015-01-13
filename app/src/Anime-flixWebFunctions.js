@@ -104,10 +104,10 @@ function updateManga(listData, callBack)
         request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createMangaAddBody(listData)));
     }
 }
-function deleteAnime(id, callBack)
+function deleteListItem(id,type, callBack)
 {
     var request = new XMLHttpRequest();
-    request.open('post', 'http://anime-flix.com/requester.php?m=delete&i=' + id);
+    request.open('post', 'http://anime-flix.com/requester.php?m=delete&i=' + id+'&t='+type);
     request.onreadystatechange = function ()
     {
         if(request.readyState == 4)

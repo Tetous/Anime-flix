@@ -53,10 +53,6 @@ define(function (require, exports, module)
         }
     }
     window.isMobile = detectmob();
-    if (window.isMobile)
-    {
-
-    }
     /*window.scrollTo(0, 1);
     addEventListener("resize", function ()
     {
@@ -115,6 +111,15 @@ define(function (require, exports, module)
                     centerSpinTransform.setTransform(Transform.translate(0, 0, 0), { duration: 1000, curve: Easing.outCubic }, function ()
                     {
                         mainContext.setPerspective(0);
+                        if(flips%2==0)
+                        {
+                            window.location.hash = 'sdisplay&' + showSelector.getShowingSection();
+                        }
+                        else
+                        {
+                            window.location.hash = 'mdisplay&' + mangaSelector.getShowingSection();
+                        }
+
                     });
                 });
             });
@@ -134,8 +139,6 @@ define(function (require, exports, module)
             mangaSelector.refreshList();
             //#region Process Hash
             
-            showSelector.showSection('1');
-            mangaSelector.showSection('1');
             var params = hash.split('&');
             switch (params[0])
             {
@@ -149,11 +152,21 @@ define(function (require, exports, module)
                     updateAnime(showData);
                     showSelected({ show: showData, episode: episode });
                     showSelector.showSection('1');
+                    mangaSelector.showSection('1');
                     break;
                 case '#sdisplay':
                     showSelector.showSection(params[1]);
+                    mangaSelector.showSection('1');
+                    break;
+                case '#mdisplay':
+                    mangaSelector.showSection(params[1]);
+                    showSelector.showSection('1');
+                    centerSpinRotation.setTransform(Transform.rotateY(Math.PI));
+                    flips++;
                     break;
                 default:
+                    showSelector.showSection('1');
+                    mangaSelector.showSection('1');
                     break;
             }
             //#endregion

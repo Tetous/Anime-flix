@@ -157,7 +157,8 @@ define(function (require, exports, module)
         });
         viewOnMALButton.on('click', function ()
         {
-            window.open('http://myanimelist.net/anime/' + series.listData.series_animedb_id);
+            var id=contentType=='anime'?series.listData.series_animedb_id:series.listData.series_mangadb_id;
+            window.open('http://myanimelist.net/'+contentType+'/' + id);
         });
         transforms.push(viewOnMALTransform);
         transformNode.add(viewOnMALTransform).add(viewOnMALButton)
@@ -220,7 +221,6 @@ define(function (require, exports, module)
             size: [400, 200],
             buttonSize: [185, 50],
             buttonBuffer: 10,
-            content: '<br>You have completed this anime, would you like to move it back to Watching?',
             button1Content: 'Yes',
             button2Content: 'No',
             showTransitionable: {
@@ -480,7 +480,8 @@ define(function (require, exports, module)
         });
         deleteButton.on('click', function ()
         {
-            deleteAnime(series.listData.series_animedb_id, function ()
+            var id=contentType=='anime'?series.listData.series_animedb_id:series.listData.series_mangadb_id;
+            deleteListItem(id,contentType, function ()
             {
                 view._eventOutput.emit('refreshList');
                 view.hide();
@@ -515,6 +516,8 @@ define(function (require, exports, module)
         {
             series = ser;
             contentType = series.listData.series_mangadb_id ? 'manga' : 'anime';
+            var watchingOrReadingText=contentType=='anime'?'Watching':'Reading';
+            changeStatusAlert.setContent('<br>You have completed this '+contentType+', would you like to move it back to '+watchingOrReadingText+'?')
             var playText = contentType == 'manga' ? 'Read' : 'Play';
             playButton.setContent(playText);
             var episodeText = contentType == 'manga' ? 'Chapters:' : 'Episodes:';

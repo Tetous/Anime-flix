@@ -4,4 +4,12 @@
     <ledgerName>Rosario-Vampire</ledgerName>
     <malName>Rosario to Vampire</malName>
   </swap>
+  <swap>
+    <ledgerName>Rosario-Vampire II</ledgerName>
+    <malName>Rosario to Vampire: Season II</malName>
+  </swap>
+<swap>
+    <ledgerName>Seikoku No Ryuu Kishi</ledgerName>
+    <malName>Seikoku no Dragonar</malName>
+  </swap>
 </Root>

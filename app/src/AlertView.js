@@ -28,6 +28,10 @@ define(function (require, exports, module)
 
         var background = Surface(options);
         alertTransformNode.add(background);
+        view.setContent=function(content)
+        {
+            background.setContent(content);
+        }
 
         var button1Transform = new StateModifier({
             transform: Transform.translate(options.buttonBuffer, options.size[1] - options.buttonBuffer - options.buttonSize[1],1)

@@ -86,7 +86,7 @@ switch ($_GET["m"])
         echo $out;
         break;
     case 'delete':
-        $out = deleteListItem($_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = deleteListItem($_GET['i'],$_GET['t'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
@@ -140,7 +140,7 @@ function getDiscussionURL($id, $episode, $username, $password)
     return 'http://myanimelist.net' . $urlPart;
 }
 
-function deleteListItem($id, $username, $password)
+function deleteListItem($id,$type, $username, $password)
 {
     global $ch;
 
@@ -150,7 +150,7 @@ function deleteListItem($id, $username, $password)
     curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/animelist/delete/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/delete/' . $id . '.xml');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     $output = curl_exec($ch);
 

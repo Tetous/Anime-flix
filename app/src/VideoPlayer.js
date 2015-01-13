@@ -24,7 +24,6 @@ define(function (require, exports, module)
 
 	function createVideoPlayer()
     {
-	    var countdown;
 	    var contentType;
 	    var streamSources = [];
 	    var streamSourcesIndex = 0;
