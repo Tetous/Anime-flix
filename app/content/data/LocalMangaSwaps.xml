@@ -12,4 +12,16 @@
     <ledgerName>Seikoku No Ryuu Kishi</ledgerName>
     <malName>Seikoku no Dragonar</malName>
   </swap>
+  <swap>
+    <ledgerName>To Aru Kagaku no Railgun</ledgerName>
+    <malName>Toaru Kagaku no Railgun</malName>
+  </swap>
+  <swap>
+    <ledgerName>To Aru Kagaku no Accelerator</ledgerName>
+    <malName>Toaru Kagaku no Accelerator</malName>
+  </swap>
+  <swap>
+    <ledgerName>To Aru Majutsu no Index</ledgerName>
+    <malName>Toaru Majutsu no Index</malName>
+  </swap>
 </Root>
