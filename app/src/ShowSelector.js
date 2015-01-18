@@ -203,6 +203,8 @@ define(function (require, exports, module)
         {
             sessionStorage.username = undefined;
             sessionStorage.password = undefined;
+            localStorage.Gamma=undefined;
+            localStorage.Epsilon=undefined;
             location.hash = '';
             location.reload();
         });

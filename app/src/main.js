@@ -9,7 +9,6 @@ define(function (require, exports, module)
     var Transform = require('famous/core/Transform');
     var Easing = require('famous/transitions/Easing');
     var RenderController = require('famous/views/RenderController');
-    var Surface = require('RichFamous/Surface');
     var ContainerSurface=require('famous/surfaces/ContainerSurface');
     var LoginScreen = require('LoginScreen');
     var ShowSelector = require('ShowSelector');

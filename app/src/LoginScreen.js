@@ -44,20 +44,32 @@ define(function (require, exports, module)
         loginBackground.on("deploy", function ()
         {
             //#region Session Relogin
-
-            if (sessionStorage.username != undefined)
+            if (localStorage.Gamma != undefined)
             {
-                overView.username = sessionStorage.username;
-                overView.password = sessionStorage.password;
+                overView.username = localStorage.Gamma;
+                overView.password = localStorage.Epsilon;
 
                 if (overView.login(overView.username, overView.password))
                 {
-                    loginRenderController.hide({ duration: 0 });
+                    loginRenderController.hide();
                 }
             }
             else
             {
-                fakeOut();
+                if (sessionStorage.username != undefined)
+                {
+                    overView.username = sessionStorage.username;
+                    overView.password = sessionStorage.password;
+
+                    if (overView.login(overView.username, overView.password))
+                    {
+                        loginRenderController.hide();
+                    }
+                }
+                else
+                {
+                    fakeOut();
+                }
             }
             //#endregion
         });
@@ -132,6 +144,17 @@ define(function (require, exports, module)
         }
         );
         passwordBox.on('keypress', textBoxEnter);
+        
+        var rememberMeTransform=new StateModifier({
+            origin:[0.5,0.5]
+        });
+        var rememberMeSurface=Surface({
+            size:[true,true],
+            properties:{
+                color:'white'
+            }
+        });
+        rememberMeSurface.setContent('<input type="checkbox" name="rememberMe" checked>Remember Me');
 
         var buttonWidth = 200;
         var buttonHeight = 60;
@@ -169,14 +192,15 @@ define(function (require, exports, module)
 
         overView.resize = function ()
         {
-            buttonTransform.setTransform(Transform.translate(0, window.formatting.scale*(buttonHeight + boxHeight), 1));
+            buttonTransform.setTransform(Transform.translate(0, window.formatting.scale*(buttonHeight + 2*boxHeight), 1));
             button.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
-            faqButtonTransform.setTransform(Transform.translate(0, window.formatting.scale * (buttonHeight*2 + boxHeight), 1));
+            faqButtonTransform.setTransform(Transform.translate(0, window.formatting.scale * (buttonHeight*2 + 2*boxHeight), 1));
             faqButton.setSize([window.formatting.scale * buttonWidth, window.formatting.scale * buttonHeight]);
             usernameBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * -boxHeight, 1));
             usernameBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
             passwordBoxTransform.setTransform(Transform.translate(0, window.formatting.scale * boxHeight, 1));
             passwordBoxTransform.setSize([window.formatting.scale * boxWidth, window.formatting.scale * boxHeight]);
+            rememberMeTransform.setTransform(Transform.translate(0, window.formatting.scale * 2*boxHeight, 1));
             logoTransform.setTransform(Transform.translate(0, window.formatting.scale * (-boxHeight - logoHeight)));
             //logo.setSize([true, window.formatting.scale * logoHeight]);
             logo.setSize([window.formatting.scale * logoWidth, window.formatting.scale * logoHeight]);
@@ -186,6 +210,8 @@ define(function (require, exports, module)
             */
             credentialInfoTransform.setTransform(Transform.translate(0, window.formatting.scale * 3 * buttonHeight+boxHeight, 1));
             credentialInfo.setProperties({ fontSize: window.formatting.scale * 16 + 'px' });
+            rememberMeSurface.setProperties({ fontSize: window.formatting.scale * 16 + 'px' });
+            faqButton.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             button.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             faqButton.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
             usernameBox.setProperties({ fontSize: window.formatting.scale * fontSize + 'px' });
@@ -233,7 +259,12 @@ define(function (require, exports, module)
                         {
                             overView._eventOutput.emit('loggedIn');
                             loginRenderController.hide({ duration: 2000 });
-                            //return true;
+                            var rememberMe=document.getElementsByName('rememberMe');
+                            var remembeMeValue=rememberMe[0].checked;
+                            if(remembeMeValue) {
+                                localStorage.Gamma=username;
+                                localStorage.Epsilon=password;
+                            }
                         }
                     }
                 }
@@ -246,6 +277,7 @@ define(function (require, exports, module)
         //loginElementsNode.add(betaTransform).add(betaRotate).add(beta);
         loginElementsNode.add(usernameBoxTransform).add(usernameBox);
         loginElementsNode.add(passwordBoxTransform).add(passwordBox);
+        loginElementsNode.add(rememberMeTransform).add(rememberMeSurface);
         loginElementsNode.add(buttonTransform).add(button);
         loginElementsNode.add(faqButtonTransform).add(faqButton);
         loginElementsNode.add(credentialInfoTransform).add(credentialInfo);
