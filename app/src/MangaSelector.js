@@ -250,7 +250,10 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         readingButton.on('click', function ()
         {
-            lightbox.show(readingIconView);
+            if(sectionDisplaying!=1)
+            {
+                lightbox.show(readingIconView);
+            }
             sectionDisplaying = 1;
             window.location.hash = 'mdisplay&1';
         });
@@ -266,7 +269,9 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         completedButton.on('click', function ()
         {
-            lightbox.show(completedIconView);
+            if(sectionDisplaying!=2) {
+                lightbox.show(completedIconView);
+            }
             sectionDisplaying = 2;
             window.location.hash = 'mdisplay&2';
         });
@@ -282,7 +287,10 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         onHoldButton.on('click', function ()
         {
-            lightbox.show(onHoldIconView);
+            if(sectionDisplaying!=3)
+            {
+                lightbox.show(onHoldIconView);
+            }
             sectionDisplaying = 3;
             window.location.hash = 'mdisplay&3';
         });
@@ -298,7 +306,10 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         droppedButton.on('click', function ()
         {
-            lightbox.show(droppedIconView);
+            if(sectionDisplaying!=4)
+            {
+                lightbox.show(droppedIconView);
+            }
             sectionDisplaying = 4;
             window.location.hash = 'mdisplay&4';
         });
@@ -314,7 +325,10 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         planToReadButton.on('click', function ()
         {
-            lightbox.show(planToReadIconView);
+            if(sectionDisplaying!=6)
+            {
+                lightbox.show(planToReadIconView);
+            }
             sectionDisplaying = 6;
             window.location.hash = 'mdisplay&6';
         });
@@ -330,7 +344,10 @@ define(function (require, exports, module)
         buttons.push(buttonView);
         searchButton.on('click', function ()
         {
-            lightbox.show(searchView);
+            if(sectionDisplaying!=7)
+            {
+                lightbox.show(searchView);
+            }
             sectionDisplaying = 7;
             window.location.hash = 'mdisplay&7';
         });

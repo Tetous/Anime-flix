@@ -141,6 +141,7 @@ define(function (require, exports, module)
                     }
                     
                     if(!hitEnd) {
+                        window.location.hash = 'manga&' + readData.manga.series_mangadb_id + '&' +readData.chapter+'&'+readData.page ;
                         header.setContent(readData.manga.series_title + ' - Chapter ' + readData.chapter+ ' Page '+(readData.page+1));
                         leftPage.setContent('<img style="max-width: 100%;max-height: 100%;" src="' + chapters[readData.chapter][readData.page] + '">');
                     }
@@ -278,7 +279,7 @@ define(function (require, exports, module)
         leftPageView.add(leftPageTransform).add(leftPage);
         pages.push(leftPageView);
 
-        view.read = function (mangaSeries, chapter)
+        view.read = function (mangaSeries, chapter,page)
         {
             showControls();
             reading = true;
@@ -286,7 +287,8 @@ define(function (require, exports, module)
             chapters={};
             readData.manga = mangaSeries;
             readData.chapter = chapter;
-            readData.page = 0;
+            readData.page = page?page:0;
+            window.location.hash = 'manga&' + readData.manga.series_mangadb_id + '&' +readData.chapter+'&'+readData.page ;
             header.setContent(readData.manga.series_title + ' - Chapter ' + readData.chapter+ ' Page '+(readData.page+1));
             ledgerItem = window.ledger.getMangaLedgerItem(mangaSeries);
             leftPage.setContent('<img style="max-width: 100%;max-height: 100%;" src="content/images/MangaLoadingThubSucker.gif">');

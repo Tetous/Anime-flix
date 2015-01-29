@@ -153,6 +153,25 @@ define(function (require, exports, module)
                     showSelector.showSection('1');
                     mangaSelector.showSection('1');
                     break;
+                case '#manga':
+                    var chapter=parseInt(params[2]);
+                    var page=parseInt(params[3]);
+                    var mangaData=mangaSelector.selectShowById(parseInt(params[1]));
+                    getChapterCountAsync(ledger.getMangaLedgerItem(mangaData), function (chapterCount)
+                    {
+                        mangaData.series_chapters = chapterCount;
+                    });
+                    if (chapter > mangaData.my_read_chapters)
+                    {
+                        mangaData.my_read_chapters = chapter - 1;
+                    }
+                    updateManga(mangaData);
+                    mangaSelected({ manga: mangaData, chapter: chapter, page:page });
+                    showSelector.showSection('1');
+                    mangaSelector.showSection('1');
+                    centerSpinRotation.setTransform(Transform.rotateY(Math.PI));
+                    flips++;
+                    break;
                 case '#sdisplay':
                     showSelector.showSection(params[1]);
                     mangaSelector.showSection('1');
@@ -268,7 +287,7 @@ define(function (require, exports, module)
             {
                 mangaSelectorTransform.setAlign([0, -1]);
             });
-            mangaPlayer.read(data.manga, data.chapter);
+            mangaPlayer.read(data.manga, data.chapter,data.page);
         }
         mangaContainer.add(mangaSelectorTransform).add(mangaSelector);
         spinnerNode.add(mangaRotation).add(mangaContainer);

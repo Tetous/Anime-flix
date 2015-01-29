@@ -566,8 +566,9 @@ define(function (require, exports, module)
 
             var isAnime = contentType == 'anime';
             //this will now happen all the time so that the episode and chapter counts match what I
-            //have access t orather than what MAL thinks there is
-            //if(ser.listData.series_status == 1)
+            //have access to rather than what MAL thinks there is
+            //turns out that the anime episode count is over sensitive like the manga one, unfortunatly it causes more fuss with anime than is worth
+            if(ser.listData.series_status == 1||!isAnime)
             {
                 if(isAnime)
                 {
