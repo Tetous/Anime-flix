@@ -141,7 +141,8 @@ define(function (require, exports, module)
                         showLedger = [];
                         dirtyLedger = false;
                     }
-                    showLedger = showLedger.concat(processLedger(request.responseText, 'Dubbed Anime', 'movie'));
+                    var moddedBody = request.responseText.replace(/ Movie\<\/a\>/g, '</a>');
+                    showLedger = showLedger.concat(processLedger(moddedBody, 'Dubbed Anime', 'movie'));
                     localStorage.ledger = JSON.stringify(showLedger);
                 }
             }
@@ -367,7 +368,8 @@ define(function (require, exports, module)
     function trimTitle(s)
     {
         var trimmedString = false;
-        if (s.charAt(s.length - 1) == '!')
+        var lastChar=s.charAt(s.length - 1);
+        if (lastChar == '!'||lastChar=='.'||lastChar==',')
         {
             trimmedString = s.substring(0, s.length - 1);
         }
@@ -377,10 +379,12 @@ define(function (require, exports, module)
             if (index > -1)
             {
                 trimmedString = s.substring(0, index);
+                
                 if (trimmedString.charAt(trimmedString.length - 1) == ':')
                 {
                     trimmedString = trimmedString.substring(0, trimmedString.length - 1);
                 }
+                
             }
         }
         return trimmedString;

@@ -315,6 +315,9 @@ function processTitle($title)
         case 'Fairy Tail (2014)':
             return 'Fairy Tail 2014';
             break;
+        case 'Rakuen Tsuihou: Expelled From Paradise Movie':
+            return'Rakuen Tsuihou: Expelled From Paradise Movie (2014)';
+            break;
         default:
             return $title;
             break;

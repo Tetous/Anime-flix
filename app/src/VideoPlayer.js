@@ -109,11 +109,17 @@ define(function (require, exports, module)
                         default:
                             break;
                     }
+                    
                     break;
                 default:
                     break;
 
             }
+            //Stupid Ass hack to remove the style attribute that chrome gives the video tag if an error is thrown
+            Engine.nextTick(function(){
+                        var playerEl=playerSurface.player.el();
+                        playerEl.firstChild.setAttribute('style','');
+                    });
         });
         view.add(playerSurface);
 

@@ -276,7 +276,10 @@ function searchMALAsync(search,type, callback)
             if(request.status == 200)
             {
                 parser = new DOMParser();
-                var domObj = parser.parseFromString(request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"').replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\''), "text/xml");
+                var domObj = parser.parseFromString(request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"')
+                        .replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'').replace(/&auml;/g, 'a').replace(/&Auml;/g, 'A')
+                        .replace(/&uuml;/g, 'u').replace(/&Uuml;/g, 'U').replace(/&ouml;/g, 'o').replace(/&Ouml;/g, 'O')
+                        .replace(/&otilde;/g, 'o').replace(/&Otilde;/g, 'O'), "text/xml");
                 obj = XML2jsobj(domObj)[type];
                 //obj = XML2jsobj(request.responseXML.documentElement);
                 callback(obj);
