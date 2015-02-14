@@ -44,6 +44,7 @@ define(function (require, exports, module)
         var textBoxTransform = new StateModifier({
             transform: Transform.translate(0, 0, window.showSelectorZ + 15)
         });
+        /*
         var textboxProperties = {
             fontSize: '12px',
             border: '1px solid gray',
@@ -53,7 +54,7 @@ define(function (require, exports, module)
             overflow: 'hidden',
             whiteSpace: 'nowrap'
         };
-
+        */
         var textBox = new InputSurface({
             size: [undefined, 30],
             type: 'text',
@@ -93,13 +94,20 @@ define(function (require, exports, module)
         function searchCallback(data)
         {
             var entries;
-            if(data.entry.length == undefined)
+            if(data==undefined)
             {
-                entries = [data.entry];
+                entries=[{title:'No Results',synopsis:'No Results were returned'}];
             }
             else
             {
-                entries = data.entry;
+                if(data.entry.length == undefined)
+                {
+                    entries = [data.entry];
+                }
+                else
+                {
+                    entries = data.entry;
+                }
             }
             var displaysToConvert = ((allCreatedSearchItemDisplays.length < entries.length) ? allCreatedSearchItemDisplays.length : entries.length);
             var displaysToCreate = ((allCreatedSearchItemDisplays.length < entries.length) ? entries.length - allCreatedSearchItemDisplays.length : 0);

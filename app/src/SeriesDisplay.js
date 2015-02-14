@@ -5,7 +5,6 @@
 
 define(function (require, exports, module)
 {
-    var Engine = require('famous/core/Engine');
     var View = require('famous/core/View');
     var Easing = require('famous/transitions/Easing');
     var Transform = require('famous/core/Transform');

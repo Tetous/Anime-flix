@@ -14,6 +14,7 @@ define(function (require, exports, module)
     var Surface = require('RichFamous/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var Easing = require('famous/transitions/Easing');
+    var Timer=require('famous/utilities/Timer');
     var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
     var VideoTransitionScreen = require('videoTransitionScreen');
     var SeriesEndScreen = require('SeriesEndScreen');
@@ -23,6 +24,7 @@ define(function (require, exports, module)
 
     function createVideoPlayer()
     {
+        var playing;
         var contentType;
         var streamSources = [];
         var streamSourcesIndex = 0;
@@ -115,11 +117,6 @@ define(function (require, exports, module)
                     break;
 
             }
-            //Stupid Ass hack to remove the style attribute that chrome gives the video tag if an error is thrown
-            Engine.nextTick(function(){
-                        var playerEl=playerSurface.player.el();
-                        playerEl.firstChild.setAttribute('style','');
-                    });
         });
         view.add(playerSurface);
 
@@ -151,6 +148,7 @@ define(function (require, exports, module)
             content: '/content/images/AnimeflixBack2.png',
         });
         function backToBrowsing() {
+            playing=false;
             if(playerSurface.player != undefined)
             {
                 //playerSurface.player.pause();
@@ -383,8 +381,22 @@ define(function (require, exports, module)
 
         window.ledger.getLedger();
 
+        function videoStyleFixer() {
+           Timer.setTimeout( function(){
+                if(playing)
+                {
+                    //Stupid Ass hack to remove the style attribute that chrome gives the video tag if an error is thrown
+                    playerEl.firstChild.setAttribute('style','');
+                    videoStyleFixer();
+                }
+            },1000);
+        }
+        var playerEl;
         view.play = function (playObject, episode)
         {
+            playing=true;
+            playerEl=playerSurface.player.el();
+            videoStyleFixer();
             streamSources = undefined;
             dubStreamSources = undefined;
 

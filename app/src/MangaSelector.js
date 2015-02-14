@@ -608,7 +608,7 @@ define(function (require, exports, module)
                     return malList.manga[i];
                 }
             }
-            var blank = createBlankMangaListData();
+            var blank = createBlankListData();
             blank.series_mangadb_id = id;
             blank.my_status = 1;
             blank.localConstruction = true;

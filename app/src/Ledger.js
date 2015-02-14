@@ -294,7 +294,8 @@ define(function (require, exports, module)
             }
             if (!swapped)
             {
-                titles.unshift(show.series_title);
+                titles.unshift(show.series_title
+                        .replace(/★/g, ' ').replace(/☆/g, ' '));
             }
 
             for (var j = 0; j < titles.length && !done; j++)
@@ -369,22 +370,28 @@ define(function (require, exports, module)
     {
         var trimmedString = false;
         var lastChar=s.charAt(s.length - 1);
-        if (lastChar == '!'||lastChar=='.'||lastChar==',')
-        {
-            trimmedString = s.substring(0, s.length - 1);
+        if(s.indexOf(':')>-1) {
+            trimmedString=s.replace(/:/g, '');
         }
         else
         {
-            var index = s.lastIndexOf(' ');
-            if (index > -1)
+            if (lastChar == '!'||lastChar=='.'||lastChar==','||lastChar=='★'||lastChar=='☆')
             {
-                trimmedString = s.substring(0, index);
-                
-                if (trimmedString.charAt(trimmedString.length - 1) == ':')
+                trimmedString = s.substring(0, s.length - 1);
+            }
+            else
+            {
+                var index = s.lastIndexOf(' ');
+                if (index > -1)
                 {
-                    trimmedString = trimmedString.substring(0, trimmedString.length - 1);
+                    trimmedString = s.substring(0, index);
+
+                    if (trimmedString.charAt(trimmedString.length - 1) == ':')
+                    {
+                        trimmedString = trimmedString.substring(0, trimmedString.length - 1);
+                    }
+
                 }
-                
             }
         }
         return trimmedString;

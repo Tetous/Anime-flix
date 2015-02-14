@@ -43,23 +43,12 @@ define(function (require, exports, module)
         }
         loginBackground.on("deploy", function ()
         {
-            //#region Session Relogin
-            if (localStorage.Gamma != undefined)
-            {
-                overView.username = localStorage.Gamma;
-                overView.password = localStorage.Epsilon;
-
-                if (overView.login(overView.username, overView.password))
+            Engine.nextTick(function(){
+                //#region Session Relogin
+                if (localStorage.Gamma != 'undefined'&&localStorage.Gamma != undefined)
                 {
-                    loginRenderController.hide();
-                }
-            }
-            else
-            {
-                if (sessionStorage.username != undefined)
-                {
-                    overView.username = sessionStorage.username;
-                    overView.password = sessionStorage.password;
+                    overView.username = localStorage.Gamma;
+                    overView.password = localStorage.Epsilon;
 
                     if (overView.login(overView.username, overView.password))
                     {
@@ -68,10 +57,26 @@ define(function (require, exports, module)
                 }
                 else
                 {
-                    fakeOut();
+                    if (sessionStorage.username != 'undefined'&&sessionStorage.username != undefined)
+                    {
+                        overView.username = sessionStorage.username;
+                        overView.password = sessionStorage.password;
+
+                        //unchecks remember me box so that credentials are not saved when they shouldn't be
+                        var rememberMe=document.getElementsByName('rememberMe');
+                        rememberMe[0].checked=false;
+                        if (overView.login(overView.username, overView.password))
+                        {
+                            loginRenderController.hide();
+                        }
+                    }
+                    else
+                    {
+                        fakeOut();
+                    }
                 }
-            }
-            //#endregion
+                //#endregion
+            });
         });
         var loginTransform = new StateModifier({
             opacity: 0,

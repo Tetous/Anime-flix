@@ -4,6 +4,7 @@
  */
 
 define(function (require, exports, module) {
+    var Engine=require('famous/core/Engine');
     var View = require('famous/core/View');
     var RenderController = require('famous/views/RenderController');
     var Transform = require('famous/core/Transform');
@@ -11,6 +12,8 @@ define(function (require, exports, module) {
     var Surface = require('famous/core/Surface');
     var ImageSurface = require('famous/surfaces/ImageSurface');
     var EventHandler = require('famous/core/EventHandler');
+    var Timer=require('famous/utilities/Timer');
+    
     function createNillaIcon(data)
     {
         var isManga=data.series_mangadb_id!=undefined;;
@@ -24,13 +27,13 @@ define(function (require, exports, module) {
         var iconEventHandler = new EventHandler();
 
         var bannerTransform = new StateModifier({
-            transform: Transform.translate(0, 0, 1)
+            transform: Transform.translate(0, 0, 5)
         });
         var bannerRenderController = new RenderController();
         var banner = new ImageSurface({
             size: [iconWidth, iconHeight],
-            content: isManga?'content/images/NewChaptersBanner.png':'content/images/NewEpisodesBanner.png',
             properties: {
+                color:'white',
                 borderRadius: '10px'
             }
         });
@@ -72,31 +75,61 @@ define(function (require, exports, module) {
             title.setContent(series.series_title);
             image.setContent(series.series_image);
             bannerRenderController.hide();
-            if(view.data.series_status == 1)
+            if(view.data.my_status==1)
             {
-                if(isManga)
+                if(view.data.series_status == 1)
                 {
-                    var ledgerItem = window.ledger.getMangaLedgerItem(view.data);
-                    getChapterCountAsync(ledgerItem, function (chapterCount)
+                    banner.setContent(isManga?'content/images/NewChaptersBanner.png':'content/images/NewEpisodesBanner.png');
+                    if(isManga)
                     {
-                        view.data.series_chapters = chapterCount;
-                        if(view.data.series_chapters > view.data.my_read_chapters)
+                        var ledgerItem = window.ledger.getMangaLedgerItem(view.data);
+                        getChapterCountAsync(ledgerItem, function (chapterCount)
                         {
-                            bannerRenderController.show(banner);
-                        }
-                    });
+                            view.data.series_chapters = chapterCount;
+                            if(view.data.series_chapters > parseInt(view.data.my_read_chapters))
+                            {
+                                bannerRenderController.show(banner);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        var ledgerItem = window.ledger.getLedgerItem(view.data);
+                        getEpisodeCountAsync(ledgerItem, function (episodeCounts)
+                        {
+                            view.data.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
+                            if(view.data.series_episodes > parseInt(view.data.my_watched_episodes))
+                            {
+                                bannerRenderController.show(banner);
+                            }
+                        });
+                    }
                 }
                 else
                 {
-                    var ledgerItem = window.ledger.getLedgerItem(view.data);
-                    getEpisodeCountAsync(ledgerItem, function (episodeCounts)
+                    banner.setContent(isManga?'content/images/UnreadChaptersBanner.png':'content/images/UnviewedEpisodesBanner.png');
+                    if(isManga)
                     {
-                        view.data.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
-                        if(view.data.series_episodes > view.data.my_watched_episodes)
+                        var ledgerItem = window.ledger.getMangaLedgerItem(view.data);
+                        getChapterCountAsync(ledgerItem, function (chapterCount)
                         {
-                            bannerRenderController.show(banner);
+                            view.data.series_chapters = chapterCount;
+                            if(view.data.series_chapters > parseInt(view.data.my_read_chapters))
+                            {
+                                bannerRenderController.show(banner);
+                            }
+                        });
+                    }
+                    else
+                    {
+                        if(parseInt(view.data.series_episodes) > parseInt(view.data.my_watched_episodes))
+                            {
+                        Timer.setTimeout(function(){
+
+                                bannerRenderController.show(banner);
+                            },3000);
                         }
-                    });
+                    }
                 }
             }
         }

@@ -266,6 +266,18 @@ function createSeriesXML(listData)
  return XML2jsobj(domObj).anime;
  }
  */
+function cleanHTMLSpecialChars(s)
+{
+    return s.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"')
+            .replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'').replace(/&auml;/g, 'a').replace(/&Auml;/g, 'A')
+            .replace(/&uuml;/g, 'u').replace(/&Uuml;/g, 'U').replace(/&ouml;/g, 'o').replace(/&Ouml;/g, 'O')
+            .replace(/&otilde;/g, 'o').replace(/&Otilde;/g, 'O').replace(/&sbquo;/g, ',').replace(/&bdquo;/g, ',,')
+            .replace(/&dagger;/g, ' ').replace(/&Dagger;/g, ' ').replace(/&permil;/g, '%0').replace(/&lsaquo;/g, '<')
+            .replace(/&rsaquo;/g, '>').replace(/&spades;/g, ' ').replace(/&clubs;/g, ' ').replace(/&hearts;/g, ' ')
+            .replace(/&diams;/g, ' ').replace(/&oline;/g, ' ').replace(/&larr;/g, '<-').replace(/&uarr;/g, ' ')
+            .replace(/&rarr;/g, '->').replace(/&darr;/g, ' ').replace(/&trade;/g, ' ').replace(/&hearts;/g, ' ')
+            .replace(/&pi;/g, ' ');
+}
 function searchMALAsync(search,type, callback)
 {
     var request = new XMLHttpRequest();
@@ -276,17 +288,14 @@ function searchMALAsync(search,type, callback)
             if(request.status == 200)
             {
                 parser = new DOMParser();
-                var domObj = parser.parseFromString(request.response.replace(/&mdash;/g, '-').replace(/&ldquo;/g, '"')
-                        .replace(/&rdquo;/g, '"').replace(/&rsquo;/g, '\'').replace(/&auml;/g, 'a').replace(/&Auml;/g, 'A')
-                        .replace(/&uuml;/g, 'u').replace(/&Uuml;/g, 'U').replace(/&ouml;/g, 'o').replace(/&Ouml;/g, 'O')
-                        .replace(/&otilde;/g, 'o').replace(/&Otilde;/g, 'O'), "text/xml");
+                var domObj = parser.parseFromString(cleanHTMLSpecialChars(request.response), "text/xml");
                 obj = XML2jsobj(domObj)[type];
                 //obj = XML2jsobj(request.responseXML.documentElement);
                 callback(obj);
             }
         }
     };
-    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search+'&t='+type, true);
+    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search.replace(/★/g, ' ').replace(/☆/g, ' ')+'&t='+type, true);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }
