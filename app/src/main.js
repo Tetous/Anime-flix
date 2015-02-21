@@ -32,6 +32,11 @@ define(function (require, exports, module)
     };
     window.formatting = { scale: 1 };
 
+    var request=new XMLHttpRequest();
+    request.open('GET', 'chars.txt',false);
+    request.send();
+    window.chars=request.responseText.split(',');
+
 
     function detectmob()
     {

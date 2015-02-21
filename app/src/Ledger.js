@@ -295,7 +295,7 @@ define(function (require, exports, module)
             if (!swapped)
             {
                 titles.unshift(show.series_title
-                        .replace(/★/g, ' ').replace(/☆/g, ' '));
+                        .replace(new RegExp('/'+window.chars[1]+'/g'), ' ').replace(new RegExp('/'+window.chars[0]+'/g'), ' '));
             }
 
             for (var j = 0; j < titles.length && !done; j++)
@@ -375,7 +375,10 @@ define(function (require, exports, module)
         }
         else
         {
-            if (lastChar == '!'||lastChar=='.'||lastChar==','||lastChar=='★'||lastChar=='☆')
+            var testChar='☆';
+            if(testChar)
+            {}
+            if (lastChar == '!'||lastChar=='.'||lastChar==','||lastChar==window.chars[1]||lastChar==window.chars[0])
             {
                 trimmedString = s.substring(0, s.length - 1);
             }

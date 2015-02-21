@@ -16,7 +16,7 @@ define(function (require, exports, module)
     var Easing = require('famous/transitions/Easing');
     var Timer=require('famous/utilities/Timer');
     var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
-    var VideoTransitionScreen = require('videoTransitionScreen');
+    var VideoTransitionScreen = require('VideoTransitionScreen');
     var SeriesEndScreen = require('SeriesEndScreen');
 
     require('xml2jsobj/xml2jsobj');

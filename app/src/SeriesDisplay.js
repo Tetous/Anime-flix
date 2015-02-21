@@ -567,7 +567,7 @@ define(function (require, exports, module)
             //this will now happen all the time so that the episode and chapter counts match what I
             //have access to rather than what MAL thinks there is
             //turns out that the anime episode count is over sensitive like the manga one, unfortunatly it causes more fuss with anime than is worth
-            if(ser.listData.series_status == 1||!isAnime)
+            if(ser.listData.series_status == 1||!isAnime||ser.searchData.status=='Currently Airing')
             {
                 if(isAnime)
                 {

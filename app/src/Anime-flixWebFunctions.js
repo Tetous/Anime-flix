@@ -276,7 +276,8 @@ function cleanHTMLSpecialChars(s)
             .replace(/&rsaquo;/g, '>').replace(/&spades;/g, ' ').replace(/&clubs;/g, ' ').replace(/&hearts;/g, ' ')
             .replace(/&diams;/g, ' ').replace(/&oline;/g, ' ').replace(/&larr;/g, '<-').replace(/&uarr;/g, ' ')
             .replace(/&rarr;/g, '->').replace(/&darr;/g, ' ').replace(/&trade;/g, ' ').replace(/&hearts;/g, ' ')
-            .replace(/&pi;/g, ' ');
+            .replace(/&pi;/g, ' ').replace(/&egrave;/g, 'e').replace(/&Egrave;/g, 'E').replace(/&eacute;/g, 'e')
+            .replace(/&Eacute;/g, 'E');
 }
 function searchMALAsync(search,type, callback)
 {
@@ -295,7 +296,8 @@ function searchMALAsync(search,type, callback)
             }
         }
     };
-    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search.replace(/★/g, ' ').replace(/☆/g, ' ')+'&t='+type, true);
+    var blackStarReg=new RegExp(window.chars[1],'g');
+    request.open("POST", 'http://www.anime-flix.com/requester.php?m=search&s=' + search.replace(blackStarReg, ' ').replace(new RegExp(window.chars[0],'g'), ' ')+'&t='+type, true);
     request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
     request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password);
 }

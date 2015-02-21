@@ -617,21 +617,27 @@ define(function (require, exports, module)
             {
                 case '1':
                     lightbox.show(watchingIconView);
+                    sectionDisplaying=1;
                     break;
                 case '2':
                     lightbox.show(completedIconView);
+                    sectionDisplaying=2;
                     break;
                 case '3':
                     lightbox.show(onHoldIconView);
+                    sectionDisplaying=3;
                     break;
                 case '4':
                     lightbox.show(droppedIconView);
+                    sectionDisplaying=4;
                     break;
                 case '6':
                     lightbox.show(planToWatchIconView);
+                    sectionDisplaying=6;
                     break;
                 case '7':
                     lightbox.show(searchView);
+                    sectionDisplaying=7;
                     break;
             }
         }
