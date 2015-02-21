@@ -50,9 +50,17 @@ define(function (require, exports, module)
             {
                 var parser = new DOMParser();
                 var domObj = parser.parseFromString(swapsRequest.response, "text/xml");
-                ledgerSwaps = XML2jsobj(domObj).Root.swap;
-                if(ledgerSwaps.length==undefined) {
-                    ledgerSwaps=[ledgerSwaps];
+                var root=XML2jsobj(domObj).Root;
+                if(root.swap!=undefined)
+                {
+                    ledgerSwaps = root.swap;
+                    if(ledgerSwaps.length==undefined) {
+                        ledgerSwaps=[ledgerSwaps];
+                    }
+                }
+                else
+                {
+                    ledgerSwaps=[];
                 }
                 localStorage.swaps = JSON.stringify(ledgerSwaps);
             }
@@ -81,7 +89,7 @@ define(function (require, exports, module)
         }
     };
     mangaSwapsRequest.send();
-
+/*
     function processLedger(body, terminator, type)
     {
         var resultLedger = [];
@@ -198,6 +206,36 @@ define(function (require, exports, module)
         request.open("GET", url, true);
         request.send();
     }
+    */
+   
+   function getAnimeLedger()
+   {
+       var url = "http://www.anime-flix.com/requester.php?m=ledger2";
+        var request = new XMLHttpRequest();
+        request.onreadystatechange = function ()
+        {
+            if (request.readyState == 4)
+            {
+                if (request.status == 200)
+                {
+                    if (dirtyLedger)
+                    {
+                        showLedger = [];
+                        dubLedger=[];
+                        dirtyLedger = false;
+                    }
+                    var processedLedger = JSON.parse(request.responseText);
+                    showLedger = showLedger.concat(processedLedger.sub);
+                    dubLedger=dubLedger.concat(processedLedger.dub);
+                    localStorage.ledger = JSON.stringify(showLedger);
+                    localStorage.dubLedger=JSON.stringify(dubLedger);
+                }
+            }
+        };
+        request.open("GET", url, true);
+        request.send();
+   }
+   
     function getMangaLedger()
     {
         var url = "http://www.anime-flix.com/requester.php?m=mangaLedger";
@@ -239,11 +277,11 @@ define(function (require, exports, module)
     {
         //showLedger = [];
         dirtyLedger = true;
-        dirtyDubLedger = true;
+        //dirtyDubLedger = true;
         getAnimeLedger();
-        getMovieLedger();
-        getDubAnimeLedger();
-        getDubMovieLedger();
+        //getMovieLedger();
+        //getDubAnimeLedger();
+        //getDubMovieLedger();
         getMangaLedger();
     }
     function getLedgerItem(show, dub)

@@ -24,6 +24,11 @@ switch ($_GET["m"])
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
+    case 'ledger2':
+        $out = getAnimeKissList();
+        header('Content-Length: ' . strlen($out));
+        echo $out;
+        break;
     case 'movieLedger':
         $out = getAnimePlusMovieList($_GET['d']);
         header('Content-Length: ' . strlen($out));
@@ -44,6 +49,11 @@ switch ($_GET["m"])
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
+    case 'stream2':
+        $out = getStreamUrlKiss(file_get_contents('php://input'), $_GET['e']);
+        header('Content-Length: ' . strlen($out));
+        echo $out;
+        break;
     case 'pages':
         $out = getMangaPages(file_get_contents('php://input'), $_GET['ch']);
         header('Content-Length: ' . strlen($out));
@@ -51,6 +61,11 @@ switch ($_GET["m"])
         break;
     case 'epCount':
         $out = getEpisodeCount(file_get_contents('php://input'), $_GET['t']);
+        header('Content-Length: ' . strlen($out));
+        echo $out;
+        break;
+    case 'epCount2':
+        $out = getEpisodeCountKiss(file_get_contents('php://input'));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
@@ -96,7 +111,7 @@ switch ($_GET["m"])
         echo $out;
         break;
     default:
-        # code...
+        echo 'default';
         break;
 }
 
@@ -475,6 +490,149 @@ function getMangaPages($mangaUrl, $chapter)
     return $pageLinks;
 }
 
+function getEpisodeCountKiss($paramShowUrl)
+{
+    global $ch;
+    $ch=  curl_init();
+    // set url 
+    curl_setopt($ch, CURLOPT_URL, $paramShowUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    curl_setopt($ch, CURLOPT_COOKIE, 'usingHTML5=true');
+
+    $output=curl_exec($ch);
+    
+    $links=array();
+        $episodeInt=  intval($episode);
+        
+        $startIndex=  strpos($output, 'class="listing"');
+        $endIndex=$startIndex;
+        $termIndex=  strpos($output, '</table>');
+        $startIndex=  strpos($output, '<a href="',$endIndex)+9;
+        $endIndex=  strpos($output, '"',$startIndex);
+        
+        $count=1;
+        while($startIndex<$termIndex)
+        {
+            $link=  substr($output, $startIndex,$endIndex-$startIndex);
+            //echo $link;
+            $links[$count]=$link;
+            
+            $startIndex=  strpos($output, '<a href="',$endIndex)+9;
+            $endIndex=  strpos($output, '"',$startIndex);
+            $count++;
+        }
+        $endIndex= strpos($links[1], '?id');
+        $count1=substr($links[1],$endIndex-3,3);
+        
+        return $count1.':'.($count-1);
+}
+
+function getStreamUrlKiss($paramShowUrl, $episode)
+{
+    global $ch;
+    $ch=  curl_init();
+    // set url 
+    curl_setopt($ch, CURLOPT_URL, $paramShowUrl);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    curl_setopt($ch, CURLOPT_COOKIE, 'usingHTML5=true');
+
+    $output=curl_exec($ch);
+    
+    $sources=array();
+    
+    $epIndex=  strpos($output, '-'.$episode);
+    if($epIndex!==false)
+    {
+        //echo 'good path';
+        $length=  strlen($output);
+        $startIndex=  strrpos($output, '"', $epIndex-$length)+1;
+        $endIndex= strpos($output, '"',$epIndex);
+        $episodeLink='http://kissanime.com'.substr($output, $startIndex,$endIndex-$startIndex);
+        
+        //echo $episodeLink;
+        curl_close($ch);
+        $ch=  curl_init();
+        
+        //curl_setopt($ch, CURLOPT_VERBOSE, 1);
+        //curl_setopt($ch, CURLOPT_HEADER, 1);
+    // set url 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    //curl_setopt($ch, CURLOPT_COOKIE, 'usingHTML5=true');
+        curl_setopt($ch, CURLOPT_URL, $episodeLink);
+        $output=  curl_exec($ch);
+    }
+    else
+    {
+        
+        $links=array();
+        $episodeInt=  intval($episode);
+        
+        $startIndex=  strpos($output, 'class="listing"');
+        $endIndex=$startIndex;
+        $termIndex=  strpos($output, '</table>');
+        $startIndex=  strpos($output, '<a href="',$endIndex)+9;
+        $endIndex=  strpos($output, '"',$startIndex);
+        
+        $count=1;
+        while($startIndex<$termIndex)
+        {
+            $link=  substr($output, $startIndex,$endIndex-$startIndex);
+            //echo $link;
+            $links[$count]=$link;
+            
+            $startIndex=  strpos($output, '<a href="',$endIndex)+9;
+            $endIndex=  strpos($output, '"',$startIndex);
+            $count++;
+        }
+        curl_close($ch);
+        $ch=  curl_init();
+    // set url 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    //curl_setopt($ch, CURLOPT_COOKIE, 'usingHTML5=true');
+        curl_setopt($ch, CURLOPT_URL, 'http://kissanime.com'.$links[$count-$episodeInt]);
+        $output=  curl_exec($ch);
+    }
+    
+    //echo $output;
+    
+    $startIndex=  strpos($output, '<select id="selectQuality">')+27;
+        $endIndex=$startIndex;
+        $termIndex=  strpos($output, '</select>',$startIndex);
+        
+        $startIndex=  strpos($output, '"',$endIndex+1)+1;
+        $endIndex=  strpos($output, '"',$startIndex);
+        while ($startIndex<$termIndex)
+        {
+            $link=  substr($output, $startIndex,$endIndex-$startIndex);
+            $endQualIndex=  strpos($output, '</option>',$endIndex);
+            $qual=  substr($output, $endIndex+2,$endQualIndex-$endIndex-2);
+            $sources[$qual]=$link;
+            
+            $startIndex=  strpos($output, '"',$endIndex+1)+1;
+            $endIndex=  strpos($output, '"',$startIndex);
+        }
+    
+    $sourcesJson='[';
+    foreach ($sources as $key => $value) {
+        $sourcesJson=$sourcesJson.'{"qual":"'.$key.'","link":"'.$value.'"},';
+    }
+    $sourcesJson=$sourcesJson.'{}]';
+     //
+    return $sourcesJson;
+}
+
 function getStreamUrl($paramShowUrl, $title, $episode)
 {
     if (strpos($paramShowUrl, 'plus'))
@@ -666,6 +824,83 @@ function getMALList($user, $type)
     curl_close($ch);
 
     return $output;
+}
+
+function getAnimeKissList()
+{
+    global $ch;
+    $ch =  curl_init();
+    curl_setopt($ch, CURLOPT_URL, 'http://kissanime.com/AnimeList');
+    //return the transfer as a string 
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain', 'Accept-Encoding: '));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+
+    // $output contains the output string 
+    $output = curl_exec($ch);
+    
+    $subedLedger=array();
+    $dubedLedger=array();
+    $pageIndex=1;
+    
+    $nextIndex=0;
+    while($nextIndex!==false)
+    {
+        curl_setopt($ch, CURLOPT_URL, 'http://kissanime.com/AnimeList?page='.$pageIndex);
+        $output = curl_exec($ch);
+        
+        $startingIndex=strpos($output,'class="listing"');
+        $endingIndex=$startingIndex;
+        $startingIndex=  strpos($output,'<a href="', $endingIndex)+9;
+        $endingIndex=  strpos($output, '">',$startingIndex);
+        $termIndex=strpos($output,'</table>',$startingIndex);
+        //echo $termIndex;
+        while ($termIndex>$startingIndex)
+        {
+            
+            $url='http://kissanime.com'.substr($output, $startingIndex,$endingIndex-$startingIndex);
+            $startingIndex=  $endingIndex+3;
+            $endingIndex=  strpos($output, '</a>',$startingIndex);
+            $name=substr($output, $startingIndex,$endingIndex-$startingIndex);
+
+            $subIndex=strpos($name,' (Sub)');
+            $dubIndex=strpos($name,' (Dub)');
+            if ($dubIndex!==false)
+            {
+                $name=  substr($name, 0,$dubIndex);
+                $name=  str_replace('"', '\\"', $name);
+                $dubedLedger[$name]=$url;
+            }
+            else {
+                if ($subIndex!==false)
+                   {
+                       $name=  substr($name, 0,$subIndex);
+                   }
+                   $name=  str_replace('"', '\\"', $name);
+                   $subedLedger[$name]=$url;
+            }
+            //echo ';'.$startingIndex;
+            $startingIndex=  strpos($output,'<a href="', $endingIndex)+9;
+            $endingIndex=  strpos($output, '">',$startingIndex);
+        }
+        $pageIndex++;
+        $nextIndex=  strpos($output, ' Next </a>');
+    }
+    $ledgerJson='{"sub":[';
+    //add subed
+    //
+    foreach ($subedLedger as $key => $value) {
+        $ledgerJson=$ledgerJson.'{"name":"'.$key.'","link":"'.$value.'"},';
+    }
+    $ledgerJson=$ledgerJson.'{"name":"","link":""}],"dub":[';
+    foreach ($dubedLedger as $key => $value) {
+        $ledgerJson=$ledgerJson.'{"name":"'.$key.'","link":"'.$value.'"},';
+    }
+    $ledgerJson=$ledgerJson.'{"name":"","link":""}]}';
+     //
+    return $ledgerJson;
 }
 
 function getAnimePlusList($dub)

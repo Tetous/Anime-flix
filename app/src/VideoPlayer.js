@@ -18,6 +18,7 @@ define(function (require, exports, module)
     var VideoJsSurface = require('RichFamous/VideoJsSurface/VideoJsSurface');
     var VideoTransitionScreen = require('VideoTransitionScreen');
     var SeriesEndScreen = require('SeriesEndScreen');
+    var ASP=require('ASP');
 
     require('xml2jsobj/xml2jsobj');
     require('Anime-flixWebFunctions');
@@ -97,12 +98,12 @@ define(function (require, exports, module)
                             if(localStorage.english == 'true')
                             {
                                 dubStreamSourcesIndex++;
-                                playerSurface.playAtSameLocation(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length]);
+                                playerSurface.playAtSameLocation(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length].link);
                             }
                             else
                             {
                                 streamSourcesIndex++;
-                                playerSurface.playAtSameLocation(streamSources[streamSourcesIndex % streamSources.length]);
+                                playerSurface.playAtSameLocation(streamSources[streamSourcesIndex % streamSources.length].link);
                             }
                             break;
                         case 'movie':
@@ -234,10 +235,10 @@ define(function (require, exports, module)
         {
             localStorage.english = language.options[language.selectedIndex].value == 2;
 
-            var link = streamSources[streamSourcesIndex];
+            var link = streamSources[streamSourcesIndex].link;
             if(localStorage.english == 'true')
             {
-                link = dubStreamSources[dubStreamSourcesIndex];
+                link = dubStreamSources[dubStreamSourcesIndex].link;
             }
             playerSurface.playAtSameLocation(link);
         });
@@ -293,7 +294,7 @@ define(function (require, exports, module)
                             dubStreamSourcesIndex++;
                             if(dubStreamSourcesIndex < dubStreamSources.length)
                             {
-                                playerSurface.play(dubStreamSources[dubStreamSourcesIndex]);
+                                playerSurface.play(dubStreamSources[dubStreamSourcesIndex].link);
                             }
                             else
                             {
@@ -312,7 +313,7 @@ define(function (require, exports, module)
                             streamSourcesIndex++;
                             if(streamSourcesIndex < streamSources.length)
                             {
-                                playerSurface.play(streamSources[streamSourcesIndex]);
+                                playerSurface.play(streamSources[streamSourcesIndex].link);
                             }
                             else
                             {
@@ -424,7 +425,17 @@ define(function (require, exports, module)
 
                 titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
 
-                url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + ledgerItem.name + '&e=' + episode;
+                var epLength=episode.toString().length;
+                switch(epLength)
+                {
+                    case 1:
+                        episode='00'+episode;
+                        break;
+                    case 2:
+                        episode='0'+episode;
+                        break;
+                }
+                url = 'http://www.anime-flix.com/requester.php?m=stream2&e=' + episode;
                 var request = new XMLHttpRequest();
                 request.onreadystatechange = function ()
                 {
@@ -443,12 +454,15 @@ define(function (require, exports, module)
                                 }
                                 else
                                 {
-                                    streamSources = body.split(';');
+                                    streamSources = JSON.parse(body);
                                     streamSources.pop();
+                                    for(var i = 0; i < streamSources.length; i++) {
+                                        streamSources[i].link=ASP.wrap(streamSources[i].link);
+                                    }
                                     streamSourcesIndex = 0;
                                     if(localStorage.english == 'false')
                                     {
-                                        playerSurface.play(streamSources[0]);
+                                        playerSurface.play(streamSources[0].link);
                                     }
                                 }
                             }
@@ -473,7 +487,7 @@ define(function (require, exports, module)
 
                     //titleBar.setContent(playData.show.series_title + ' - Episode ' + episode);
 
-                    url = 'http://www.anime-flix.com/requester.php?m=stream&t=' + dubLedgerItem.name + '&e=' + episode;
+                    url = 'http://www.anime-flix.com/requester.php?m=stream2&e=' + episode;
                     var dubRequest = new XMLHttpRequest();
                     dubRequest.onreadystatechange = function ()
                     {
@@ -490,17 +504,20 @@ define(function (require, exports, module)
                                         language.options.selectedIndex = 0;
                                         if(streamSources)
                                         {
-                                            playerSurface.play(streamSources[0]);
+                                            playerSurface.play(streamSources[0].link);
                                         }
                                     }
                                     else
                                     {
-                                        dubStreamSources = body.split(';');
+                                        dubStreamSources = JSON.parse(body);
                                         dubStreamSources.pop();
+                                        for(var i = 0; i < dubStreamSources.length; i++) {
+                                            dubStreamSources[i].link=ASP.wrap(dubStreamSources[i].link);
+                                        }
                                         dubStreamSourcesIndex = 0;
                                         if(localStorage.english == 'true')
                                         {
-                                            playerSurface.play(dubStreamSources[0]);
+                                            playerSurface.play(dubStreamSources[0].link);
 
                                         }
                                     }

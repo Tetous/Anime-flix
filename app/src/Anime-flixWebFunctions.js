@@ -303,7 +303,7 @@ function searchMALAsync(search,type, callback)
 }
 function getEpisodeCountAsync(ledgerItem, callback)
 {
-    var url = 'http://www.anime-flix.com/requester.php?m=epCount&t=' + ledgerItem.name;
+    var url = 'http://www.anime-flix.com/requester.php?m=epCount2';
     var request = new XMLHttpRequest();
     request.onreadystatechange = function ()
     {
@@ -312,7 +312,11 @@ function getEpisodeCountAsync(ledgerItem, callback)
             if(request.status == 200)
             {
                 var strings = request.responseText.split(':');
-                var arr = [parseInt(strings[0]), parseInt(strings[1])];
+                var firstCount=parseInt(strings[0]);
+                if(firstCount=='NaN') {
+                    firstCount=-1;
+                }
+                var arr = [firstCount, parseInt(strings[1])];
                 callback(arr);
             }
         }
