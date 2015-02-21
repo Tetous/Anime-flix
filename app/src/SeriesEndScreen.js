@@ -16,7 +16,7 @@ define(function (require, exports, module)
     {
         var view = new View();
         var backgroundSurface = Surface({
-            content: 'You have watched all of the episodes in this show!<br>Don\'t forget to check for sequels :)',
+            content: 'You have finished this Anime!<br>Don\'t forget to check for sequels :)',
             properties: {
                 color:'white',
                 backgroundColor: window.colorScheme.main,

@@ -30,7 +30,6 @@ define(function (require, exports, module)
         var streamSources = [];
         var streamSourcesIndex = 0;
         var dubStreamSources = [];
-        var dubStreamSourcesIndex = 0;
         var playData = {
             show: undefined, 
             episode: undefined
@@ -97,8 +96,8 @@ define(function (require, exports, module)
                         case 'anime':
                             if(localStorage.english == 'true')
                             {
-                                dubStreamSourcesIndex++;
-                                playerSurface.playAtSameLocation(dubStreamSources[dubStreamSourcesIndex % dubStreamSources.length].link);
+                                streamSourcesIndex++;
+                                playerSurface.playAtSameLocation(dubStreamSources[streamSourcesIndex % dubStreamSources.length].link);
                             }
                             else
                             {
@@ -238,7 +237,7 @@ define(function (require, exports, module)
             var link = streamSources[streamSourcesIndex].link;
             if(localStorage.english == 'true')
             {
-                link = dubStreamSources[dubStreamSourcesIndex].link;
+                link = dubStreamSources[streamSourcesIndex].link;
             }
             playerSurface.playAtSameLocation(link);
         });
@@ -259,6 +258,36 @@ define(function (require, exports, module)
             }
         });
         languageView.add(languageTransform).add(languageSurface);
+        
+        var quality = document.createElement('SELECT');
+        quality.options.selectedIndex = 0;
+        quality.addEventListener('change', function ()
+        {
+            streamSourcesIndex=quality.selectedIndex;
+            
+            var link = streamSources[streamSourcesIndex].link;
+            if(localStorage.english == 'true')
+            {
+                link = dubStreamSources[streamSourcesIndex].link;
+            }
+            playerSurface.playAtSameLocation(link);
+        });
+        
+        var qualityView = new View();
+        titleBarModifierNode.add(qualityView);
+        var qualityTransform = new StateModifier({
+            align: [1, 0],
+            origin: [1, 0],
+            transform: Transform.translate(-190, 8, 2)
+        });
+        var qualitySurface = Surface({
+            size: [true, titleBarHeight],
+            content: quality,
+            properties: {
+                vertialAlign: 'middle'
+            }
+        });
+        qualityView.add(qualityTransform).add(qualitySurface);
 
         var transitionScreen = VideoTransitionScreen();
         transitionScreen.on('backToBrowsing', backToBrowsing);
@@ -286,49 +315,6 @@ define(function (require, exports, module)
                 seriesEndScreen.setContent();
 
                 //update anime list
-                switch(contentType)
-                {
-                    case 'movie':
-                        if(localStorage.english == 'true')
-                        {
-                            dubStreamSourcesIndex++;
-                            if(dubStreamSourcesIndex < dubStreamSources.length)
-                            {
-                                playerSurface.play(dubStreamSources[dubStreamSourcesIndex].link);
-                            }
-                            else
-                            {
-                                if(playData.episode > playData.show.my_watched_episodes)
-                                {
-                                    playData.show.my_watched_episodes = playData.episode;
-                                }
-                                playData.show.my_status = 2;
-                                seriesEndScreen.setContent('That is the end of the movie.<br>I hope you enjoyed it.');
-                                lightbox.show(seriesEndScreen);
-                                updateAnime(playData.show);
-                            }
-                        }
-                        else
-                        {
-                            streamSourcesIndex++;
-                            if(streamSourcesIndex < streamSources.length)
-                            {
-                                playerSurface.play(streamSources[streamSourcesIndex].link);
-                            }
-                            else
-                            {
-                                if(playData.episode > playData.show.my_watched_episodes)
-                                {
-                                    playData.show.my_watched_episodes = playData.episode;
-                                }
-                                playData.show.my_status = 2;
-                                seriesEndScreen.setContent('That is the end of the movie.<br>I hope you enjoyed it.');
-                                lightbox.show(seriesEndScreen);
-                                updateAnime(playData.show);
-                            }
-                        }
-                        break;
-                    case 'anime':
                         clear();
                         if(playData.episode > playData.show.my_watched_episodes)
                         {
@@ -371,11 +357,6 @@ define(function (require, exports, module)
                             transitionScreen.startCountdown(playData.episode, playData.show.series_animedb_id);
                         }
                         updateAnime(playData.show);
-                        break;
-                    default:
-                        break;
-                }
-
             });
             view._eventOutput.emit('playerLoaded');
         });
@@ -456,8 +437,11 @@ define(function (require, exports, module)
                                 {
                                     streamSources = JSON.parse(body);
                                     streamSources.pop();
+                                    quality.options=[];
                                     for(var i = 0; i < streamSources.length; i++) {
                                         streamSources[i].link=ASP.wrap(streamSources[i].link);
+                                        var option = new Option(streamSources[i].qual, i);
+                                        quality.options.add(option);
                                     }
                                     streamSourcesIndex = 0;
                                     if(localStorage.english == 'false')
@@ -514,7 +498,7 @@ define(function (require, exports, module)
                                         for(var i = 0; i < dubStreamSources.length; i++) {
                                             dubStreamSources[i].link=ASP.wrap(dubStreamSources[i].link);
                                         }
-                                        dubStreamSourcesIndex = 0;
+                                        streamSourcesIndex = 0;
                                         if(localStorage.english == 'true')
                                         {
                                             playerSurface.play(dubStreamSources[0].link);

@@ -608,6 +608,10 @@ function getStreamUrlKiss($paramShowUrl, $episode)
     //echo $output;
     
     $startIndex=  strpos($output, '<select id="selectQuality">')+27;
+    if($startIndex==27)
+    {
+        return 'Link not found';
+    }
         $endIndex=$startIndex;
         $termIndex=  strpos($output, '</select>',$startIndex);
         
@@ -617,7 +621,8 @@ function getStreamUrlKiss($paramShowUrl, $episode)
         {
             $link=  substr($output, $startIndex,$endIndex-$startIndex);
             $endQualIndex=  strpos($output, '</option>',$endIndex);
-            $qual=  substr($output, $endIndex+2,$endQualIndex-$endIndex-2);
+            $startIndex=  strpos($output, '>',$endIndex)+1;
+            $qual=  substr($output, $startIndex,$endQualIndex-$startIndex);
             $sources[$qual]=$link;
             
             $startIndex=  strpos($output, '"',$endIndex+1)+1;
