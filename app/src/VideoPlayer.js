@@ -437,7 +437,10 @@ define(function (require, exports, module)
                                 {
                                     streamSources = JSON.parse(body);
                                     streamSources.pop();
-                                    quality.options=[];
+                                    while(quality.options.length > 0)
+                                    {
+                                        quality.options.remove(0);
+                                    }
                                     for(var i = 0; i < streamSources.length; i++) {
                                         streamSources[i].link=ASP.wrap(streamSources[i].link);
                                         var option = new Option(streamSources[i].qual, i);

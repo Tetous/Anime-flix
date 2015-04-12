@@ -377,7 +377,7 @@ function getChapterCount($mangaUrl)
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+        //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
         $foutput = curl_exec($ch);
 
         $startIndex = strpos($foutput, '<ul class="mangadata">');
@@ -835,12 +835,13 @@ function getAnimeKissList()
 {
     global $ch;
     $ch =  curl_init();
+    //curl_setopt($ch, CURLINFO_HEADER_OUT, true);
     curl_setopt($ch, CURLOPT_URL, 'http://kissanime.com/AnimeList');
     //return the transfer as a string 
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain', 'Accept-Encoding: '));
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: '));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/40.0.2214.115 Safari/537.36', 'Accept-Encoding: ','Cookie: cf_clearance=c5b737851c8096c3326057d16fb97b7f9ea7275a-1428246601-604800;'));
     curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
     // $output contains the output string 
@@ -855,6 +856,9 @@ function getAnimeKissList()
     {
         curl_setopt($ch, CURLOPT_URL, 'http://kissanime.com/AnimeList?page='.$pageIndex);
         $output = curl_exec($ch);
+        //echo curl_getinfo($ch, CURLINFO_HEADER_OUT );
+        //echo '~';
+        return $output;
         
         $startingIndex=strpos($output,'class="listing"');
         $endingIndex=$startingIndex;
@@ -892,6 +896,7 @@ function getAnimeKissList()
         }
         $pageIndex++;
         $nextIndex=  strpos($output, ' Next </a>');
+        return "failed";
     }
     $ledgerJson='{"sub":[';
     //add subed

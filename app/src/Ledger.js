@@ -352,7 +352,14 @@ define(function (require, exports, module)
                             done = true;
                         };
                     };
-                    workingTitle = trimTitle(workingTitle);
+                    if(dub)
+                    {
+                        done=true;
+                    }
+                    else
+                    {
+                        workingTitle = trimTitle(workingTitle);
+                    }
                 };
             };
         //}
