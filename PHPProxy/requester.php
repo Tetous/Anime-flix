@@ -66,22 +66,22 @@ switch ($_GET["m"])
         echo str_replace('utf-8', 'UTF-8', $out);
         break;
     case 'update':
-        $out = changeListItem(htmlspecialchars($_POST["data"]), $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = changeListItem($_POST["data"],'anime', $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
     case 'add':
-        $out = addListItem(htmlspecialchars($_POST["data"]), $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = addListItem($_POST["data"],'anime', $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
     case 'updatem':
-        $out = changeMangaListItem(htmlspecialchars($_POST["data"]), $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = changeListItem($_POST["data"],'manga', $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
     case 'addm':
-        $out = addMangaListItem(htmlspecialchars($_POST["data"]), $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
+        $out = addListItem($_POST["data"],'manga', $_GET['i'], htmlspecialchars($_POST["u"]), htmlspecialchars($_POST["p"]));
         header('Content-Length: ' . strlen($out));
         echo $out;
         break;
@@ -103,10 +103,22 @@ switch ($_GET["m"])
 function MALLogin($ch, $username, $password)
 {
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    curl_exec($ch);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    curl_exec($ch);
+    
+    
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/login.php');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
-    curl_setopt($ch, CURLOPT_POSTFIELDS, 'username=' . $username . '&password=' . $password . '&sublogin=+Login+');
+    curl_setopt($ch, CURLOPT_POSTFIELDS, 'username=' . $username . '&password=' . $password . '&sublogin=Login&cookie=1&submit=1');
     curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
     curl_exec($ch);
@@ -157,7 +169,45 @@ function deleteListItem($id,$type, $username, $password)
     curl_close($ch);
     return $output;
 }
+function addListItem($body,$type, $id, $username, $password)
+{
+    global $ch;
 
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/add/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: application/x-www-form-urlencoded'));
+    $body=  str_replace('\\"', '"', $body);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    $output = curl_exec($ch);
+
+    curl_close($ch);
+    return $output;
+}
+function changeListItem($body,$type, $id, $username, $password)
+{
+    global $ch;
+
+    $ch = curl_init();
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
+    curl_setopt($ch, CURLOPT_POST, 1);
+    curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
+    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/update/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: application/x-www-form-urlencoded'));
+    $body=  str_replace('\\"', '"', $body);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
+    $output = curl_exec($ch);
+
+    curl_close($ch);
+    return $output;
+}
+/*
 function addListItem($body, $id, $username, $password)
 {
     global $ch;
@@ -194,7 +244,7 @@ function changeListItem($body, $id, $username, $password)
     curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/editlist.php?type=anime&id=' . $id);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: application/x-www-form-urlencoded'));
     $body = str_replace("&amp;", "&", $body);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
     $output = curl_exec($ch);
@@ -204,6 +254,7 @@ function changeListItem($body, $id, $username, $password)
     curl_close($ch);
     return $output;
 }
+*/
 
 function addMangaListItem($body, $id, $username, $password)
 {
@@ -362,7 +413,7 @@ function getChapterCount($mangaUrl)
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+        //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
         $foutput = curl_exec($ch);
 
         $startIndex = strpos($foutput, '<ul class="mangadata">');
@@ -414,7 +465,7 @@ function getMangaPages($mangaUrl, $chapter)
         curl_setopt($ch, CURLOPT_URL, $url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+        //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
         $foutput = curl_exec($ch);
 
         $startIndex = strpos($foutput, '<ul class="mangadata">');
@@ -444,7 +495,7 @@ function getMangaPages($mangaUrl, $chapter)
     curl_setopt($ch, CURLOPT_URL, $chapterLink);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
-    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
     $output = curl_exec($ch);
 
@@ -460,7 +511,7 @@ function getMangaPages($mangaUrl, $chapter)
         curl_setopt($ch, CURLOPT_URL, 'http://www.mangachapter.me' . $link);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain,text/xml'));
-        curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+        //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
         $pagePage = curl_exec($ch);
         //echo $pagePage;
@@ -657,8 +708,12 @@ function getMALList($user, $type)
 {
     global $ch;
     $ch = curl_init();
+    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    //curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/malappinfo.php?u=' . $user . '&status=all&type=' . $type);
+    //curl_exec($ch);
+    
     curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/malappinfo.php?u=' . $user . '&status=all&type=' . $type);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: xml', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
     $output = curl_exec($ch);
@@ -741,7 +796,7 @@ function getMangaList()
 
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-type: text/plain', 'Accept-Encoding: '));
 
-    curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
+    //curl_setopt($ch, CURLOPT_HEADERFUNCTION, 'setCookies');
 
     // $output contains the output string 
     //$output = curl_exec($ch); 
@@ -892,7 +947,6 @@ function getEpisodeCount($paramShowUrl, $title)
                     }
                 }
             }
-
             $searchIndex = strpos($output, '<a href="', $searchIndex) + 9;
             $loopCount++;
         }

@@ -40,7 +40,7 @@ function updateAnime(listData, callBack)
             }
         };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createUpdateBody(listData)));
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + (createUpdateBody(listData)));
     }
     else
     {
@@ -53,13 +53,14 @@ function updateAnime(listData, callBack)
                 {
                     if(callBack)
                     {
+                        listData.localConstruction=undefined;
                         callBack(request.response);
                     }
                 }
             }
         };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createAddBody(listData)));
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + (createUpdateBody(listData)));
     }
 }
 function updateManga(listData, callBack)
@@ -67,7 +68,7 @@ function updateManga(listData, callBack)
     var request = new XMLHttpRequest();
     if(listData.localConstruction == undefined)
     {
-        request.open('post', 'http://anime-flix.com/requester.php?m=updatem&i=' + listData.my_id);
+        request.open('post', 'http://anime-flix.com/requester.php?m=updatem&i=' + listData.series_mangadb_id);
         request.onreadystatechange = function ()
         {
             if(request.readyState == 4)
@@ -82,7 +83,7 @@ function updateManga(listData, callBack)
             }
         };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createMangaUpdateBody(listData)));
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + (createMangaUpdateBody(listData)));
     }
     else
     {
@@ -95,13 +96,14 @@ function updateManga(listData, callBack)
                 {
                     if(callBack)
                     {
+                        listData.localConstruction=undefined;
                         callBack(request.response);
                     }
                 }
             }
         };
         request.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + encodeURIComponent(createMangaAddBody(listData)));
+        request.send('u=' + sessionStorage.username + '&p=' + sessionStorage.password + '&data=' + (createMangaUpdateBody(listData)));
     }
 }
 function deleteListItem(id,type, callBack)
@@ -137,6 +139,7 @@ function getDiscussionURL(episode, showId)
 
 function createMangaUpdateBody(listData)
 {
+    /*
     var ret = 'entry_id=' +listData.my_id +
             '&manga_id=' + listData.series_mangadb_id +
             '&anime_db_series_id=' + listData.series_animedb_id +
@@ -164,11 +167,39 @@ function createMangaUpdateBody(listData)
     {
         ret += '&unknownEnd=1';
     }
+    */
+   var ret='data='+
+           '<?xml version="1.0" encoding="UTF-8"?><entry>'+
+                    '<chapter>'+listData.my_read_chapters+'</chapter>'+
+                    '<volume>'+listData.my_read_volumes+'</volume>'+
+                    '<status>'+listData.my_status+'</status>'+
+                    '<score>'+listData.my_score+'</score>'+/*
+                    '<downloaded_chapters></downloaded_chapters>'+
+                    '<times_reread></times_reread>'+
+                    '<reread_value></reread_value>'+*/
+                    '<date_start>';
+                    var split=listData.my_start_date.split('-');
+            ret+=split[1]+split[2]+split[0];
+            ret+='</date_start>'+
+                    '<date_finish>';
+                    var split=listData.my_finish_date.split('-');
+            ret+=split[1]+split[2]+split[0];
+                    ret+='</date_finish>'+/*
+                    '<priority></priority>'+
+                    '<enable_discussion></enable_discussion>'+
+                    '<enable_rereading></enable_rereading>'+
+                    '<comments></comments>'+
+                    '<scan_group></scan_group>'+
+                    '<tags></tags>'+
+                    '<retail_volumes></retail_volumes>'+*/
+                    '</entry>';
+   
     return ret;
 }
 
 function createUpdateBody(listData)
 {
+    /*
     var ret = 'series_id=' + listData.series_animedb_id +
             '&anime_db_series_id=' + listData.series_animedb_id +
             '&series_title=' + listData.series_animedb_id +
@@ -199,9 +230,38 @@ function createUpdateBody(listData)
     {
         ret += '&unknownEnd=1';
     }
+    */
+   var ret='data='+
+           '<?xml version="1.0" encoding="UTF-8"?><entry>'+
+                    '<episode>'+listData.my_watched_episodes+'</episode>'+
+                    '<status>'+listData.my_status+'</status>'+
+                    '<score>'+listData.my_score+'</score>'+
+                    /*
+                    '<downloaded_chapters></downloaded_chapters>'+
+                    '<times_reread></times_reread>'+
+                    '<reread_value></reread_value>'+
+                    */
+                    '<date_start>';
+                    var split=listData.my_start_date.split('-');
+            ret+=split[1]+split[2]+split[0];
+            ret+='</date_start>'+
+                    '<date_finish>';
+                    var split=listData.my_finish_date.split('-');
+            ret+=split[1]+split[2]+split[0];
+                    ret+='</date_finish>'+/*
+                    '<priority></priority>'+
+                    '<enable_discussion></enable_discussion>'+
+                    '<enable_rereading></enable_rereading>'+
+                    '<comments></comments>'+
+                    '<scan_group></scan_group>'+
+                    '<tags></tags>'+
+                    '<retail_volumes></retail_volumes></entry>'+*/
+                    '</entry>';
+   
+   
     return ret;
 }
-
+/*
 function createMangaAddBody(listData)
 {
     return 'entry_id=0 ' + // listData.series_animedb_id +
@@ -253,6 +313,7 @@ function createSeriesXML(listData)
             '<tags></tags>' +
             '</entry>';
 }
+*/
 /*
  function searchMAL(search)
  {
