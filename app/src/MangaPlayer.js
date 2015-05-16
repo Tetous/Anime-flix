@@ -75,6 +75,7 @@ define(function (require, exports, module)
                         }
                     }
 
+                    var chapterAtCallTime=readData.chapter;
                     if(readData.chapter < readData.manga.series_chapters)
                     {
                         if(chapters[readData.chapter + 1] == undefined)
@@ -82,7 +83,7 @@ define(function (require, exports, module)
                             chapters[readData.chapter + 1] = 'fetching';
                             getPages(ledgerItem, readData.chapter + 1, function (pages)
                             {
-                                chapters[readData.chapter + 1] = pages;
+                                chapters[chapterAtCallTime+1] = pages;
                             });
                         }
                     }
@@ -113,7 +114,7 @@ define(function (require, exports, module)
                             chapters[readData.chapter - 1] = 'fetching';
                             getPages(ledgerItem, readData.chapter - 1, function (pages)
                             {
-                                chapters[readData.chapter - 1] = pages;
+                                chapters[chapterAtCallTime - 1] = pages;
                             });
                         }
                     }
@@ -123,7 +124,7 @@ define(function (require, exports, module)
                         chapters[readData.chapter + 2] = 'fetching';
                         getPages(ledgerItem, readData.chapter + 2, function (pages)
                         {
-                            chapters[readData.chapter + 2] = pages;
+                            chapters[chapterAtCallTime + 2] = pages;
                         });
                     }
                     if(chapters[readData.chapter - 2] == undefined && readData.chapter > 2)
@@ -131,7 +132,7 @@ define(function (require, exports, module)
                         chapters[readData.chapter - 2] = 'fetching';
                         getPages(ledgerItem, readData.chapter - 2, function (pages)
                         {
-                            chapters[readData.chapter - 2] = pages;
+                            chapters[chapterAtCallTime - 2] = pages;
                         });
                     }
                     if(readData.chapter - 1 > readData.manga.my_read_chapters)
