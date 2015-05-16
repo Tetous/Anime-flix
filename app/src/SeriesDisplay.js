@@ -578,8 +578,8 @@ define(function (require, exports, module)
                         {
                             episodeDropdown.options.remove(0);
                         }
-                        ser.listData.series_episodes = episodeCounts[0] ? episodeCounts[0] : episodeCounts[1];
-                        if(ser.listData.series_episodes == 0)
+                        ser.listData.series_episodes = episodeCounts[0]>0 ? episodeCounts[0] : episodeCounts[1];
+                        if(ser.listData.series_episodes <1)
                         {
                             episodeDropdown.options.add(new Option('0'));
                         }
