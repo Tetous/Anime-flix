@@ -164,4 +164,8 @@
     <ledgerName>Tower of Druaga : The Sword of Uruk</ledgerName>
     <malName>Druaga no Tou: The Sword of Uruk</malName>
   </swap>
+<swap>
+    <ledgerName>Trinity Seven: 7-nin no Mahoutsukai</ledgerName>
+    <malName>Trinity Seven</malName>
+  </swap>
 </Root>

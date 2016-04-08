@@ -730,7 +730,7 @@ function getAnimePlusList($dub)
     // set url 
     if ($dub == 'true')
     {
-        curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.tv/dubbed-anime');
+        curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.eu/dubbed-anime');
     } else
     {
         curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-show-list');
@@ -760,7 +760,7 @@ function getAnimePlusMovieList($dub)
     // set url 
     if ($dub == 'true')
     {
-        curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.tv/movies');
+        curl_setopt($ch, CURLOPT_URL, 'http://www.animetoon.eu/movies');
     } else
     {
         curl_setopt($ch, CURLOPT_URL, 'http://www.animeplus.tv/anime-movies');

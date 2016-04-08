@@ -192,7 +192,7 @@ define(function (require, exports, module)
         var logoutButtonTransform = new StateModifier({
             origin: [1, 0],
             align: [1, 0],
-            transform: Transform.translate(-5, -5, 1)
+            transform: Transform.translate(-5, -5, 10)
         });
         var logoutButton = Surface({
             size: [100, 40],

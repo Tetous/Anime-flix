@@ -152,6 +152,7 @@ define(function (require, exports, module)
     }
     function getDubAnimeLedger()
     {
+        /*
         var url = "http://www.anime-flix.com/requester.php?m=ledger&d=true";
         var request = new XMLHttpRequest();
         request.onreadystatechange = function ()
@@ -173,9 +174,11 @@ define(function (require, exports, module)
         };
         request.open("GET", url, true);
         request.send();
+        */
     }
     function getDubMovieLedger()
     {
+        /*
         var url = "http://www.anime-flix.com/requester.php?m=movieLedger&d=true";
         var request = new XMLHttpRequest();
         request.onreadystatechange = function ()
@@ -197,6 +200,7 @@ define(function (require, exports, module)
         };
         request.open("GET", url, true);
         request.send();
+        */
     }
     function getMangaLedger()
     {

@@ -79,6 +79,7 @@ define(function (require, exports, module)
             });
         });
         var loginTransform = new StateModifier({
+            transform:Transform.translate(0,0,10),
             opacity: 0,
             origin: [0.5, 0.5],
             align: [0.5, 0.5]
