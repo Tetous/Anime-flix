@@ -44,9 +44,6 @@ While the default style guidelines are fairly strict, we are doing so with reaso
 
 While our Package Manager (which is currently in development) will enforce our style guide if you would like to publish a module, feel free to disable eslint or jscs as you see fit.  If you want to disable linting you will need to comment out lines 18 - 19 in ```grunt/aliases.js```
 
-## Contributing
-All contributions are welcome! The simplest way to show your support for this project is to **"star" it**.
-
 ##License
 ISC
 
