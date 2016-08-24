@@ -712,7 +712,7 @@ function getMALList($user, $type)
     //curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/malappinfo.php?u=' . $user . '&status=all&type=' . $type);
     //curl_exec($ch);
     
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/malappinfo.php?u=' . $user . '&status=all&type=' . $type);
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/malappinfo.php?u=' . $user . '&status=all&type=' . $type);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept: xml', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
 
