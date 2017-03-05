@@ -351,7 +351,8 @@ function searchMALAsync(search,type, callback)
             {
                 parser = new DOMParser();
                 var domObj = parser.parseFromString(cleanHTMLSpecialChars(request.response), "text/xml");
-                obj = XML2jsobj(domObj)[type];
+                obj = XML2jsobj(domObj);
+                obj = obj[type];
                 //obj = XML2jsobj(request.responseXML.documentElement);
                 callback(obj);
             }

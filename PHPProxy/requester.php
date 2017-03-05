@@ -162,7 +162,7 @@ function deleteListItem($id,$type, $username, $password)
     curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/delete/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/api/'.$type.'list/delete/' . $id . '.xml');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     $output = curl_exec($ch);
 
@@ -179,7 +179,7 @@ function addListItem($body,$type, $id, $username, $password)
     curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/add/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/api/'.$type.'list/add/' . $id . '.xml');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: application/x-www-form-urlencoded'));
     $body=  str_replace('\\"', '"', $body);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
@@ -198,7 +198,7 @@ function changeListItem($body,$type, $id, $username, $password)
     curl_setopt($ch, CURLINFO_HEADER_OUT, 1);
     curl_setopt($ch, CURLOPT_POST, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/'.$type.'list/update/' . $id . '.xml');
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/api/'.$type.'list/update/' . $id . '.xml');
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50','Content-Type: application/x-www-form-urlencoded'));
     $body=  str_replace('\\"', '"', $body);
     curl_setopt($ch, CURLOPT_POSTFIELDS, $body);
@@ -339,7 +339,7 @@ function getSearch($searchItem, $type, $username, $password)
     $ch = curl_init();
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/' . $type . '/search.xml?q=' . $replacedItem);
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/api/' . $type . '/search.xml?q=' . $replacedItem);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     $output = curl_exec($ch);
     // close curl resource to free up system resources 
@@ -695,7 +695,7 @@ function getStreamUrl($paramShowUrl, $title, $episode)
 function checkLogin($username, $password)
 {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, 'http://myanimelist.net/api/account/verify_credentials.xml');
+    curl_setopt($ch, CURLOPT_URL, 'https://myanimelist.net/api/account/verify_credentials.xml');
     curl_setopt($ch, CURLOPT_USERPWD, $username . ':' . $password);
     curl_setopt($ch, CURLOPT_HTTPHEADER, array('Accept-Encoding: ', 'User-Agent: api-indiv-D0DBACC0751B8D31B1580E361A75EF50'));
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
